@@ -3,9 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Nav() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50 border-b border-gray-200">
@@ -62,13 +64,21 @@ export default function Nav() {
           <div className="hidden md:flex items-center space-x-3">
             <Link
               href="/auth/login"
-              className="px-4 py-2 text-gray-700 hover:text-amber-600 transition-colors font-medium"
+              className={`px-6 py-2 rounded-lg transition-colors font-medium shadow-md hover:shadow-lg ${
+                pathname === "/auth/login"
+                  ? "bg-amber-700 text-white"
+                  : "text-black "
+              }`}
             >
               Login
             </Link>
             <Link
               href="/auth/register"
-              className="px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium shadow-md hover:shadow-lg"
+              className={`px-6 py-2 rounded-lg transition-colors font-medium shadow-md hover:shadow-lg ${
+                pathname === "/auth/register"
+                  ? "bg-amber-700 text-white"
+                  : " text-black"
+              }`}
             >
               Sign Up
             </Link>
@@ -141,14 +151,22 @@ export default function Nav() {
                 <Link
                   href="/auth/login"
                   onClick={() => setIsMenuOpen(false)}
-                  className="block px-4 py-3 text-gray-700 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors font-medium"
+                  className={`block px-4 py-3 rounded-lg transition-colors font-medium text-center ${
+                    pathname === "/auth/login"
+                      ? "bg-amber-700 text-white"
+                      : "bg-amber-600 text-white hover:bg-amber-700"
+                  }`}
                 >
                   Login
                 </Link>
                 <Link
                   href="/auth/register"
                   onClick={() => setIsMenuOpen(false)}
-                  className="block px-4 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium text-center"
+                  className={`block px-4 py-3 rounded-lg transition-colors font-medium text-center ${
+                    pathname === "/auth/register"
+                      ? "bg-amber-700 text-white"
+                      : "bg-amber-600 text-white hover:bg-amber-700"
+                  }`}
                 >
                   Sign Up
                 </Link>

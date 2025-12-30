@@ -1,0 +1,306 @@
+"use client";
+
+import Image from "next/image";
+import PageContainer from "@/compounents/PageContainer";
+import { useEffect, useState } from "react";
+
+export default function ProfilePage() {
+  const [isEditing, setIsEditing] = useState(false);
+  const [userData, setUserData] = useState({
+    name: "John Doe",
+    email: "john.doe@example.com",
+    phone: "+855 12 345 678",
+    membershipType: "Premium",
+    joinDate: "January 2024",
+    documentsViewed: 12,
+    videosWatched: 8,
+  });
+
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: "0px 0px -50px 0px",
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("animate-in");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    const checkAndAnimate = () => {
+      const animatedElements = document.querySelectorAll(
+        '.opacity-0[class*="delay"], .opacity-0.translate-y-8, .opacity-0.translate-y-4, .opacity-0.translate-x-8, .opacity-0.-translate-x-8'
+      );
+      animatedElements.forEach((el) => {
+        observer.observe(el);
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          setTimeout(() => {
+            el.classList.add("animate-in");
+          }, 50);
+        }
+      });
+    };
+
+    checkAndAnimate();
+    setTimeout(checkAndAnimate, 100);
+
+    return () => observer.disconnect();
+  }, []);
+
+  const handleSave = () => {
+    setIsEditing(false);
+    // Here you would typically save to an API
+  };
+
+  return (
+    <PageContainer>
+      {/* Hero Section */}
+      <section className="relative bg-slate-900 text-white py-20 overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/asset/aboutUs.png"
+            alt="Profile background"
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+            style={{ objectFit: 'cover' }}
+          />
+        </div>
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-linear-to-br from-slate-900/70 via-slate-900/60 to-slate-900/70 z-10"></div>
+        {/* Amber accent overlay */}
+        <div className="absolute inset-0 bg-linear-to-br from-amber-900/20 to-transparent z-10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
+          <div className="text-center">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 opacity-0 translate-y-8 delay-100">
+              My Profile
+            </h1>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto opacity-0 translate-y-8 delay-300">
+              Manage your account settings and preferences
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Profile Content */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Left Sidebar - Profile Card */}
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 sticky top-24 opacity-0 translate-y-8 delay-100">
+                <div className="text-center">
+                  {/* Avatar */}
+                  <div className="relative w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-4 border-amber-100">
+                    <div className="w-full h-full bg-amber-100 flex items-center justify-center">
+                      <span className="text-4xl font-bold text-amber-600">
+                        {userData.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                    {userData.name}
+                  </h2>
+                  <p className="text-gray-600 mb-4">{userData.email}</p>
+                  
+                  {/* Membership Badge */}
+                  <div className="inline-flex items-center px-4 py-2 bg-amber-100 text-amber-700 rounded-full font-semibold mb-6">
+                    <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    {userData.membershipType} Member
+                  </div>
+
+                  {/* Stats */}
+                  <div className="grid grid-cols-2 gap-4 mt-6">
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <p className="text-2xl font-bold text-gray-900">{userData.documentsViewed}</p>
+                      <p className="text-sm text-gray-600">Documents</p>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <p className="text-2xl font-bold text-gray-900">{userData.videosWatched}</p>
+                      <p className="text-sm text-gray-600">Videos</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Side - Main Content */}
+            <div className="lg:col-span-2 space-y-8">
+              {/* Personal Information */}
+              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 opacity-0 translate-y-8 delay-200">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-2xl font-bold text-gray-900">Personal Information</h3>
+                  {!isEditing ? (
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium"
+                    >
+                      Edit Profile
+                    </button>
+                  ) : (
+                    <div className="space-x-3">
+                      <button
+                        onClick={() => setIsEditing(false)}
+                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleSave}
+                        className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium"
+                      >
+                        Save Changes
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Full Name
+                    </label>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={userData.name}
+                        onChange={(e) => setUserData({ ...userData, name: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      />
+                    ) : (
+                      <p className="text-gray-900">{userData.name}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Email Address
+                    </label>
+                    {isEditing ? (
+                      <input
+                        type="email"
+                        value={userData.email}
+                        onChange={(e) => setUserData({ ...userData, email: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      />
+                    ) : (
+                      <p className="text-gray-900">{userData.email}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Phone Number
+                    </label>
+                    {isEditing ? (
+                      <input
+                        type="tel"
+                        value={userData.phone}
+                        onChange={(e) => setUserData({ ...userData, phone: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      />
+                    ) : (
+                      <p className="text-gray-900">{userData.phone}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Member Since
+                    </label>
+                    <p className="text-gray-900">{userData.joinDate}</p>
+                  </div>
+                </div>
+              </div>
+              {/* Activity History */}
+              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 opacity-0 translate-y-8 delay-400">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">Recent Activity</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-4 p-4 border-b border-gray-200">
+                    <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                      <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-900">Viewed: Cambodian Labor Law</p>
+                      <p className="text-sm text-gray-600">2 days ago</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4 p-4 border-b border-gray-200">
+                    <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                      <svg className="w-6 h-6 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-900">Watched: Introduction to Corporate Law</p>
+                      <p className="text-sm text-gray-600">5 days ago</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4 p-4">
+                    <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                      <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-900">Viewed: Land Law in Cambodia</p>
+                      <p className="text-sm text-gray-600">1 week ago</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Account Settings */}
+              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 opacity-0 translate-y-8 delay-500">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">Account Settings</h3>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-4 border-b border-gray-200">
+                    <div>
+                      <p className="font-semibold text-gray-900">Change Password</p>
+                      <p className="text-sm text-gray-600">Update your account password</p>
+                    </div>
+                    <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                      Change
+                    </button>
+                  </div>
+                  <div className="flex justify-between items-center p-4 border-b border-gray-200">
+                    <div>
+                      <p className="font-semibold text-gray-900">Email Notifications</p>
+                      <p className="text-sm text-gray-600">Receive updates via email</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" className="sr-only peer" defaultChecked />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                    </label>
+                  </div>
+                  <div className="flex justify-between items-center p-4">
+                    <div>
+                      <p className="font-semibold text-red-600">Delete Account</p>
+                      <p className="text-sm text-gray-600">Permanently delete your account</p>
+                    </div>
+                    <button className="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors font-medium">
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </PageContainer>
+  );
+}
+

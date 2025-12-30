@@ -72,12 +72,43 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }
 
 .animate-in {
   animation: fadeInUp 0.8s ease-out forwards;
+}
+
+/* Handle different animation directions based on initial transform */
+.opacity-0.translate-x-8.animate-in {
+  animation: slideInRight 0.8s ease-out forwards;
+}
+
+.opacity-0.-translate-x-8.animate-in {
+  animation: slideInLeft 0.8s ease-out forwards;
 }
 
 /* Ensure animated elements become visible */
@@ -87,9 +118,13 @@ h1, h2, h3, h4, h5, h6 {
 .animate-in.delay-300,
 .animate-in.delay-400,
 .animate-in.delay-500,
-.animate-in.delay-700 {
+.animate-in.delay-600,
+.animate-in.delay-700,
+.animate-in.delay-800,
+.animate-in.delay-900,
+.animate-in.delay-1000 {
   opacity: 1 !important;
-  transform: translateY(0) !important;
+  transform: translateY(0) translateX(0) !important;
 }
 
 .animate-in.delay-100 {
@@ -112,6 +147,22 @@ h1, h2, h3, h4, h5, h6 {
   animation-delay: 0.5s;
 }
 
+.animate-in.delay-600 {
+  animation-delay: 0.6s;
+}
+
 .animate-in.delay-700 {
   animation-delay: 0.7s;
+}
+
+.animate-in.delay-800 {
+  animation-delay: 0.8s;
+}
+
+.animate-in.delay-900 {
+  animation-delay: 0.9s;
+}
+
+.animate-in.delay-1000 {
+  animation-delay: 1s;
 }
