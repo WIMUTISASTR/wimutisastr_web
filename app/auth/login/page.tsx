@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { supabase } from "@/lib/supabase";
 import PageContainer from "@/compounents/PageContainer";
 import FormSection from "@/compounents/FormSection";
 import FormCard from "@/compounents/FormCard";
@@ -13,15 +16,41 @@ import Divider from "@/compounents/Divider";
 import FormLink from "@/compounents/FormLink";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login:", formData);
+    setLoading(true);
+
+    try {
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (signInError) {
+        toast.error(signInError.message || "Failed to sign in. Please check your credentials.");
+        setLoading(false);
+        return;
+      }
+
+      if (data.user) {
+        toast.success("Welcome back! Sign in successful.");
+        // Redirect to home page or profile page
+        setTimeout(() => {
+          router.push("/");
+          router.refresh();
+        }, 1000);
+      }
+    } catch (err) {
+      toast.error("An unexpected error occurred. Please try again.");
+      setLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,6 +78,7 @@ export default function LoginPage() {
               onChange={handleChange}
               required
               placeholder="your.email@example.com"
+              disabled={loading}
             />
 
             <Input
@@ -59,6 +89,7 @@ export default function LoginPage() {
               onChange={handleChange}
               required
               placeholder="Enter your password"
+              disabled={loading}
               rightElement={
                 <Link
                   href="#"
@@ -73,10 +104,11 @@ export default function LoginPage() {
               id="remember"
               name="remember"
               label="Remember me"
+              disabled={loading}
             />
 
-            <Button type="submit" fullWidth>
-              Sign In
+            <Button type="submit" fullWidth disabled={loading}>
+              {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
 

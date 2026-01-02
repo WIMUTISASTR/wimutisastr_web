@@ -1,20 +1,83 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { useAuth } from "@/lib/auth-context";
+import { supabase } from "@/lib/supabase";
 import PageContainer from "@/compounents/PageContainer";
 import { useEffect, useState } from "react";
 
 export default function ProfilePage() {
+  const router = useRouter();
+  const { user, loading: authLoading, signOut } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState({
-    name: "John Doe",
-    email: "john.doe@example.com",
-    phone: "+855 12 345 678",
-    membershipType: "Premium",
-    joinDate: "January 2024",
-    documentsViewed: 12,
-    videosWatched: 8,
+    name: "",
+    email: "",
+    phone: "",
+    membershipType: "Free",
+    joinDate: "",
+    documentsViewed: 0,
+    videosWatched: 0,
   });
+
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/auth/login");
+    }
+  }, [user, authLoading, router]);
+
+  // Fetch user data from Supabase
+  useEffect(() => {
+    if (user) {
+      const fetchUserData = async () => {
+        try {
+          // Get user metadata
+          const fullName = user.user_metadata?.full_name || "";
+          const phone = user.user_metadata?.phone || "";
+          const email = user.email || "";
+          
+          // Get join date from created_at
+          const joinDate = user.created_at 
+            ? new Date(user.created_at).toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long' 
+              })
+            : "";
+
+          // Check payment status
+          const paymentData = localStorage.getItem('payment_status');
+          const hasPaid = paymentData ? JSON.parse(paymentData).paid === true : false;
+          const membershipType = hasPaid ? "Premium" : "Free";
+
+          // TODO: Fetch actual documents viewed and videos watched from Supabase
+          // For now, using placeholder values
+          const documentsViewed = 0;
+          const videosWatched = 0;
+
+          setUserData({
+            name: fullName || email.split("@")[0],
+            email: email,
+            phone: phone,
+            membershipType: membershipType,
+            joinDate: joinDate,
+            documentsViewed: documentsViewed,
+            videosWatched: videosWatched,
+          });
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          toast.error("Failed to load profile data");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchUserData();
+    }
+  }, [user]);
 
   useEffect(() => {
     const observerOptions = {
@@ -52,10 +115,52 @@ export default function ProfilePage() {
     return () => observer.disconnect();
   }, []);
 
-  const handleSave = () => {
-    setIsEditing(false);
-    // Here you would typically save to an API
+  const handleSave = async () => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+      
+      // Update user metadata in Supabase
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: {
+          full_name: userData.name,
+          phone: userData.phone,
+        },
+      });
+
+      if (updateError) {
+        toast.error(updateError.message || "Failed to update profile");
+        setLoading(false);
+        return;
+      }
+
+      toast.success("Profile updated successfully!");
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast.error("An unexpected error occurred");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (authLoading || loading) {
+    return (
+      <PageContainer>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading profile...</p>
+          </div>
+        </div>
+      </PageContainer>
+    );
+  }
+
+  if (!user) {
+    return null; // Will redirect
+  }
 
   return (
     <PageContainer>
@@ -186,16 +291,8 @@ export default function ProfilePage() {
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                       Email Address
                     </label>
-                    {isEditing ? (
-                      <input
-                        type="email"
-                        value={userData.email}
-                        onChange={(e) => setUserData({ ...userData, email: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
-                      />
-                    ) : (
-                      <p className="text-gray-900">{userData.email}</p>
-                    )}
+                    <p className="text-gray-900">{userData.email}</p>
+                    <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
                   </div>
 
                   <div>
@@ -268,11 +365,17 @@ export default function ProfilePage() {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center p-4 border-b border-gray-200">
                     <div>
-                      <p className="font-semibold text-gray-900">Change Password</p>
-                      <p className="text-sm text-gray-600">Update your account password</p>
+                      <p className="font-semibold text-gray-900">Sign Out</p>
+                      <p className="text-sm text-gray-600">Sign out of your account</p>
                     </div>
-                    <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
-                      Change
+                    <button 
+                      onClick={async () => {
+                        await signOut();
+                        toast.success("Signed out successfully");
+                      }}
+                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                    >
+                      Sign Out
                     </button>
                   </div>
                   <div className="flex justify-between items-center p-4 border-b border-gray-200">

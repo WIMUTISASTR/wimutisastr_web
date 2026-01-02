@@ -97,7 +97,7 @@ export default function CourseDetailPage() {
               </svg>
               Back to Courses
             </Link>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 opacity-0 translate-y-8 delay-200">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 opacity-0 translate-y-8 delay-200 leading-tight line-clamp-2">
               {course.title}
             </h1>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto opacity-0 translate-y-8 delay-300">
@@ -110,65 +110,9 @@ export default function CourseDetailPage() {
       {/* Course Content */}
       <section className="py-20 px-2 sm:px-4 lg:px-6">
         <div className="max-w-7xl mx-auto">
-          {/* Course Info Card */}
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-8 opacity-0 translate-y-8 delay-100">
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="relative w-full md:w-80 h-48 rounded-lg overflow-hidden shrink-0">
-                <Image
-                  src={course.thumbnail}
-                  alt={course.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 320px"
-                />
-                <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                  <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center">
-                    <svg
-                      className="w-8 h-8 text-amber-600 ml-1"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-              <div className="flex-1">
-                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
-                  <span className="flex items-center">
-                    <svg className="w-4 h-4 mr-1 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    {course.author}
-                  </span>
-                  <span className="flex items-center">
-                    <svg className="w-4 h-4 mr-1 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    {course.year}
-                  </span>
-                  <span className="flex items-center">
-                    <svg className="w-4 h-4 mr-1 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
-                    </svg>
-                    {course.totalVideos} videos
-                  </span>
-                  <span className="flex items-center">
-                    <svg className="w-4 h-4 mr-1 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {course.totalDuration}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* Videos List */}
           <div className="space-y-0">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 opacity-0 translate-y-8 delay-200">
-              Course Videos
-            </h2>
             {course.videos.map((video, index) => (
               <div
                 key={video.id}
@@ -178,17 +122,17 @@ export default function CourseDetailPage() {
                 <div className="grid md:grid-cols-3 gap-8">
                   {/* Left Side - Video Thumbnail */}
                   <div className="flex justify-center md:justify-start">
-                    <div className="relative w-56 h-80 rounded-lg overflow-hidden shadow-lg border-2 border-amber-100 hover:border-amber-300 transition-all duration-300 hover:scale-105 group cursor-pointer">
+                    <div className="relative w-full md:w-96 aspect-video rounded-md overflow-hidden group cursor-pointer">
                       <Image
                         src={video.thumbnail}
                         alt={video.title}
                         fill
                         className="object-cover"
-                        sizes="(max-width: 768px) 100vw, 224px"
+                        sizes="(max-width: 768px) 100vw, 384px"
                       />
-                      {/* Play Button Overlay */}
-                      <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
-                        <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center group-hover:bg-white group-hover:scale-110 transition-all">
+                      {/* Play Button Overlay - YouTube style (appears on hover) */}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center">
+                        <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100 transition-all duration-200 shadow-lg">
                           <svg
                             className="w-8 h-8 text-amber-600 ml-1"
                             fill="currentColor"
@@ -198,8 +142,8 @@ export default function CourseDetailPage() {
                           </svg>
                         </div>
                       </div>
-                      {/* Duration Badge */}
-                      <div className="absolute bottom-2 right-2 bg-black/80 text-white px-2 py-1 rounded text-xs font-semibold">
+                      {/* Duration Badge - YouTube style */}
+                      <div className="absolute bottom-2 right-2 bg-black/80 text-white px-1.5 py-0.5 rounded text-xs font-medium">
                         {video.duration}
                       </div>
                     </div>
@@ -208,7 +152,7 @@ export default function CourseDetailPage() {
                   {/* Right Side - Video Details */}
                   <div className="md:col-span-2 flex flex-col justify-center space-y-4">
                     <div>
-                      <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                      <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 leading-tight line-clamp-2">
                         {index + 1}. {video.title}
                       </h3>
                       <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import Nav from "@/compounents/Nav";
 import Button from "@/compounents/Button";
 import { useEffect, useRef, useState } from "react";
@@ -58,11 +59,90 @@ function TypingText({ text, delay = 0, className = "" }: { text: string; delay?:
   );
 }
 
+const books = [
+  {
+    id: 1,
+    title: "Cambodian Labor Law",
+    description: "Comprehensive guide to labor laws and regulations in Cambodia, covering employment rights, workplace safety, and employee benefits.",
+    author: "Men Vuth",
+    year: 2024,
+    coverImage: "/sample_book/cover/book1.png",
+  },
+  {
+    id: 2,
+    title: "Land Law in Cambodia",
+    description: "Detailed explanation of land ownership, property rights, and real estate regulations in the Kingdom of Cambodia.",
+    author: "Men Vuth",
+    year: 2024,
+    coverImage: "/sample_book/cover/book1.png",
+  },
+  {
+    id: 3,
+    title: "Corporate Law Handbook",
+    description: "Essential guide for understanding corporate structures, business registration, and company law in Cambodia.",
+    author: "Men Vuth",
+    year: 2023,
+    coverImage: "/sample_book/cover/book1.png",
+  },
+  {
+    id: 4,
+    title: "Investment Protection Law",
+    description: "Complete reference on investment laws, foreign investment regulations, and protection mechanisms for investors.",
+    author: "Men Vuth",
+    year: 2024,
+    coverImage: "/sample_book/cover/book1.png",
+  },
+];
+
 export default function Home() {
+  const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
+  const [currentBookIndex, setCurrentBookIndex] = useState(0);
+  const [currentCourseIndex, setCurrentCourseIndex] = useState(0);
+  const [hasPaid, setHasPaid] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
   const partnersRef = useRef<HTMLDivElement>(null);
+
+  // Check payment status
+  useEffect(() => {
+    const checkPaymentStatus = () => {
+      try {
+        const paymentData = localStorage.getItem('payment_status');
+        if (paymentData) {
+          const parsed = JSON.parse(paymentData);
+          if (parsed.paid === true) {
+            setHasPaid(true);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking payment status:', error);
+      }
+    };
+
+    checkPaymentStatus();
+    // Listen for storage changes (when payment is completed in another tab)
+    window.addEventListener('storage', checkPaymentStatus);
+    return () => window.removeEventListener('storage', checkPaymentStatus);
+  }, []);
+
+  // Auto-slide carousel for books
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBookIndex((prevIndex) => (prevIndex + 1) % books.length);
+    }, 5000); // Change slide every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Auto-slide carousel for courses
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentCourseIndex((prevIndex) => (prevIndex + 1) % courses.length);
+    }, 5000); // Change slide every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     setIsVisible(true);
@@ -253,7 +333,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Videos Section */}
+      {/* Featured Videos Section - Carousel */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-linear-to-br from-slate-50 via-white to-amber-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 opacity-0 translate-y-8 delay-100">
@@ -265,98 +345,108 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="space-y-6 mb-12">
-            {courses.slice(0, 3).map((course, index) => (
-              <Link
-                key={course.id}
-                href={`/law_video/${course.id}`}
-                className="group block bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 opacity-0 translate-y-8"
-                style={{ animationDelay: `${(index + 1) * 100}ms` }}
+          {/* Carousel Container */}
+          <div className="relative mb-12">
+            <div className="relative overflow-hidden">
+              {/* Carousel Slides */}
+              <div 
+                className="flex transition-transform duration-700 ease-in-out"
+                style={{ transform: `translateX(-${currentCourseIndex * 100}%)` }}
               >
-                <div className="flex flex-col md:flex-row">
-                  {/* Course Thumbnail - Larger and more prominent */}
-                  <div className="relative w-full md:w-80 h-64 md:h-auto overflow-hidden bg-gray-900">
-                    <Image
-                      src={course.thumbnail}
-                      alt={course.title}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-700"
-                      sizes="(max-width: 768px) 100vw, 320px"
-                    />
-                    {/* Play Button Overlay */}
-                    <div className="absolute inset-0 bg-linear-to-br from-black/40 to-black/60 flex items-center justify-center group-hover:from-black/30 group-hover:to-black/50 transition-all duration-300">
-                      <div className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-2xl">
-                        <svg className="w-10 h-10 text-amber-600 ml-1" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                        </svg>
-                      </div>
-                    </div>
-                    {/* Badge */}
-                    <div className="absolute top-4 left-4 bg-amber-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
-                      {course.totalVideos} Videos
-                    </div>
-                    <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1.5 rounded-lg text-xs font-semibold backdrop-blur-sm">
-                      {course.totalDuration}
-                    </div>
-                  </div>
+                {courses.map((course) => (
+                  <div
+                    key={course.id}
+                    className="min-w-full"
+                  >
+                    <Link href={`/law_video/${course.id}`} className="block">
+                      <div className="grid md:grid-cols-3 gap-8 p-8 hover:bg-gray-50 transition-colors duration-200">
+                        {/* Left Side - Course Thumbnail */}
+                        <div className="flex justify-center md:justify-start">
+                          <div className="relative w-full md:w-96 aspect-video rounded-md overflow-hidden group cursor-pointer">
+                            <Image
+                              src={course.thumbnail}
+                              alt={course.title}
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 768px) 100vw, 384px"
+                            />
+                            {/* Play Button Overlay - YouTube style (appears on hover) */}
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center">
+                              <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100 transition-all duration-200 shadow-lg">
+                                <svg className="w-8 h-8 text-amber-600 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                                </svg>
+                              </div>
+                            </div>
+                            {/* Duration Badge - YouTube style */}
+                            <div className="absolute bottom-2 right-2 bg-black/80 text-white px-1.5 py-0.5 rounded text-xs font-medium">
+                              {course.totalDuration}
+                            </div>
+                          </div>
+                        </div>
 
-                  {/* Course Info - Better spacing and hierarchy */}
-                  <div className="flex-1 p-8 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center gap-3 mb-3">
-                        <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">
-                          {course.year}
-                        </span>
-                        <span className="text-sm text-gray-500 flex items-center">
-                          <svg className="w-4 h-4 mr-1 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                          </svg>
-                          {course.author}
-                        </span>
-                      </div>
-                      <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 group-hover:text-amber-600 transition-colors">
-                        {course.title}
-                      </h3>
-                      <p className="text-gray-600 text-base leading-relaxed mb-4 line-clamp-2">
-                        {course.description}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
-                        <span className="flex items-center gap-1">
-                          <svg className="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
-                          </svg>
-                          <span className="font-medium">Video Course</span>
-                        </span>
-                      </div>
-                      <div className="flex items-center text-amber-600 font-semibold group-hover:translate-x-2 transition-transform duration-300">
-                        <span className="mr-2">View Course</span>
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                        {/* Right Side - Course Details */}
+                        <div className="md:col-span-2 flex flex-col justify-center space-y-4">
+                          <div>
+                            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 leading-tight line-clamp-2">
+                              {course.title}
+                            </h2>
+                            <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
+                              <span className="flex items-center">
+                                <svg className="w-4 h-4 mr-1 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                {course.author}
+                              </span>
+                              <span className="flex items-center">
+                                <svg className="w-4 h-4 mr-1 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                {course.year}
+                              </span>
+                            </div>
+                          </div>
 
-          <div className="text-center opacity-0 translate-y-8 delay-400">
-            <Link href="/law_video">
-              <Button variant="outline" className="px-8 py-4 text-lg">
-                View All Video Courses
-                <svg className="w-5 h-5 ml-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Button>
-            </Link>
+                          <p className="text-gray-700 leading-relaxed">
+                            {course.description}
+                          </p>
+
+                          <div className="pt-2">
+                            <div className="inline-flex items-center px-6 py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1">
+                              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+                              </svg>
+                              View Course
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Navigation Dots */}
+            <div className="flex justify-center items-center gap-2 mt-8">
+              {courses.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentCourseIndex(index)}
+                  className={`transition-all duration-300 rounded-full ${
+                    index === currentCourseIndex
+                      ? 'w-12 h-3 bg-amber-600'
+                      : 'w-3 h-3 bg-gray-300 hover:bg-gray-400'
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Featured Books Section */}
+      {/* Featured Books Section - Carousel */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 opacity-0 translate-y-8 delay-100">
@@ -368,117 +458,113 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            {[
-              {
-                id: 1,
-                title: "Cambodian Labor Law",
-                author: "Men Vuth",
-                year: 2024,
-                coverImage: "/sample_book/cover/book1.png",
-              },
-              {
-                id: 2,
-                title: "Land Law in Cambodia",
-                author: "Men Vuth",
-                year: 2024,
-                coverImage: "/sample_book/cover/book1.png",
-              },
-              {
-                id: 3,
-                title: "Corporate Law Handbook",
-                author: "Men Vuth",
-                year: 2023,
-                coverImage: "/sample_book/cover/book1.png",
-              },
-              {
-                id: 4,
-                title: "Investment Protection Law",
-                author: "Men Vuth",
-                year: 2024,
-                coverImage: "/sample_book/cover/book1.png",
-              },
-            ].slice(0, 4).map((book, index) => (
-              <Link
-                key={book.id}
-                href="/law_documents"
-                className="group relative opacity-0 translate-y-8"
-                style={{ animationDelay: `${(index + 1) * 100}ms` }}
+          {/* Carousel Container */}
+          <div className="relative mb-12">
+            <div className="relative overflow-hidden">
+              {/* Carousel Slides */}
+              <div 
+                className="flex transition-transform duration-700 ease-in-out"
+                style={{ transform: `translateX(-${currentBookIndex * 100}%)` }}
               >
-                <div className="relative h-full">
-                  {/* 3D Book Effect Container */}
-                  <div className="relative" style={{ perspective: '1000px' }}>
-                    <div className="relative transform transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-2" style={{ transformStyle: 'preserve-3d' }}>
-                      {/* Book Shadow */}
-                      <div className="absolute inset-0 bg-black/20 rounded-lg blur-xl transform translate-y-4 group-hover:translate-y-6 group-hover:blur-2xl transition-all duration-500"></div>
-                      
-                      {/* Book Card */}
-                      <div className="relative bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden h-full flex flex-col group-hover:shadow-2xl transition-all duration-500">
-                        {/* Book Cover with 3D effect */}
-                        <div className="relative w-full h-96 overflow-hidden bg-linear-to-br from-amber-50 via-amber-100 to-yellow-50 p-6">
-                          <div className="relative w-full h-full">
-                            <div className="absolute inset-0 bg-linear-to-br from-amber-200/30 to-transparent"></div>
-                            <Image
-                              src={book.coverImage}
-                              alt={book.title}
-                              fill
-                              className="object-contain drop-shadow-2xl group-hover:scale-110 transition-transform duration-700"
-                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                            />
-                            {/* Decorative corner accent */}
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-linear-to-br from-amber-400/20 to-transparent rounded-bl-full"></div>
-                            <div className="absolute bottom-0 left-0 w-24 h-24 bg-linear-to-tr from-amber-400/20 to-transparent rounded-tr-full"></div>
-                          </div>
-                          {/* Hover overlay */}
-                          <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4">
-                            <div className="text-white">
-                              <svg className="w-8 h-8 mb-2 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                {books.map((book) => (
+                  <div
+                    key={book.id}
+                    className="min-w-full"
+                  >
+                    <div 
+                      className="grid md:grid-cols-3 gap-8 p-8 hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
+                      onClick={() => router.push(hasPaid ? "/law_documents" : "/pricing_page")}
+                    >
+                      {/* Left Side - Book Cover */}
+                      <div className="flex justify-center md:justify-start">
+                        <div className="relative w-56 h-80 rounded-lg overflow-hidden shadow-lg border-2 border-amber-100 hover:border-amber-300 transition-all duration-300 hover:scale-105">
+                          <Image
+                            src={book.coverImage}
+                            alt={book.title}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, 224px"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Right Side - Document Details */}
+                      <div className="md:col-span-2 flex flex-col justify-center space-y-4">
+                        <div>
+                          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                            {book.title}
+                          </h2>
+                          <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
+                            <span className="flex items-center">
+                              <svg className="w-4 h-4 mr-1 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                               </svg>
-                              <span className="text-sm font-semibold">View Document</span>
-                            </div>
+                              {book.author}
+                            </span>
+                            <span className="flex items-center">
+                              <svg className="w-4 h-4 mr-1 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                              {book.year}
+                            </span>
                           </div>
                         </div>
 
-                        {/* Book Info */}
-                        <div className="flex-1 p-6 flex flex-col justify-between bg-white">
-                          <div>
-                            <div className="flex items-center gap-2 mb-3">
-                              <span className="px-2.5 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">
-                                {book.year}
-                              </span>
-                            </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-amber-600 transition-colors line-clamp-2 min-h-14">
-                              {book.title}
-                            </h3>
-                          </div>
-                          <div className="pt-4 border-t border-gray-100">
-                            <div className="flex items-center text-sm text-gray-600">
-                              <svg className="w-4 h-4 mr-2 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        <p className="text-gray-700 leading-relaxed">
+                          {book.description}
+                        </p>
+
+                        <div className="pt-2">
+                          {hasPaid ? (
+                            <div
+                              className="inline-flex items-center px-6 py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push("/law_documents");
+                              }}
+                            >
+                              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                               </svg>
-                              <span className="font-medium">{book.author}</span>
+                              View Document
                             </div>
-                          </div>
+                          ) : (
+                            <div
+                              className="inline-flex items-center px-6 py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push("/pricing_page");
+                              }}
+                            >
+                              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                              </svg>
+                              Subscribe to Access
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                ))}
+              </div>
+            </div>
 
-          <div className="text-center opacity-0 translate-y-8 delay-500">
-            <Link href="/law_documents">
-              <Button variant="outline" className="px-8 py-4 text-lg">
-                View All Documents
-                <svg className="w-5 h-5 ml-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Button>
-            </Link>
+            {/* Navigation Dots */}
+            <div className="flex justify-center items-center gap-2 mt-8">
+              {books.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentBookIndex(index)}
+                  className={`transition-all duration-300 rounded-full ${
+                    index === currentBookIndex
+                      ? 'w-12 h-3 bg-amber-600'
+                      : 'w-3 h-3 bg-gray-300 hover:bg-gray-400'
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>

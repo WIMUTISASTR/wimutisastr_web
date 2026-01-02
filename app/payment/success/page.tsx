@@ -12,6 +12,19 @@ export default function PaymentSuccessPage() {
   const reference = searchParams.get("reference");
 
   useEffect(() => {
+    // Store payment status in localStorage
+    if (planId && reference) {
+      const paymentData = {
+        planId,
+        reference,
+        paid: true,
+        paidAt: Date.now(),
+      };
+      localStorage.setItem('payment_status', JSON.stringify(paymentData));
+    }
+  }, [planId, reference]);
+
+  useEffect(() => {
     const observerOptions = {
       threshold: 0.1,
       rootMargin: "0px 0px -50px 0px",

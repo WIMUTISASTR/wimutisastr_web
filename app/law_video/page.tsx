@@ -161,16 +161,17 @@ export default function LawVideoPage() {
                   <div className="p-6 border-b border-gray-200">
                     <div className="flex flex-col md:flex-row gap-6">
                       {/* Course Thumbnail */}
-                      <div className="relative w-full md:w-64 h-48 rounded-lg overflow-hidden shrink-0">
+                      <div className="relative w-full md:w-80 aspect-video rounded-md overflow-hidden shrink-0 group cursor-pointer">
                         <Image
                           src={course.thumbnail}
                           alt={course.title}
                           fill
                           className="object-cover"
-                          sizes="(max-width: 768px) 100vw, 256px"
+                          sizes="(max-width: 768px) 100vw, 320px"
                         />
-                        <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                          <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center">
+                        {/* Play Button Overlay - YouTube style (appears on hover) */}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center">
+                          <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100 transition-all duration-200 shadow-lg">
                             <svg
                               className="w-8 h-8 text-amber-600 ml-1"
                               fill="currentColor"
@@ -180,11 +181,15 @@ export default function LawVideoPage() {
                             </svg>
                           </div>
                         </div>
+                        {/* Duration Badge - YouTube style */}
+                        <div className="absolute bottom-2 right-2 bg-black/80 text-white px-1.5 py-0.5 rounded text-xs font-medium">
+                          {course.totalDuration}
+                        </div>
                       </div>
 
                       {/* Course Info */}
                       <div className="flex-1">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 leading-tight line-clamp-2">
                           {course.title}
                         </h2>
                         <p className="text-gray-600 mb-4">

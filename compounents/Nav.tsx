@@ -4,10 +4,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
 
 export default function Nav() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { user, loading } = useAuth();
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50 border-b border-gray-200">
@@ -62,26 +64,50 @@ export default function Nav() {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-3">
-            <Link
-              href="/auth/login"
-              className={`px-6 py-2 rounded-lg transition-colors font-medium shadow-md hover:shadow-lg ${
-                pathname === "/auth/login"
-                  ? "bg-amber-700 text-white"
-                  : "text-black "
-              }`}
-            >
-              Login
-            </Link>
-            <Link
-              href="/auth/register"
-              className={`px-6 py-2 rounded-lg transition-colors font-medium shadow-md hover:shadow-lg ${
-                pathname === "/auth/register"
-                  ? "bg-amber-700 text-white"
-                  : " text-black"
-              }`}
-            >
-              Sign Up
-            </Link>
+            {!loading && (
+              <>
+                {user ? (
+                  <Link
+                    href="/profile_page"
+                    className={`px-5 py-2.5 rounded-lg transition-all duration-200 font-semibold text-sm shadow-md hover:shadow-lg ${
+                      pathname === "/profile_page"
+                        ? "bg-amber-600 text-white shadow-lg"
+                        : "bg-amber-600 text-white hover:bg-amber-700"
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      <span>Profile</span>
+                    </div>
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      href="/auth/login"
+                      className={`px-5 py-2.5 rounded-lg transition-all duration-200 font-semibold text-sm ${
+                        pathname === "/auth/login"
+                          ? "bg-amber-600 text-white shadow-lg"
+                          : "text-gray-700 hover:text-amber-600 hover:bg-amber-50 border border-gray-200 hover:border-amber-300"
+                      }`}
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      href="/auth/register"
+                      className={`px-5 py-2.5 rounded-lg transition-all duration-200 font-semibold text-sm shadow-md hover:shadow-lg ${
+                        pathname === "/auth/register"
+                          ? "bg-amber-600 text-white shadow-lg"
+                          : "bg-amber-600 text-white hover:bg-amber-700"
+                      }`}
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                )}
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -147,29 +173,54 @@ export default function Nav() {
               >
                 About Us
               </Link>
-              <div className="pt-2 border-t border-gray-200 mt-2 space-y-1">
-                <Link
-                  href="/auth/login"
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`block px-4 py-3 rounded-lg transition-colors font-medium text-center ${
-                    pathname === "/auth/login"
-                      ? "bg-amber-700 text-white"
-                      : "bg-amber-600 text-white hover:bg-amber-700"
-                  }`}
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/auth/register"
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`block px-4 py-3 rounded-lg transition-colors font-medium text-center ${
-                    pathname === "/auth/register"
-                      ? "bg-amber-700 text-white"
-                      : "bg-amber-600 text-white hover:bg-amber-700"
-                  }`}
-                >
-                  Sign Up
-                </Link>
+              <div className="pt-2 border-t border-gray-200 mt-2 space-y-2">
+                {!loading && (
+                  <>
+                    {user ? (
+                      <Link
+                        href="/profile_page"
+                        onClick={() => setIsMenuOpen(false)}
+                        className={`block px-4 py-3 rounded-lg transition-all duration-200 font-semibold text-center shadow-md hover:shadow-lg ${
+                          pathname === "/profile_page"
+                            ? "bg-amber-600 text-white"
+                            : "bg-amber-600 text-white hover:bg-amber-700"
+                        }`}
+                      >
+                        <div className="flex items-center justify-center space-x-2">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                          <span>Profile</span>
+                        </div>
+                      </Link>
+                    ) : (
+                      <>
+                        <Link
+                          href="/auth/login"
+                          onClick={() => setIsMenuOpen(false)}
+                          className={`block px-4 py-3 rounded-lg transition-all duration-200 font-semibold text-center ${
+                            pathname === "/auth/login"
+                              ? "bg-amber-600 text-white shadow-md"
+                              : "text-gray-700 hover:text-amber-600 hover:bg-amber-50 border border-gray-200 hover:border-amber-300"
+                          }`}
+                        >
+                          Login
+                        </Link>
+                        <Link
+                          href="/auth/register"
+                          onClick={() => setIsMenuOpen(false)}
+                          className={`block px-4 py-3 rounded-lg transition-all duration-200 font-semibold text-center shadow-md hover:shadow-lg ${
+                            pathname === "/auth/register"
+                              ? "bg-amber-600 text-white"
+                              : "bg-amber-600 text-white hover:bg-amber-700"
+                          }`}
+                        >
+                          Sign Up
+                        </Link>
+                      </>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           </div>

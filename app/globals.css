@@ -9,7 +9,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-display: var(--font-playfair);
-  --font-sans: var(--font-inter);
+  --font-serif: var(--font-lora);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,14 +19,33 @@
   }
 }
 
+/* Apply serif font to all elements globally */
+*,
+*::before,
+*::after {
+  font-family: var(--font-lora), Georgia, "Times New Roman", serif !important;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-lora), Georgia, "Times New Roman", serif !important;
 }
 
+/* Headings use Playfair Display serif */
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-playfair), serif;
+  font-family: var(--font-playfair), Georgia, "Times New Roman", serif !important;
+}
+
+/* Ensure all text elements use serif */
+p, span, div, a, button, input, textarea, select, label, li, td, th {
+  font-family: var(--font-lora), Georgia, "Times New Roman", serif !important;
+}
+
+/* Override any Tailwind font utilities */
+.font-sans,
+.font-mono {
+  font-family: var(--font-lora), Georgia, "Times New Roman", serif !important;
 }
 
 /* Animations */
@@ -165,4 +184,13 @@ h1, h2, h3, h4, h5, h6 {
 
 .animate-in.delay-1000 {
   animation-delay: 1s;
+}
+
+/* React Toastify Custom Styles */
+.Toastify__toast {
+  font-family: var(--font-lora), Georgia, "Times New Roman", serif !important;
+}
+
+.Toastify__toast-body {
+  font-family: var(--font-lora), Georgia, "Times New Roman", serif !important;
 }

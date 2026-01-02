@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { supabase } from "@/lib/supabase";
 import PageContainer from "@/compounents/PageContainer";
 import FormSection from "@/compounents/FormSection";
 import FormCard from "@/compounents/FormCard";
@@ -12,6 +15,7 @@ import Divider from "@/compounents/Divider";
 import FormLink from "@/compounents/FormLink";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -24,24 +28,62 @@ export default function RegisterPage() {
     password?: string;
     confirmPassword?: string;
     agreeToTerms?: string;
+    general?: string;
   }>({});
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: typeof errors = {};
 
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
+      toast.error("Passwords do not match");
+    }
+    if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
+      toast.error("Password must be at least 8 characters");
     }
     if (!formData.agreeToTerms) {
       newErrors.agreeToTerms = "Please agree to the terms and conditions";
+      toast.error("Please agree to the terms and conditions");
     }
 
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      // Handle registration logic here
-      console.log("Register:", formData);
+      setLoading(true);
+      setErrors({});
+
+      try {
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            data: {
+              full_name: formData.fullName,
+            },
+          },
+        });
+
+        if (signUpError) {
+          toast.error(signUpError.message || "Failed to create account. Please try again.");
+          setLoading(false);
+          return;
+        }
+
+        if (data.user) {
+          toast.success("Account created successfully! Welcome!");
+          // Redirect to home page or show success message
+          setTimeout(() => {
+            router.push("/");
+            router.refresh();
+          }, 1000);
+        }
+      } catch (err) {
+        toast.error("An unexpected error occurred. Please try again.");
+        setLoading(false);
+      }
     }
   };
 
@@ -78,6 +120,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               required
               placeholder="John Doe"
+              disabled={loading}
             />
 
             <Input
@@ -88,6 +131,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               required
               placeholder="your.email@example.com"
+              disabled={loading}
             />
 
             <Input
@@ -100,6 +144,8 @@ export default function RegisterPage() {
               minLength={8}
               placeholder="At least 8 characters"
               helperText="Must be at least 8 characters long"
+              disabled={loading}
+              error={errors.password}
             />
 
             <Input
@@ -111,6 +157,7 @@ export default function RegisterPage() {
               required
               placeholder="Confirm your password"
               error={errors.confirmPassword}
+              disabled={loading}
             />
 
             <Checkbox
@@ -119,6 +166,7 @@ export default function RegisterPage() {
               checked={formData.agreeToTerms}
               onChange={handleChange}
               required
+              disabled={loading}
               label={
                 <>
                   I agree to the <FormLink href="#">Terms of Service</FormLink> and{" "}
@@ -130,8 +178,8 @@ export default function RegisterPage() {
               <p className="text-xs text-red-600">{errors.agreeToTerms}</p>
             )}
 
-            <Button type="submit" fullWidth>
-              Create Account
+            <Button type="submit" fullWidth disabled={loading}>
+              {loading ? "Creating account..." : "Create Account"}
             </Button>
           </form>
 
