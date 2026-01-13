@@ -93,7 +93,7 @@ export default function LoginPage() {
               rightElement={
                 <Link
                   href="#"
-                  className="text-sm text-amber-600 hover:text-amber-700 font-medium"
+                  className="text-sm text-[var(--brown-strong)] hover:text-[var(--brown)] font-medium"
                 >
                   Forgot password?
                 </Link>

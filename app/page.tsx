@@ -3,59 +3,51 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import Nav from "@/compounents/Nav";
+import PageContainer from "@/compounents/PageContainer";
 import Button from "@/compounents/Button";
 import { useEffect, useRef, useState } from "react";
 import { courses } from "./law_video/data";
 
-// Typing Animation Component
-function TypingText({ text, delay = 0, className = "" }: { text: string; delay?: number; className?: string }) {
-  const [displayedText, setDisplayedText] = useState("");
-  const [showCursor, setShowCursor] = useState(true);
+// Animated Counter Component
+function AnimatedCounter({ value, suffix = "+", duration = 2000 }: { value: number; suffix?: string; duration?: number }) {
+  const [count, setCount] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    let cursorInterval: NodeJS.Timeout;
-
-    // Start typing after delay
-    const startTyping = () => {
-      let currentIndex = 0;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+          let start = 0;
+          const end = value;
+          const increment = end / (duration / 16);
       
-      const typeChar = () => {
-        if (currentIndex < text.length) {
-          setDisplayedText(text.slice(0, currentIndex + 1));
-          currentIndex++;
-          timeoutId = setTimeout(typeChar, 100); // Typing speed: 100ms per character
+          const timer = setInterval(() => {
+            start += increment;
+            if (start >= end) {
+              setCount(end);
+              clearInterval(timer);
         } else {
-          // Stop cursor blinking after typing is complete
-          setTimeout(() => {
-            setShowCursor(false);
-          }, 500);
+              setCount(Math.floor(start));
+            }
+          }, 16);
         }
-      };
+      },
+      { threshold: 0.5 }
+    );
 
-      typeChar();
-    };
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
 
-    // Cursor blinking effect
-    cursorInterval = setInterval(() => {
-      setShowCursor((prev) => !prev);
-    }, 530);
-
-    const startTimeout = setTimeout(startTyping, delay);
-
-    return () => {
-      clearTimeout(startTimeout);
-      clearTimeout(timeoutId);
-      clearInterval(cursorInterval);
-    };
-  }, [text, delay]);
+    return () => observer.disconnect();
+  }, [value, duration, hasAnimated]);
 
   return (
-    <span className={className}>
-      {displayedText}
-      {showCursor && <span className="ml-1 animate-pulse">|</span>}
-    </span>
+    <div ref={ref} className="text-5xl font-bold text-gray-900">
+      {count}{suffix}
+    </div>
   );
 }
 
@@ -100,9 +92,22 @@ export default function Home() {
   const [currentBookIndex, setCurrentBookIndex] = useState(0);
   const [currentCourseIndex, setCurrentCourseIndex] = useState(0);
   const [hasPaid, setHasPaid] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
-  const partnersRef = useRef<HTMLDivElement>(null);
+  const statsRef = useRef<HTMLDivElement>(null);
+
+  // Mouse parallax effect
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({
+        x: (e.clientX / window.innerWidth - 0.5) * 20,
+        y: (e.clientY / window.innerHeight - 0.5) * 20,
+      });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
   // Check payment status
   useEffect(() => {
@@ -121,7 +126,6 @@ export default function Home() {
     };
 
     checkPaymentStatus();
-    // Listen for storage changes (when payment is completed in another tab)
     window.addEventListener('storage', checkPaymentStatus);
     return () => window.removeEventListener('storage', checkPaymentStatus);
   }, []);
@@ -130,8 +134,7 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentBookIndex((prevIndex) => (prevIndex + 1) % books.length);
-    }, 5000); // Change slide every 5 seconds
-
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -139,11 +142,11 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentCourseIndex((prevIndex) => (prevIndex + 1) % courses.length);
-    }, 5000); // Change slide every 5 seconds
-
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
+  // Scroll animations
   useEffect(() => {
     setIsVisible(true);
     
@@ -161,31 +164,9 @@ export default function Home() {
       });
     }, observerOptions);
 
-    // Observe sections and trigger animation for visible elements
-    const checkAndAnimate = () => {
-      // Observe sections
-      if (featuresRef.current) {
-        observer.observe(featuresRef.current);
-        // Check if already visible
-        const rect = featuresRef.current.getBoundingClientRect();
-        if (rect.top < window.innerHeight && rect.bottom > 0) {
-          featuresRef.current.classList.add("animate-in");
-        }
-      }
-      if (partnersRef.current) {
-        observer.observe(partnersRef.current);
-        // Check if already visible
-        const rect = partnersRef.current.getBoundingClientRect();
-        if (rect.top < window.innerHeight && rect.bottom > 0) {
-          partnersRef.current.classList.add("animate-in");
-        }
-      }
-
-      // Observe all elements with opacity-0 that need animation
-      const animatedElements = document.querySelectorAll('.opacity-0[class*="delay"], .opacity-0.translate-y-8, .opacity-0.translate-y-4');
+    const animatedElements = document.querySelectorAll('.scroll-animate');
       animatedElements.forEach((el) => {
         observer.observe(el);
-        // Check if already visible
         const rect = el.getBoundingClientRect();
         if (rect.top < window.innerHeight && rect.bottom > 0) {
           setTimeout(() => {
@@ -193,77 +174,116 @@ export default function Home() {
           }, 50);
         }
       });
-    };
-
-    // Run immediately and after a short delay
-    checkAndAnimate();
-    setTimeout(checkAndAnimate, 100);
 
     return () => observer.disconnect();
   }, []);
+
   return (
-    <div className="min-h-screen bg-white">
-      <Nav />
-      
-      {/* Hero Section - FORM KH Style */}
-      <section className="relative overflow-hidden bg-slate-900 text-white min-h-[85vh] flex items-center">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/asset/background.png"
-            alt="Background"
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
-            style={{ objectFit: 'cover' }}
+    <PageContainer>
+      {/* Modern Hero Section with Glassmorphism */}
+      <section 
+        ref={heroRef}
+        className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white min-h-screen flex items-center"
+      >
+        {/* Animated Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div 
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `radial-gradient(circle at ${50 + mousePosition.x * 0.1}% ${50 + mousePosition.y * 0.1}%, rgba(139, 111, 71, 0.3) 0%, transparent 50%)`,
+              transition: 'background-position 0.3s ease-out'
+            }}
           />
+          <div className="absolute inset-0 bg-[url('/asset/background.png')] bg-cover bg-center mix-blend-overlay opacity-20" />
         </div>
-        {/* Dark Overlay for text readability */}
-        <div className="absolute inset-0 bg-linear-to-br from-slate-900/70 via-slate-900/60 to-slate-900/70 z-10"></div>
-        {/* Amber accent overlay */}
-        <div className="absolute inset-0 bg-linear-to-br from-amber-900/20 to-transparent z-10"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 w-full z-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+
+        {/* Floating Law Icons */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div 
+            className="absolute top-20 left-10 w-32 h-32 opacity-20 animate-float"
+            style={{ transform: `translate(${mousePosition.x * 0.5}px, ${mousePosition.y * 0.5}px)` }}
+          >
+            <svg viewBox="0 0 100 100" className="w-full h-full text-[var(--brown)]">
+              <path d="M50 10 L60 40 L90 40 L65 60 L75 90 L50 70 L25 90 L35 60 L10 40 L40 40 Z" fill="currentColor" />
+            </svg>
+          </div>
+          <div 
+            className="absolute bottom-20 right-10 w-24 h-24 opacity-15 animate-float"
+            style={{ 
+              animationDelay: '2s',
+              transform: `translate(${-mousePosition.x * 0.3}px, ${-mousePosition.y * 0.3}px)` 
+            }}
+          >
+            <svg viewBox="0 0 100 100" className="w-full h-full text-white">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="3" />
+              <path d="M30 50 L45 65 L70 35" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 w-full z-20">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left Side - Text Content */}
             <div 
-              ref={heroRef}
-              className={`space-y-6 transition-all duration-1000 ${
+              className={`space-y-8 transition-all duration-1000 ${
                 isVisible 
                   ? "opacity-100 translate-x-0" 
                   : "opacity-0 -translate-x-10"
               }`}
             >
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
-                {isVisible && (
-                  <span className="inline-block">
-                    <TypingText 
-                      text="Learn Cambodian Law" 
-                      delay={300}
-                      className="text-white"
-                    />
+              <div className="inline-block">
+                <span className="px-4 py-2 bg-[var(--brown)]/20 backdrop-blur-sm border border-[var(--brown)]/30 rounded-full text-sm font-semibold text-[var(--brown)] animate-scale-in">
+                  ⚖️ Legal Education Platform
                   </span>
-                )}
+              </div>
+              
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight bg-gradient-to-r from-white via-gray-100 to-[var(--brown)] bg-clip-text text-transparent animate-gradient">
+                Master Cambodian Law
               </h1>
-              <p className={`text-lg sm:text-xl text-gray-300 leading-relaxed max-w-xl transition-all duration-700 delay-500 ${
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              }`}>
-                Instant access to expert legal education with zero barriers. Comprehensive videos and documents 
-                to master Cambodian law securely and efficiently.
+              
+              <p className="text-xl sm:text-2xl text-gray-300 leading-relaxed max-w-2xl">
+                Transform your legal expertise with our comprehensive platform. Access expert-led video courses, 
+                detailed legal documents, and cutting-edge educational resources—all designed to elevate your understanding 
+                of Cambodian law.
               </p>
-              <div className={`transition-all duration-700 delay-700 ${
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              }`}>
-                <Link 
-                  href="/law_video"
-                  className="inline-block px-8 py-4 bg-white text-slate-900 rounded-lg font-semibold text-lg hover:bg-amber-50 transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 hover:scale-105"
+              
+              <div className="flex flex-wrap gap-4">
+                <Button
+                  onClick={() => router.push("/law_video")}
+                  variant="primary"
+                  className="px-8 py-4 text-lg group relative overflow-hidden"
                 >
-                  Start Learning Now
-                </Link>
+                  <span className="relative z-10">Start Learning Now</span>
+                  <span className="absolute inset-0 bg-gradient-to-r from-[var(--brown-strong)] to-[var(--brown)] opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Button>
+                <Button
+                  onClick={() => router.push("/pricing_page")}
+                  variant="outline"
+                  className="px-8 py-4 text-lg glass border-white/20 text-white hover:bg-white/10"
+                >
+                  View Pricing
+                </Button>
+              </div>
+
+              {/* Stats Preview */}
+              <div className="grid grid-cols-3 gap-6 pt-8 border-t border-white/10">
+                <div>
+                  <div className="text-3xl font-bold text-[var(--brown)]">{courses.length}</div>
+                  <div className="text-sm text-gray-400">Courses</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-[var(--brown)]">{courses.reduce((sum, c) => sum + c.totalVideos, 0)}+</div>
+                  <div className="text-sm text-gray-400">Videos</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-[var(--brown)]">{books.length}</div>
+                  <div className="text-sm text-gray-400">Documents</div>
+                </div>
               </div>
             </div>
 
-            {/* Right Side - Hero Logo */}
+            {/* Right Side - Hero Visual */}
             <div 
               className={`relative hidden lg:flex items-center justify-center transition-all duration-1000 delay-300 ${
                 isVisible 
@@ -271,12 +291,19 @@ export default function Home() {
                   : "opacity-0 translate-x-10"
               }`}
             >
-              <div className="relative w-full max-w-lg h-[500px] flex items-center justify-center animate-float">
+              <div 
+                className="relative w-full max-w-lg h-[600px] flex items-center justify-center"
+                style={{
+                  transform: `translate(${mousePosition.x * 0.1}px, ${mousePosition.y * 0.1}px) rotateY(${mousePosition.x * 0.05}deg) rotateX(${-mousePosition.y * 0.05}deg)`,
+                  transition: 'transform 0.3s ease-out'
+                }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-[var(--brown)]/20 to-transparent rounded-full blur-3xl animate-pulse-glow" />
                 <Image
                   src="/asset/hero.png"
-                  alt="Scales of Justice with Crown and Laurel Wreath"
+                  alt="Scales of Justice"
                   fill
-                  className="object-contain"
+                  className="object-contain relative z-10 animate-float"
                   priority
                   sizes="(max-width: 1024px) 0vw, 50vw"
                 />
@@ -284,61 +311,103 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <svg className="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+        </div>
       </section>
 
-      {/* Features Section - Simplified */}
-      <section ref={featuresRef} className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* Videos Feature */}
+      {/* Modern Features Section with 3D Cards */}
+      <section ref={featuresRef} className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
+        {/* Background Decoration */}
+        <div className="absolute top-0 left-0 w-full h-full opacity-5">
+          <div className="absolute top-20 left-10 w-96 h-96 bg-[var(--brown)] rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[var(--brown)] rounded-full blur-3xl" />
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-16 scroll-animate opacity-0 translate-y-8">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-4">
+              Everything You Need to <span className="text-[var(--brown)]">Excel</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Comprehensive legal education resources at your fingertips
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Video Feature Card */}
             <Link 
               href="/law_video"
-              className="group flex items-center space-x-6 p-8 rounded-xl border-2 border-gray-200 hover:border-amber-400 hover:shadow-xl transition-all duration-300 opacity-0 translate-y-8"
+              className="group card-3d scroll-animate opacity-0 translate-y-8 delay-100"
             >
-              <div className="shrink-0 w-16 h-16 bg-amber-100 rounded-lg flex items-center justify-center group-hover:bg-amber-500 transition-colors">
-                <svg className="w-8 h-8 text-amber-600 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 20 20">
+              <div className="relative h-full p-8 rounded-3xl bg-white border-2 border-gray-100 hover:border-[var(--brown)] transition-all duration-500 shadow-lg hover:shadow-2xl overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[var(--brown)]/10 to-transparent rounded-bl-full" />
+                <div className="relative z-10">
+                  <div className="w-16 h-16 bg-gradient-to-br from-[var(--brown)] to-[var(--brown-strong)] rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                    <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
                 </svg>
               </div>
-              <div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-amber-600 transition-colors">
-                  Educational Videos
+                  <h3 className="text-3xl font-bold text-gray-900 mb-3 group-hover:text-[var(--brown)] transition-colors">
+                    Video Courses
                 </h3>
-                <p className="text-gray-600">
-                  Learn from expert legal professionals through comprehensive video tutorials
-                </p>
+                  <p className="text-gray-600 text-lg leading-relaxed mb-6">
+                    Learn from expert legal professionals through comprehensive, professionally produced video tutorials 
+                    covering all aspects of Cambodian law.
+                  </p>
+                  <div className="flex items-center text-[var(--brown)] font-semibold group-hover:translate-x-2 transition-transform">
+                    Explore Courses
+                    <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
             </Link>
 
-            {/* Documents Feature */}
+            {/* Documents Feature Card */}
             <Link 
               href="/law_documents"
-              className="group flex items-center space-x-6 p-8 rounded-xl border-2 border-gray-200 hover:border-amber-400 hover:shadow-xl transition-all duration-300 opacity-0 translate-y-8 delay-200"
+              className="group card-3d scroll-animate opacity-0 translate-y-8 delay-200"
             >
-              <div className="shrink-0 w-16 h-16 bg-amber-100 rounded-lg flex items-center justify-center group-hover:bg-amber-500 transition-colors">
-                <svg className="w-8 h-8 text-amber-600 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="relative h-full p-8 rounded-3xl bg-white border-2 border-gray-100 hover:border-[var(--brown)] transition-all duration-500 shadow-lg hover:shadow-2xl overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[var(--brown)]/10 to-transparent rounded-bl-full" />
+                <div className="relative z-10">
+                  <div className="w-16 h-16 bg-gradient-to-br from-[var(--brown)] to-[var(--brown-strong)] rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-amber-600 transition-colors">
+                  <h3 className="text-3xl font-bold text-gray-900 mb-3 group-hover:text-[var(--brown)] transition-colors">
                   Legal Documents
                 </h3>
-                <p className="text-gray-600">
-                  Access comprehensive legal documents, statutes, and case studies
-                </p>
+                  <p className="text-gray-600 text-lg leading-relaxed mb-6">
+                    Access comprehensive legal documents, statutes, case studies, and reference materials 
+                    to deepen your understanding of Cambodian legal frameworks.
+                  </p>
+                  <div className="flex items-center text-[var(--brown)] font-semibold group-hover:translate-x-2 transition-transform">
+                    Browse Documents
+                    <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Featured Videos Section - Carousel */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-linear-to-br from-slate-50 via-white to-amber-50">
+      {/* Featured Courses Section - Modern Grid */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white relative">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16 opacity-0 translate-y-8 delay-100">
-            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
-              Featured Video Courses
+          <div className="text-center mb-16 scroll-animate opacity-0 translate-y-8">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-4">
+              Featured <span className="text-[var(--brown)]">Courses</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Explore our most popular legal education courses
@@ -347,95 +416,97 @@ export default function Home() {
 
           {/* Carousel Container */}
           <div className="relative mb-12">
-            <div className="relative overflow-hidden">
-              {/* Carousel Slides */}
+            <div className="relative overflow-hidden rounded-3xl">
               <div 
                 className="flex transition-transform duration-700 ease-in-out"
                 style={{ transform: `translateX(-${currentCourseIndex * 100}%)` }}
               >
                 {courses.map((course) => (
-                  <div
-                    key={course.id}
-                    className="min-w-full"
-                  >
+                  <div key={course.id} className="min-w-full">
                     <Link href={`/law_video/${course.id}`} className="block">
-                      <div className="grid md:grid-cols-3 gap-8 p-8 hover:bg-gray-50 transition-colors duration-200">
+                      <div className="grid md:grid-cols-2 gap-12 p-8 md:p-12 bg-gradient-to-br from-gray-50 to-white rounded-3xl hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-[var(--brown)]/30">
                         {/* Left Side - Course Thumbnail */}
-                        <div className="flex justify-center md:justify-start">
-                          <div className="relative w-full md:w-96 aspect-video rounded-md overflow-hidden group cursor-pointer">
-                            <Image
-                              src={course.thumbnail}
-                              alt={course.title}
-                              fill
-                              className="object-cover"
-                              sizes="(max-width: 768px) 100vw, 384px"
+                        <div className="relative group">
+                          <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl">
+                    <Image
+                      src={course.thumbnail}
+                      alt={course.title}
+                      fill
+                              className="object-cover group-hover:scale-110 transition-transform duration-500"
+                              sizes="(max-width: 768px) 100vw, 50vw"
                             />
-                            {/* Play Button Overlay - YouTube style (appears on hover) */}
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center">
-                              <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100 transition-all duration-200 shadow-lg">
-                                <svg className="w-8 h-8 text-amber-600 ml-1" fill="currentColor" viewBox="0 0 20 20">
-                                  <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                                </svg>
-                              </div>
-                            </div>
-                            {/* Duration Badge - YouTube style */}
-                            <div className="absolute bottom-2 right-2 bg-black/80 text-white px-1.5 py-0.5 rounded text-xs font-medium">
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                            <div className="absolute bottom-4 right-4 bg-black/80 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg text-sm font-semibold">
                               {course.totalDuration}
                             </div>
-                          </div>
-                        </div>
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
+                              <div className="w-20 h-20 bg-white/95 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100 transition-all duration-300 shadow-xl">
+                                <svg className="w-10 h-10 text-[var(--brown)] ml-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                        </svg>
+                      </div>
+                            </div>
+                    </div>
+                  </div>
 
                         {/* Right Side - Course Details */}
-                        <div className="md:col-span-2 flex flex-col justify-center space-y-4">
-                          <div>
-                            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 leading-tight line-clamp-2">
+                        <div className="flex flex-col justify-center space-y-6">
+                    <div>
+                            <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 leading-tight">
                               {course.title}
-                            </h2>
-                            <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
-                              <span className="flex items-center">
-                                <svg className="w-4 h-4 mr-1 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                                {course.author}
-                              </span>
-                              <span className="flex items-center">
-                                <svg className="w-4 h-4 mr-1 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            </h3>
+                            <div className="flex items-center space-x-6 text-gray-600 mb-4">
+                              <span className="flex items-center font-medium">
+                                <svg className="w-5 h-5 mr-2 text-[var(--brown)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                          {course.author}
+                        </span>
+                              <span className="flex items-center font-medium">
+                                <svg className="w-5 h-5 mr-2 text-[var(--brown)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                                 {course.year}
                               </span>
                             </div>
-                          </div>
-
-                          <p className="text-gray-700 leading-relaxed">
-                            {course.description}
-                          </p>
-
-                          <div className="pt-2">
-                            <div className="inline-flex items-center px-6 py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1">
-                              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
-                              </svg>
-                              View Course
-                            </div>
-                          </div>
-                        </div>
                       </div>
-                    </Link>
+
+                          <p className="text-gray-700 text-lg leading-relaxed">
+                        {course.description}
+                      </p>
+
+                          <div className="flex items-center gap-4 pt-4">
+                            <Button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(`/law_video/${course.id}`);
+                              }}
+                              variant="primary"
+                              className="px-8 py-4 text-lg"
+                            >
+                              Start Learning
+                            </Button>
+                            <div className="text-sm text-gray-600">
+                              <span className="font-semibold text-gray-900">{course.totalVideos}</span> videos
+                            </div>
+                    </div>
                   </div>
-                ))}
+                </div>
+              </Link>
+                  </div>
+            ))}
               </div>
-            </div>
+          </div>
 
             {/* Navigation Dots */}
-            <div className="flex justify-center items-center gap-2 mt-8">
+            <div className="flex justify-center items-center gap-3 mt-8">
               {courses.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentCourseIndex(index)}
                   className={`transition-all duration-300 rounded-full ${
                     index === currentCourseIndex
-                      ? 'w-12 h-3 bg-amber-600'
+                      ? 'w-12 h-3 bg-[var(--brown)] shadow-lg'
                       : 'w-3 h-3 bg-gray-300 hover:bg-gray-400'
                   }`}
                   aria-label={`Go to slide ${index + 1}`}
@@ -446,12 +517,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Books Section - Carousel */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      {/* Featured Documents Section - Modern Cards */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16 opacity-0 translate-y-8 delay-100">
-            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
-              Featured Legal Documents
+          <div className="text-center mb-16 scroll-animate opacity-0 translate-y-8">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-4">
+              Legal <span className="text-[var(--brown)]">Documents</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Access comprehensive legal documents and resources
@@ -460,49 +531,46 @@ export default function Home() {
 
           {/* Carousel Container */}
           <div className="relative mb-12">
-            <div className="relative overflow-hidden">
-              {/* Carousel Slides */}
+            <div className="relative overflow-hidden rounded-3xl">
               <div 
                 className="flex transition-transform duration-700 ease-in-out"
                 style={{ transform: `translateX(-${currentBookIndex * 100}%)` }}
               >
                 {books.map((book) => (
-                  <div
-                    key={book.id}
-                    className="min-w-full"
-                  >
+                  <div key={book.id} className="min-w-full">
                     <div 
-                      className="grid md:grid-cols-3 gap-8 p-8 hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
+                      className="grid md:grid-cols-2 gap-12 p-8 md:p-12 bg-white rounded-3xl hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-[var(--brown)]/30 cursor-pointer"
                       onClick={() => router.push(hasPaid ? "/law_documents" : "/pricing_page")}
                     >
                       {/* Left Side - Book Cover */}
-                      <div className="flex justify-center md:justify-start">
-                        <div className="relative w-56 h-80 rounded-lg overflow-hidden shadow-lg border-2 border-amber-100 hover:border-amber-300 transition-all duration-300 hover:scale-105">
-                          <Image
-                            src={book.coverImage}
-                            alt={book.title}
-                            fill
+                      <div className="relative group">
+                        <div className="relative w-full max-w-sm mx-auto aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl group-hover:scale-105 transition-transform duration-500">
+                            <Image
+                              src={book.coverImage}
+                              alt={book.title}
+                              fill
                             className="object-cover"
-                            sizes="(max-width: 768px) 100vw, 224px"
+                            sizes="(max-width: 768px) 100vw, 384px"
                           />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                         </div>
-                      </div>
+                        </div>
 
                       {/* Right Side - Document Details */}
-                      <div className="md:col-span-2 flex flex-col justify-center space-y-4">
-                        <div>
-                          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-                            {book.title}
-                          </h2>
-                          <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
-                            <span className="flex items-center">
-                              <svg className="w-4 h-4 mr-1 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="flex flex-col justify-center space-y-6">
+                          <div>
+                          <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+                              {book.title}
+                          </h3>
+                          <div className="flex items-center space-x-6 text-gray-600 mb-4">
+                            <span className="flex items-center font-medium">
+                              <svg className="w-5 h-5 mr-2 text-[var(--brown)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                               </svg>
                               {book.author}
                             </span>
-                            <span className="flex items-center">
-                              <svg className="w-4 h-4 mr-1 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <span className="flex items-center font-medium">
+                              <svg className="w-5 h-5 mr-2 text-[var(--brown)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                               </svg>
                               {book.year}
@@ -510,55 +578,51 @@ export default function Home() {
                           </div>
                         </div>
 
-                        <p className="text-gray-700 leading-relaxed">
+                        <p className="text-gray-700 text-lg leading-relaxed">
                           {book.description}
                         </p>
 
-                        <div className="pt-2">
+                        <div className="pt-4">
                           {hasPaid ? (
-                            <div
-                              className="inline-flex items-center px-6 py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+                            <Button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 router.push("/law_documents");
                               }}
+                              variant="primary"
+                              className="px-8 py-4 text-lg"
                             >
-                              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                              </svg>
                               View Document
-                            </div>
+                            </Button>
                           ) : (
-                            <div
-                              className="inline-flex items-center px-6 py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+                            <Button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 router.push("/pricing_page");
                               }}
+                              variant="primary"
+                              className="px-8 py-4 text-lg"
                             >
-                              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                              </svg>
                               Subscribe to Access
-                            </div>
+                            </Button>
                           )}
                         </div>
                       </div>
                     </div>
                   </div>
-                ))}
+            ))}
               </div>
-            </div>
+          </div>
 
             {/* Navigation Dots */}
-            <div className="flex justify-center items-center gap-2 mt-8">
+            <div className="flex justify-center items-center gap-3 mt-8">
               {books.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentBookIndex(index)}
                   className={`transition-all duration-300 rounded-full ${
                     index === currentBookIndex
-                      ? 'w-12 h-3 bg-amber-600'
+                      ? 'w-12 h-3 bg-[var(--brown)] shadow-lg'
                       : 'w-3 h-3 bg-gray-300 hover:bg-gray-400'
                   }`}
                   aria-label={`Go to slide ${index + 1}`}
@@ -569,9 +633,23 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Statistics Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-linear-to-br from-amber-50 to-amber-100">
-        <div className="max-w-7xl mx-auto">
+      {/* Statistics Section - Animated Counters */}
+      <section ref={statsRef} className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white relative overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('/asset/background.png')] bg-cover bg-center mix-blend-overlay" />
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-16 scroll-animate opacity-0 translate-y-8">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4">
+              Trusted by <span className="text-[var(--brown)]">Thousands</span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Join a growing community of legal professionals and students
+            </p>
+          </div>
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
               { label: "Video Courses", value: courses.length, icon: "M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" },
@@ -581,88 +659,65 @@ export default function Home() {
             ].map((stat, index) => (
               <div
                 key={stat.label}
-                className="text-center bg-white rounded-xl p-6 shadow-lg border border-amber-200 hover:shadow-xl transition-all duration-300 opacity-0 translate-y-8"
-                style={{ animationDelay: `${(index + 1) * 100}ms` }}
+                className="text-center bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 hover:bg-white/10 transition-all duration-300 scroll-animate opacity-0 translate-y-8"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-16 h-16 bg-gradient-to-br from-[var(--brown)] to-[var(--brown-strong)] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={stat.icon} />
                   </svg>
                 </div>
-                <div className="text-4xl font-bold text-gray-900 mb-2">{stat.value}+</div>
-                <div className="text-gray-600 font-medium">{stat.label}</div>
+                <AnimatedCounter value={stat.value} />
+                <div className="text-gray-300 font-medium mt-2">{stat.label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Trusted By Section - FORM KH Style */}
-      <section ref={partnersRef} className="py-16 px-4 sm:px-6 lg:px-8 bg-white border-t border-gray-200">
+      {/* Trusted By Section - Modern */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white border-t border-gray-200">
         <div className="max-w-7xl mx-auto">
-          <p className="text-center text-gray-600 mb-8 text-lg font-medium opacity-0 translate-y-4">
+          <p className="text-center text-gray-600 mb-12 text-lg font-medium scroll-animate opacity-0 translate-y-4">
             Trusted by legal professionals and institutions
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center">
-            {/* Placeholder for partner logos - You can replace these with actual logos */}
-            <div className="flex flex-col items-center space-y-2 p-4 rounded-lg hover:bg-gray-50 transition-all duration-300 hover:scale-110 opacity-0 translate-y-4">
-              <div className="w-16 h-16 bg-linear-to-br from-amber-400 to-yellow-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xs">LAW</span>
+            {[
+              { name: "Law School", abbrev: "LAW" },
+              { name: "Bar Association", abbrev: "BAR" },
+              { name: "Judicial Institute", abbrev: "JUD" },
+              { name: "Ministry", abbrev: "MIN" },
+              { name: "Legal Firm", abbrev: "LEG" },
+              { name: "Education", abbrev: "EDU" },
+            ].map((partner, index) => (
+              <div
+                key={partner.abbrev}
+                className="flex flex-col items-center space-y-3 p-6 rounded-2xl hover:bg-gray-50 transition-all duration-300 hover:scale-110 hover:shadow-lg scroll-animate opacity-0 translate-y-4"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className="w-20 h-20 rounded-2xl flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-700 ring-2 ring-[var(--brown)]/25 shadow-lg">
+                  <span className="text-white font-bold text-sm">{partner.abbrev}</span>
               </div>
-              <p className="text-xs text-gray-600 text-center font-medium">Law School</p>
-            </div>
-            
-            <div className="flex flex-col items-center space-y-2 p-4 rounded-lg hover:bg-gray-50 transition-all duration-300 hover:scale-110 opacity-0 translate-y-4 delay-100">
-              <div className="w-16 h-16 bg-linear-to-br from-amber-400 to-yellow-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xs">BAR</span>
+                <p className="text-xs text-gray-600 text-center font-medium">{partner.name}</p>
               </div>
-              <p className="text-xs text-gray-600 text-center font-medium">Bar Association</p>
-            </div>
-            
-            <div className="flex flex-col items-center space-y-2 p-4 rounded-lg hover:bg-gray-50 transition-all duration-300 hover:scale-110 opacity-0 translate-y-4 delay-200">
-              <div className="w-16 h-16 bg-linear-to-br from-amber-400 to-yellow-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xs">JUD</span>
-              </div>
-              <p className="text-xs text-gray-600 text-center font-medium">Judicial Institute</p>
-            </div>
-            
-            <div className="flex flex-col items-center space-y-2 p-4 rounded-lg hover:bg-gray-50 transition-all duration-300 hover:scale-110 opacity-0 translate-y-4 delay-300">
-              <div className="w-16 h-16 bg-linear-to-br from-amber-400 to-yellow-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xs">MIN</span>
-              </div>
-              <p className="text-xs text-gray-600 text-center font-medium">Ministry</p>
-            </div>
-            
-            <div className="flex flex-col items-center space-y-2 p-4 rounded-lg hover:bg-gray-50 transition-all duration-300 hover:scale-110 opacity-0 translate-y-4 delay-400">
-              <div className="w-16 h-16 bg-linear-to-br from-amber-400 to-yellow-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xs">LEG</span>
-              </div>
-              <p className="text-xs text-gray-600 text-center font-medium">Legal Firm</p>
-            </div>
-            
-            <div className="flex flex-col items-center space-y-2 p-4 rounded-lg hover:bg-gray-50 transition-all duration-300 hover:scale-110 opacity-0 translate-y-4 delay-500">
-              <div className="w-16 h-16 bg-linear-to-br from-amber-400 to-yellow-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xs">EDU</span>
-              </div>
-              <p className="text-xs text-gray-600 text-center font-medium">Education</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-12 px-4 sm:px-6 lg:px-8">
+      <footer className="bg-gray-900 text-gray-300 py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="grid sm:grid-cols-3 gap-8 mb-8">
+          <div className="grid sm:grid-cols-3 gap-12 mb-12">
             <div>
-              <h3 className="text-white font-bold text-lg mb-4">About Us</h3>
-              <Link href="/about_us" className="text-gray-400 hover:text-white transition-colors">
+              <h3 className="text-white font-bold text-xl mb-6">About Us</h3>
+              <Link href="/about_us" className="text-gray-400 hover:text-white transition-colors block mb-2">
                 Learn More
               </Link>
             </div>
             <div>
-              <h3 className="text-white font-bold text-lg mb-4">Resources</h3>
-              <div className="space-y-2">
+              <h3 className="text-white font-bold text-xl mb-6">Resources</h3>
+              <div className="space-y-3">
                 <Link href="/law_video" className="block text-gray-400 hover:text-white transition-colors">
                   Legal Videos
                 </Link>
@@ -672,8 +727,8 @@ export default function Home() {
               </div>
             </div>
             <div>
-              <h3 className="text-white font-bold text-lg mb-4">Account</h3>
-              <div className="space-y-2">
+              <h3 className="text-white font-bold text-xl mb-6">Account</h3>
+              <div className="space-y-3">
                 <Link href="/auth/login" className="block text-gray-400 hover:text-white transition-colors">
                   Login
                 </Link>
@@ -688,6 +743,6 @@ export default function Home() {
           </div>
         </div>
       </footer>
-    </div>
+    </PageContainer>
   );
 }

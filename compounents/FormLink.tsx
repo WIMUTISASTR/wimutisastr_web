@@ -11,7 +11,7 @@ export default function FormLink({ href, children, className = "" }: FormLinkPro
   return (
     <Link
       href={href}
-      className={`text-amber-600 hover:text-amber-700 font-semibold ${className}`}
+      className={`text-[var(--brown-strong)] hover:text-[var(--brown)] font-semibold underline-offset-4 hover:underline ${className}`}
     >
       {children}
     </Link>

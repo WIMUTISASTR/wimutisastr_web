@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import PageContainer from "@/compounents/PageContainer";
-import Link from "next/link";
+import Button from "@/compounents/Button";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 interface PricingPlan {
@@ -67,6 +68,7 @@ const pricingPlans: PricingPlan[] = [
 ];
 
 export default function PricingPage() {
+  const router = useRouter();
   useEffect(() => {
     const observerOptions = {
       threshold: 0.1,
@@ -120,9 +122,9 @@ export default function PricingPage() {
           />
         </div>
         {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-linear-to-br from-slate-900/70 via-slate-900/60 to-slate-900/70 z-10"></div>
-        {/* Amber accent overlay */}
-        <div className="absolute inset-0 bg-linear-to-br from-amber-900/20 to-transparent z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/70 via-slate-900/60 to-slate-900/70 z-10"></div>
+        {/* Subtle gold accent overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--brown-soft)] to-transparent z-10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
           <div className="text-center">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 opacity-0 translate-y-8 delay-100">
@@ -136,43 +138,46 @@ export default function PricingPage() {
       </section>
 
       {/* Pricing Plans */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-8">
+      <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
             {pricingPlans.map((plan, index) => (
               <div
                 key={plan.id}
-                className={`bg-white rounded-xl shadow-lg border-2 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 opacity-0 translate-y-8 ${
+                className={`relative rounded-2xl border border-[var(--border)] bg-[var(--surface-strong)] backdrop-blur-xl shadow-[var(--shadow-elev-1)] overflow-hidden transition-all duration-300 hover:shadow-[var(--shadow-elev-2)] hover:-translate-y-1 opacity-0 translate-y-8 ${
                   plan.popular
-                    ? "border-amber-500 scale-105"
-                    : "border-gray-200"
+                    ? "ring-2 ring-[rgb(var(--brown-rgb)/0.35)] md:scale-[1.03]"
+                    : ""
                 }`}
                 style={{ animationDelay: `${(index + 1) * 100}ms` }}
               >
-                {plan.popular && (
-                  <div className="bg-amber-600 text-white text-center py-2 text-sm font-semibold">
-                    Most Popular
-                  </div>
-                )}
                 <div className="p-8">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  {plan.popular && (
+                    <div className="absolute top-5 right-5">
+                      <span className="inline-flex items-center rounded-full bg-[rgb(var(--brown-rgb)/0.16)] text-[var(--brown-strong)] ring-1 ring-[rgb(var(--brown-rgb)/0.25)] px-3 py-1 text-xs font-semibold">
+                        Most popular
+                      </span>
+                    </div>
+                  )}
+
+                  <h3 className="text-2xl font-bold text-slate-900 mb-2">
                     {plan.name}
                   </h3>
-                  <p className="text-gray-600 mb-6">{plan.duration}</p>
-                  
+                  <p className="text-slate-600 mb-6">{plan.duration}</p>
+
                   <div className="mb-6">
-                    <div className="flex items-baseline">
-                      <span className="text-5xl font-bold text-gray-900">
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-5xl font-bold text-slate-900 tracking-tight">
                         ${plan.price}
                       </span>
                       {plan.originalPrice && (
-                        <span className="ml-3 text-xl text-gray-400 line-through">
+                        <span className="text-lg text-slate-400 line-through">
                           ${plan.originalPrice}
                         </span>
                       )}
                     </div>
                     {plan.discount && (
-                      <span className="inline-block mt-2 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">
+                      <span className="inline-flex mt-3 items-center px-3 py-1 bg-[var(--brown-soft)] text-[var(--brown-strong)] rounded-full text-sm font-semibold">
                         {plan.discount}
                       </span>
                     )}
@@ -186,7 +191,7 @@ export default function PricingPage() {
                         style={{ animationDelay: `${(index + 1) * 100 + (featureIndex + 1) * 50}ms` }}
                       >
                         <svg
-                          className="w-5 h-5 text-amber-600 mr-3 shrink-0 mt-0.5"
+                          className="w-5 h-5 text-[var(--brown-strong)] mr-3 shrink-0 mt-0.5"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -198,21 +203,19 @@ export default function PricingPage() {
                             d="M5 13l4 4L19 7"
                           />
                         </svg>
-                        <span className="text-gray-700">{feature}</span>
+                        <span className="text-slate-700">{feature}</span>
                       </li>
                     ))}
                   </ul>
 
-                  <Link
-                    href={`/payment?plan=${plan.id}`}
-                    className={`w-full block text-center px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
-                      plan.popular
-                        ? "bg-amber-600 text-white hover:bg-amber-700 shadow-md hover:shadow-lg"
-                        : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                    }`}
+                  <Button
+                    onClick={() => router.push(`/payment?plan=${plan.id}`)}
+                    variant={plan.popular ? "primary" : "outline"}
+                    fullWidth
+                    className="px-6 py-3"
                   >
                     Get Started
-                  </Link>
+                  </Button>
                 </div>
               </div>
             ))}
@@ -220,10 +223,10 @@ export default function PricingPage() {
 
           {/* Additional Info */}
           <div className="mt-16 text-center opacity-0 translate-y-8 delay-500">
-            <p className="text-gray-600 mb-4">
+            <p className="text-slate-700 mb-4">
               All plans include full access to our legal education platform
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-slate-500">
               Secure payment • Cancel anytime • 30-day money-back guarantee
             </p>
           </div>

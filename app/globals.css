@@ -1,51 +1,70 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Professional law office color system - traditional brown */
+  --paper: #fafafa;
+  --ink: #1a1a1a; /* Deep charcoal */
+  --ink-rgb: 26 26 26;
+  --brown: #8B6F47; /* Rich warm brown - primary accent */
+  --brown-rgb: 139 111 71;
+  --brown-strong: #6B5438; /* Darker brown for emphasis */
+  --brown-soft: rgba(139, 111, 71, 0.12); /* Subtle brown tint */
+  --border: rgba(26, 26, 26, 0.10);
+  --surface: rgba(255, 255, 255, 0.85);
+  --surface-strong: rgba(255, 255, 255, 0.95);
+
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --shadow-elev-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 10px 24px rgba(15, 23, 42, 0.06);
+  --shadow-elev-2: 0 2px 8px rgba(15, 23, 42, 0.10), 0 18px 40px rgba(15, 23, 42, 0.10);
+
+  --background: var(--paper);
+  --foreground: var(--ink);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-display: var(--font-playfair);
-  --font-serif: var(--font-lora);
-}
+/* Note: Tailwind v4 supports @theme, but some editors flag it as unknown.
+   We keep our tokens as plain CSS variables instead. */
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --paper: #0b1220;
+    --ink: #e5e7eb;
+    --ink-rgb: 229 231 235;
+    --border: rgba(226, 232, 240, 0.14);
+    --surface: rgba(2, 6, 23, 0.55);
+    --surface-strong: rgba(2, 6, 23, 0.72);
+    --background: var(--paper);
+    --foreground: var(--ink);
   }
 }
 
-/* Apply serif font to all elements globally */
-*,
-*::before,
-*::after {
-  font-family: var(--font-lora), Georgia, "Times New Roman", serif !important;
+html,
+body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(1100px circle at 16% -10%, var(--brown-soft), transparent 44%),
+    radial-gradient(900px circle at 85% -10%, rgba(26, 26, 26, 0.06), transparent 52%),
+    var(--background);
   color: var(--foreground);
-  font-family: var(--font-lora), Georgia, "Times New Roman", serif !important;
+  font-family: var(--font-body), system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  text-rendering: optimizeLegibility;
 }
 
-/* Headings use Playfair Display serif */
+::selection {
+  background: rgba(139, 111, 71, 0.25);
+}
+
+/* Headings use classic serif */
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-playfair), Georgia, "Times New Roman", serif !important;
+  font-family: var(--font-heading), Georgia, "Times New Roman", serif;
 }
 
-/* Ensure all text elements use serif */
-p, span, div, a, button, input, textarea, select, label, li, td, th {
-  font-family: var(--font-lora), Georgia, "Times New Roman", serif !important;
-}
-
-/* Override any Tailwind font utilities */
-.font-sans,
+/* Keep code-like content readable */
 .font-mono {
-  font-family: var(--font-lora), Georgia, "Times New Roman", serif !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 /* Animations */
@@ -186,11 +205,163 @@ p, span, div, a, button, input, textarea, select, label, li, td, th {
   animation-delay: 1s;
 }
 
+/* Modern Advanced Animations */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes rotate3d {
+  0%, 100% {
+    transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+  }
+  25% {
+    transform: perspective(1000px) rotateY(5deg) rotateX(2deg);
+  }
+  50% {
+    transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+  }
+  75% {
+    transform: perspective(1000px) rotateY(-5deg) rotateX(-2deg);
+  }
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(139, 111, 71, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(139, 111, 71, 0.6);
+  }
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes counterUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardHover {
+  0% {
+    transform: translateY(0) rotateX(0deg);
+  }
+  100% {
+    transform: translateY(-10px) rotateX(5deg);
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 3s infinite;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.6s ease-out forwards;
+}
+
+.animate-rotate-3d {
+  animation: rotate3d 20s ease-in-out infinite;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+.animate-slide-up-fade {
+  animation: slideUpFade 0.8s ease-out forwards;
+}
+
+/* Glassmorphism */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* 3D Card Effect */
+.card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.card-3d:hover {
+  transform: translateY(-12px) rotateX(2deg) rotateY(-2deg);
+}
+
+/* Parallax */
+.parallax-slow {
+  transition: transform 0.3s ease-out;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
 /* React Toastify Custom Styles */
 .Toastify__toast {
-  font-family: var(--font-lora), Georgia, "Times New Roman", serif !important;
+  font-family: var(--font-body), system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
 }
 
 .Toastify__toast-body {
-  font-family: var(--font-lora), Georgia, "Times New Roman", serif !important;
+  font-family: var(--font-body), system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
 }

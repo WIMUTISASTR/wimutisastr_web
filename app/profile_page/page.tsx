@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
 import PageContainer from "@/compounents/PageContainer";
+import Button from "@/compounents/Button";
 import { useEffect, useState } from "react";
 
 export default function ProfilePage() {
@@ -150,7 +151,7 @@ export default function ProfilePage() {
       <PageContainer>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--brown)] mx-auto mb-4"></div>
             <p className="text-gray-600">Loading profile...</p>
           </div>
         </div>
@@ -179,9 +180,9 @@ export default function ProfilePage() {
           />
         </div>
         {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-linear-to-br from-slate-900/70 via-slate-900/60 to-slate-900/70 z-10"></div>
-        {/* Amber accent overlay */}
-        <div className="absolute inset-0 bg-linear-to-br from-amber-900/20 to-transparent z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/70 via-slate-900/60 to-slate-900/70 z-10"></div>
+        {/* Subtle gold accent overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--brown-soft)] to-transparent z-10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
           <div className="text-center">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 opacity-0 translate-y-8 delay-100">
@@ -203,9 +204,9 @@ export default function ProfilePage() {
               <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 sticky top-24 opacity-0 translate-y-8 delay-100">
                 <div className="text-center">
                   {/* Avatar */}
-                  <div className="relative w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-4 border-amber-100">
-                    <div className="w-full h-full bg-amber-100 flex items-center justify-center">
-                      <span className="text-4xl font-bold text-amber-600">
+                  <div className="relative w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-4 border-[var(--brown)]/25">
+                    <div className="w-full h-full bg-[var(--brown-soft)] flex items-center justify-center">
+                      <span className="text-4xl font-bold text-[var(--brown-strong)]">
                         {userData.name.charAt(0).toUpperCase()}
                       </span>
                     </div>
@@ -217,7 +218,7 @@ export default function ProfilePage() {
                   <p className="text-gray-600 mb-4">{userData.email}</p>
                   
                   {/* Membership Badge */}
-                  <div className="inline-flex items-center px-4 py-2 bg-amber-100 text-amber-700 rounded-full font-semibold mb-6">
+                  <div className="inline-flex items-center px-4 py-2 bg-[var(--brown-soft)] text-[var(--brown-strong)] rounded-full font-semibold mb-6">
                     <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
@@ -246,26 +247,30 @@ export default function ProfilePage() {
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-2xl font-bold text-gray-900">Personal Information</h3>
                   {!isEditing ? (
-                    <button
+                    <Button
                       onClick={() => setIsEditing(true)}
-                      className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium"
+                      variant="primary"
+                      className="px-4 py-2 text-base"
                     >
                       Edit Profile
-                    </button>
+                    </Button>
                   ) : (
                     <div className="space-x-3">
-                      <button
+                      <Button
                         onClick={() => setIsEditing(false)}
-                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                        variant="outline"
+                        className="px-4 py-2 text-base"
                       >
                         Cancel
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={handleSave}
-                        className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium"
+                        variant="primary"
+                        className="px-4 py-2 text-base"
+                        disabled={loading}
                       >
-                        Save Changes
-                      </button>
+                        {loading ? "Saving..." : "Save Changes"}
+                      </Button>
                     </div>
                   )}
                 </div>
@@ -280,7 +285,7 @@ export default function ProfilePage() {
                         type="text"
                         value={userData.name}
                         onChange={(e) => setUserData({ ...userData, name: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--brown)]"
                       />
                     ) : (
                       <p className="text-gray-900">{userData.name}</p>
@@ -304,7 +309,7 @@ export default function ProfilePage() {
                         type="tel"
                         value={userData.phone}
                         onChange={(e) => setUserData({ ...userData, phone: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--brown)]"
                       />
                     ) : (
                       <p className="text-gray-900">{userData.phone}</p>
@@ -324,8 +329,8 @@ export default function ProfilePage() {
                 <h3 className="text-2xl font-bold text-gray-900 mb-6">Recent Activity</h3>
                 <div className="space-y-4">
                   <div className="flex items-center space-x-4 p-4 border-b border-gray-200">
-                    <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
-                      <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-12 h-12 bg-[var(--brown-soft)] rounded-lg flex items-center justify-center">
+                      <svg className="w-6 h-6 text-[var(--brown-strong)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
                     </div>
@@ -335,8 +340,8 @@ export default function ProfilePage() {
                     </div>
                   </div>
                   <div className="flex items-center space-x-4 p-4 border-b border-gray-200">
-                    <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
-                      <svg className="w-6 h-6 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                    <div className="w-12 h-12 bg-[var(--brown-soft)] rounded-lg flex items-center justify-center">
+                      <svg className="w-6 h-6 text-[var(--brown-strong)]" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
                       </svg>
                     </div>
@@ -346,8 +351,8 @@ export default function ProfilePage() {
                     </div>
                   </div>
                   <div className="flex items-center space-x-4 p-4">
-                    <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
-                      <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-12 h-12 bg-[var(--brown-soft)] rounded-lg flex items-center justify-center">
+                      <svg className="w-6 h-6 text-[var(--brown-strong)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
                     </div>
@@ -368,15 +373,16 @@ export default function ProfilePage() {
                       <p className="font-semibold text-gray-900">Sign Out</p>
                       <p className="text-sm text-gray-600">Sign out of your account</p>
                     </div>
-                    <button 
+                    <Button 
                       onClick={async () => {
                         await signOut();
                         toast.success("Signed out successfully");
                       }}
-                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                      variant="outline"
+                      className="px-4 py-2 text-base"
                     >
                       Sign Out
-                    </button>
+                    </Button>
                   </div>
                   <div className="flex justify-between items-center p-4 border-b border-gray-200">
                     <div>
@@ -385,7 +391,7 @@ export default function ProfilePage() {
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input type="checkbox" className="sr-only peer" defaultChecked />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[var(--brown)]/25 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--brown)]"></div>
                     </label>
                   </div>
                   <div className="flex justify-between items-center p-4">
@@ -393,9 +399,12 @@ export default function ProfilePage() {
                       <p className="font-semibold text-red-600">Delete Account</p>
                       <p className="text-sm text-gray-600">Permanently delete your account</p>
                     </div>
-                    <button className="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors font-medium">
+                    <Button 
+                      variant="outline"
+                      className="px-4 py-2 text-base border-red-300 text-red-600 hover:bg-red-50"
+                    >
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>

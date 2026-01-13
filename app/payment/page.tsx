@@ -2,10 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
 import PageContainer from "@/compounents/PageContainer";
+import Button from "@/compounents/Button";
 import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
+import { useAuth } from "@/lib/auth-context";
+import { supabase } from "@/lib/supabase";
+import { toast } from "react-toastify";
 
 interface PlanDetails {
   id: string;
@@ -41,16 +46,22 @@ const plans: Record<string, PlanDetails> = {
   },
 };
 
-export default function PaymentPage() {
+function PaymentPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
   const planId = searchParams.get("plan") || "monthly";
   const selectedPlan = plans[planId] || plans.monthly;
 
   const [paymentReference, setPaymentReference] = useState<string>("");
   const [qrData, setQrData] = useState<string>("");
-  const [paymentStatus, setPaymentStatus] = useState<"pending" | "checking" | "completed" | "failed">("pending");
+  const [paymentStatus, setPaymentStatus] = useState<"pending" | "completed" | "failed">("pending");
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [proofImage, setProofImage] = useState<File | null>(null);
+  const [proofImagePreview, setProofImagePreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -122,60 +133,134 @@ export default function PaymentPage() {
     createPaymentSession();
   }, [selectedPlan.id, selectedPlan.price]);
 
-  // Poll for payment status
-  useEffect(() => {
-    if (!paymentReference || paymentStatus === "completed" || paymentStatus === "failed") {
+  // Auto-checking removed - payment verification will be done manually after proof upload
+
+  // Handle proof of payment image upload
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setErrorMessage("Please upload an image file (JPG, PNG, etc.)");
+        return;
+      }
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setErrorMessage("Image size must be less than 5MB");
+        return;
+      }
+      setProofImage(file);
+      setErrorMessage("");
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProofImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setProofImage(null);
+    setProofImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleUploadProof = async () => {
+    if (!proofImage || !paymentReference) {
+      setErrorMessage("Please select an image and ensure payment reference is available");
       return;
     }
 
-    // Start polling after 5 seconds (give user time to scan)
-    const startPolling = setTimeout(() => {
-      setPaymentStatus("checking");
+    // Check if user is authenticated
+    if (!user) {
+      setErrorMessage("Please log in to upload proof of payment");
+      toast.error("Please log in to upload proof of payment");
+      router.push("/auth/login");
+      return;
+    }
 
-      const checkPaymentStatus = async () => {
-        try {
-          const response = await fetch(`/api/payment?reference=${paymentReference}`);
-          
-          if (!response.ok) {
-            throw new Error("Failed to check payment status");
-          }
+    setIsUploading(true);
+    setErrorMessage("");
 
-          const data = await response.json();
-
-          if (data.status === "completed") {
-            setPaymentStatus("completed");
-            if (pollingIntervalRef.current) {
-              clearInterval(pollingIntervalRef.current);
-            }
-            // Redirect to success page
-            router.push(`/payment/success?plan=${planId}&reference=${paymentReference}`);
-          } else if (data.status === "failed") {
-            setPaymentStatus("failed");
-            setErrorMessage("Payment failed. Please try again or contact support.");
-            if (pollingIntervalRef.current) {
-              clearInterval(pollingIntervalRef.current);
-            }
-          }
-        } catch (error) {
-          console.error("Error checking payment status:", error);
-        }
-      };
-
-      // Check immediately
-      checkPaymentStatus();
-
-      // Then poll every 3 seconds
-      pollingIntervalRef.current = setInterval(checkPaymentStatus, 3000);
-    }, 5000);
-
-    return () => {
-      clearTimeout(startPolling);
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
+    try {
+      // Get the current session token
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session?.access_token) {
+        setErrorMessage("Session expired. Please log in again.");
+        toast.error("Session expired. Please log in again.");
+        router.push("/auth/login");
+        return;
       }
-    };
-  }, [paymentReference, paymentStatus, router, planId]);
 
+      // Create FormData to send the image
+      const formData = new FormData();
+      formData.append('proof', proofImage);
+      formData.append('reference', paymentReference);
+      formData.append('planId', planId);
+      formData.append('amount', selectedPlan.price.toString());
+
+      const response = await fetch('/api/payment/upload-proof', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: "Failed to upload proof of payment" }));
+        const message = errorData.error || "Failed to upload proof of payment";
+        // Use toast for user-facing messaging (and avoid throwing / red overlay)
+        if (response.status === 409) {
+          toast.info(message);
+        } else {
+          toast.error(message);
+        }
+        setErrorMessage(message);
+        return;
+      }
+
+      const data = await response.json();
+      setUploadSuccess(true);
+      setErrorMessage("");
+      toast.success("Proof of payment uploaded. Waiting for admin review.");
+    } catch (error) {
+      console.error("Error uploading proof:", error);
+      const message = error instanceof Error ? error.message : "Failed to upload proof of payment. Please try again.";
+      setErrorMessage(message);
+      toast.error(message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/auth/login?redirect=/payment?plan=" + planId);
+    }
+  }, [user, authLoading, router, planId]);
+
+  if (authLoading) {
+    return (
+      <PageContainer>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--brown)] mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </div>
+      </PageContainer>
+    );
+  }
+
+  if (!user) {
+    return null; // Will redirect
+  }
 
   return (
     <PageContainer>
@@ -194,9 +279,9 @@ export default function PaymentPage() {
           />
         </div>
         {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-linear-to-br from-slate-900/70 via-slate-900/60 to-slate-900/70 z-10"></div>
-        {/* Amber accent overlay */}
-        <div className="absolute inset-0 bg-linear-to-br from-amber-900/20 to-transparent z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/70 via-slate-900/60 to-slate-900/70 z-10"></div>
+        {/* Subtle gold accent overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--brown-soft)] to-transparent z-10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
           <div className="text-center">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 opacity-0 translate-y-8 delay-100">
@@ -226,7 +311,9 @@ export default function PaymentPage() {
                   <div className="text-sm text-gray-600">
                     <p>{selectedPlan.duration}</p>
                     {selectedPlan.discount && (
-                      <p className="text-amber-600 mt-1">{selectedPlan.discount}</p>
+                      <p className="text-[var(--brown-strong)] mt-1">
+                        {selectedPlan.discount}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -242,13 +329,15 @@ export default function PaymentPage() {
                   </div>
                   <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-200">
                     <span className="text-gray-900">Total</span>
-                    <span className="text-amber-600">${selectedPlan.price}</span>
+                    <span className="text-[var(--brown-strong)]">
+                      ${selectedPlan.price}
+                    </span>
                   </div>
                 </div>
 
                 <Link
                   href="/pricing_page"
-                  className="text-sm text-amber-600 hover:text-amber-700 underline"
+                  className="text-sm text-[var(--brown-strong)] hover:text-[var(--brown)] underline"
                 >
                   Change Plan
                 </Link>
@@ -266,7 +355,7 @@ export default function PaymentPage() {
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Pay with KHQR Bakong</h3>
                     
                     {/* QR Code Display */}
-                    <div className="bg-gray-50 rounded-xl p-8 border-2 border-amber-200">
+                    <div className="bg-gray-50 rounded-xl p-8 border-2 border-[rgb(var(--brown-rgb)/0.3)]">
                       <div className="flex flex-col items-center">
                         <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
                           {qrData ? (
@@ -297,32 +386,6 @@ export default function PaymentPage() {
                           )}
                         </div>
 
-                        {/* Payment Status */}
-                        {paymentStatus === "checking" && (
-                          <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4 w-full max-w-md">
-                            <div className="flex items-center justify-center space-x-2">
-                              <svg className="animate-spin h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                              </svg>
-                              <p className="text-blue-700 font-semibold">Checking payment status...</p>
-                            </div>
-                          </div>
-                        )}
-
-                        {paymentStatus === "failed" && errorMessage && (
-                          <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-4 w-full max-w-md">
-                            <div className="flex items-start space-x-2">
-                              <svg className="w-5 h-5 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                              <div>
-                                <p className="text-red-700 font-semibold">Payment Failed</p>
-                                <p className="text-red-600 text-sm mt-1">{errorMessage}</p>
-                              </div>
-                            </div>
-                          </div>
-                        )}
 
                         {/* Payment Instructions */}
                         <div className="text-center space-y-3 max-w-md">
@@ -336,23 +399,131 @@ export default function PaymentPage() {
                               <li>Scan the QR code above</li>
                               <li>Confirm the payment amount: <span className="font-semibold">${selectedPlan.price}</span></li>
                               <li>Complete the payment in your app</li>
-                              <li>Payment will be automatically verified after completion</li>
+                              <li>Upload proof of payment below after completing the transaction</li>
                             </ol>
                           </div>
-                          {paymentStatus === "pending" && (
-                            <p className="text-xs text-gray-500 mt-2">
-                              Waiting for payment... Status will update automatically.
-                            </p>
-                          )}
+                          <p className="text-xs text-gray-500 mt-2">
+                            After payment, please upload proof of payment for verification.
+                          </p>
                         </div>
                       </div>
                     </div>
                   </div>
 
+                  {/* Upload Proof of Payment */}
+                  <div className="space-y-4 pt-6 border-t border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Proof of Payment</h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      After completing your payment, you can upload a screenshot or photo of your payment confirmation for faster verification.
+                    </p>
+
+                    {!proofImagePreview ? (
+                      <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-[var(--brown)] transition-colors">
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageSelect}
+                          className="hidden"
+                          id="proof-upload"
+                        />
+                        <label
+                          htmlFor="proof-upload"
+                          className="cursor-pointer flex flex-col items-center"
+                        >
+                          <svg
+                            className="w-12 h-12 text-gray-400 mb-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                            />
+                          </svg>
+                          <p className="text-gray-700 font-medium mb-1">Click to upload proof of payment</p>
+                          <p className="text-sm text-gray-500">PNG, JPG up to 5MB</p>
+                        </label>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <div className="relative rounded-xl overflow-hidden border-2 border-gray-200">
+                          <Image
+                            src={proofImagePreview}
+                            alt="Proof of payment preview"
+                            width={600}
+                            height={400}
+                            className="w-full h-auto object-contain bg-gray-50"
+                          />
+                          <button
+                            onClick={handleRemoveImage}
+                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-lg"
+                            aria-label="Remove image"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                        <div className="flex gap-3">
+                          <Button
+                            onClick={handleUploadProof}
+                            variant="primary"
+                            fullWidth
+                            disabled={isUploading || uploadSuccess}
+                            className="px-6 py-3"
+                          >
+                            {isUploading ? (
+                              <span className="flex items-center justify-center">
+                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Uploading...
+                              </span>
+                            ) : uploadSuccess ? (
+                              <span className="flex items-center justify-center">
+                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                Uploaded Successfully
+                              </span>
+                            ) : (
+                              "Upload Proof"
+                            )}
+                          </Button>
+                          <Button
+                            onClick={handleRemoveImage}
+                            variant="outline"
+                            className="px-6 py-3"
+                          >
+                            Change Image
+                          </Button>
+                        </div>
+                        {uploadSuccess && (
+                          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <div className="flex items-start space-x-2">
+                              <svg className="w-5 h-5 text-green-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              <div>
+                                <p className="text-green-700 font-semibold">Proof uploaded successfully!</p>
+                                <p className="text-green-600 text-sm mt-1">We'll verify your payment shortly. You can also wait for automatic verification.</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
                   {/* Security Notice */}
                   <div className="bg-gray-50 rounded-lg p-4 flex items-start space-x-3">
-                    <svg
-                      className="w-5 h-5 text-amber-600 shrink-0 mt-0.5"
+                      <svg
+                      className="w-5 h-5 text-[var(--brown-strong)] shrink-0 mt-0.5"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -372,7 +543,7 @@ export default function PaymentPage() {
 
                   {/* Retry Button (only shown on failure) */}
                   {paymentStatus === "failed" && (
-                    <button
+                    <Button
                       onClick={() => {
                         setPaymentStatus("pending");
                         setErrorMessage("");
@@ -381,17 +552,19 @@ export default function PaymentPage() {
                         // Trigger re-initialization
                         window.location.reload();
                       }}
-                      className="w-full px-6 py-4 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                      variant="primary"
+                      fullWidth
+                      className="px-6 py-4"
                     >
                       Try Again
-                    </button>
+                    </Button>
                   )}
 
                   {/* Status Message */}
-                  {paymentStatus === "pending" && qrData && (
-                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                      <p className="text-sm text-amber-800 text-center">
-                        Scan the QR code with your Bakong app to complete payment. We'll automatically detect when your payment is successful.
+                  {qrData && (
+                    <div className="bg-[var(--brown-soft)] border border-[rgb(var(--brown-rgb)/0.25)] rounded-lg p-4">
+                      <p className="text-sm text-slate-800 text-center">
+                        Scan the QR code with your Bakong app to complete payment. After payment, upload proof of payment below for manual verification.
                       </p>
                     </div>
                   )}
@@ -402,5 +575,22 @@ export default function PaymentPage() {
         </div>
       </section>
     </PageContainer>
+  );
+}
+
+export default function PaymentPage() {
+  return (
+    <Suspense fallback={
+      <PageContainer>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--brown)] mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </div>
+      </PageContainer>
+    }>
+      <PaymentPageContent />
+    </Suspense>
   );
 }

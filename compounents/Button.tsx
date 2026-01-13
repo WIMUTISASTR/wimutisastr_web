@@ -1,31 +1,53 @@
 import React from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline";
+  variant?: "primary" | "secondary" | "outline" | "ghost";
+  size?: "sm" | "md" | "icon";
   fullWidth?: boolean;
   children: React.ReactNode;
 }
 
+function cn(...parts: Array<string | undefined | false>) {
+  return parts.filter(Boolean).join(" ");
+}
+
 export default function Button({
   variant = "primary",
+  size = "md",
   fullWidth = false,
   children,
   className = "",
   ...props
 }: ButtonProps) {
-  const baseStyles = "px-6 py-3 rounded-lg font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5";
-  
+  const baseStyles =
+    "inline-flex items-center justify-center gap-2 rounded-xl font-semibold tracking-tight transition-all duration-200 ring-1 ring-inset focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brown)] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
+
   const variants = {
-    primary: "bg-amber-600 text-white hover:bg-amber-700",
-    secondary: "bg-gray-200 text-gray-900 hover:bg-gray-300",
-    outline: "border-2 border-amber-600 text-amber-600 hover:bg-amber-50",
+    // Professional brown primary
+    primary:
+      "bg-[var(--brown)] text-white ring-[var(--brown)]/25 shadow-sm hover:shadow-md hover:-translate-y-[1px] hover:bg-[var(--brown-strong)]",
+    // Charcoal button for serious actions
+    secondary:
+      "bg-[var(--ink)] text-white ring-[var(--ink)]/10 shadow-sm hover:shadow-md hover:-translate-y-[1px] hover:opacity-90",
+    // Paper button
+    outline:
+      "bg-white/80 backdrop-blur text-[var(--ink)] ring-slate-200 shadow-sm hover:bg-white hover:shadow-md hover:-translate-y-[1px]",
+    // Minimal button (for icon/utility controls)
+    ghost:
+      "bg-transparent text-slate-700 ring-transparent shadow-none hover:bg-slate-100 hover:text-slate-900",
+  };
+
+  const sizes = {
+    sm: "px-4 py-2.5 text-sm",
+    md: "px-5 py-3 text-sm sm:text-base",
+    icon: "p-2",
   };
 
   const widthClass = fullWidth ? "w-full" : "";
 
   return (
     <button
-      className={`${baseStyles} ${variants[variant]} ${widthClass} ${className}`}
+      className={cn(baseStyles, variants[variant], sizes[size], widthClass, className)}
       {...props}
     >
       {children}

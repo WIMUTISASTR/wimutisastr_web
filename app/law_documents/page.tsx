@@ -3,6 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import PageContainer from "@/compounents/PageContainer";
+import Button from "@/compounents/Button";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 interface Document {
@@ -56,6 +58,7 @@ const documents: Document[] = [
 ];
 
 export default function LawDocumentsPage() {
+  const router = useRouter();
   const documentsRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [hasPaid, setHasPaid] = useState(false);
@@ -146,9 +149,9 @@ export default function LawDocumentsPage() {
           />
         </div>
         {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-linear-to-br from-slate-900/70 via-slate-900/60 to-slate-900/70 z-10"></div>
-        {/* Amber accent overlay */}
-        <div className="absolute inset-0 bg-linear-to-br from-amber-900/20 to-transparent z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/70 via-slate-900/60 to-slate-900/70 z-10"></div>
+        {/* Subtle gold accent overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--brown-soft)] to-transparent z-10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
           <div className="text-center">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 opacity-0 translate-y-8 delay-100">
@@ -166,17 +169,17 @@ export default function LawDocumentsPage() {
         <div className="max-w-7xl mx-auto">
           {/* Payment Notice */}
           {!isChecking && !hasPaid && (
-            <div className="mb-8 bg-amber-50 border-l-4 border-amber-600 p-4 rounded-lg opacity-0 translate-y-8 delay-100">
+            <div className="mb-8 bg-[var(--brown-soft)] border-l-4 border-[var(--brown)] p-4 rounded-lg opacity-0 translate-y-8 delay-100">
               <div className="flex items-start">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                <div className="shrink-0">
+                  <svg className="h-5 w-5 text-[var(--brown-strong)]" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
                 </div>
                 <div className="ml-3 flex-1">
-                  <p className="text-sm text-amber-800">
+                  <p className="text-sm text-slate-800">
                     <span className="font-semibold">Subscription Required:</span> You need to subscribe to access legal documents. 
-                    <Link href="/pricing_page" className="ml-1 font-semibold underline hover:text-amber-900">
+                    <Link href="/pricing_page" className="ml-1 font-semibold underline text-[var(--brown-strong)] hover:text-[var(--brown)]">
                       View pricing plans →
                     </Link>
                   </p>
@@ -209,12 +212,16 @@ export default function LawDocumentsPage() {
                   placeholder="Search by title, author, description, or year..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent shadow-md hover:shadow-lg transition-all duration-200 text-lg"
+                  className="block w-full pl-12 pr-4 py-4 rounded-2xl bg-white/80 backdrop-blur text-slate-900 placeholder:text-slate-400 shadow-sm ring-1 ring-inset ring-slate-200 focus:outline-none focus:ring-2 focus:ring-[var(--brown)] transition-colors text-lg"
                 />
                 {searchQuery && (
-                  <button
+                  <Button
+                    type="button"
                     onClick={() => setSearchQuery("")}
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute inset-y-0 right-0 pr-3 text-gray-400 hover:text-gray-600"
+                    aria-label="Clear search"
                   >
                     <svg
                       className="h-5 w-5"
@@ -229,7 +236,7 @@ export default function LawDocumentsPage() {
                         d="M6 18L18 6M6 6l12 12"
                       />
                     </svg>
-                  </button>
+                  </Button>
                 )}
               </div>
               {searchQuery && (
@@ -251,7 +258,7 @@ export default function LawDocumentsPage() {
                 <div className="grid md:grid-cols-3 gap-8">
                   {/* Left Side - Book Cover */}
                   <div className="flex justify-center md:justify-start">
-                    <div className="relative w-56 h-80 rounded-lg overflow-hidden shadow-lg border-2 border-amber-100 hover:border-amber-300 transition-all duration-300 hover:scale-105">
+                    <div className="relative w-56 h-80 rounded-lg overflow-hidden shadow-lg border-2 border-[var(--border)] hover:border-[var(--brown)] transition-all duration-300 hover:scale-105">
                       <Image
                         src={doc.coverImage}
                         alt={doc.title}
@@ -270,13 +277,13 @@ export default function LawDocumentsPage() {
                       </h2>
                       <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
                         <span className="flex items-center">
-                          <svg className="w-4 h-4 mr-1 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 mr-1 text-[var(--brown-strong)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                           </svg>
                           {doc.author}
                         </span>
                         <span className="flex items-center">
-                          <svg className="w-4 h-4 mr-1 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 mr-1 text-[var(--brown-strong)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                           {doc.year}
@@ -290,27 +297,29 @@ export default function LawDocumentsPage() {
 
                     <div className="pt-2">
                       {hasPaid ? (
-                        <a
-                          href={doc.pdfUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center px-6 py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+                        <Button
+                          onClick={() =>
+                            window.open(doc.pdfUrl, "_blank", "noopener,noreferrer")
+                          }
+                          variant="primary"
+                          className="inline-flex items-center px-6 py-3"
                         >
                           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
                           View Document
-                        </a>
+                        </Button>
                       ) : (
-                        <Link
-                          href="/pricing_page"
-                          className="inline-flex items-center px-6 py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+                        <Button
+                          onClick={() => router.push("/pricing_page")}
+                          variant="primary"
+                          className="inline-flex items-center px-6 py-3"
                         >
                           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                           </svg>
                           Subscribe to Access
-                        </Link>
+                        </Button>
                       )}
                     </div>
                   </div>

@@ -34,10 +34,10 @@ export default function Input({
       )}
       <input
         id={inputId}
-        className={`w-full px-4 py-3 border rounded-lg transition-colors outline-none ${
+        className={`w-full px-4 py-3 rounded-xl bg-[var(--surface-strong)] shadow-sm ring-1 ring-inset transition-colors outline-none placeholder:text-slate-400 ${
           hasError
-            ? "border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500"
-            : "border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+            ? "ring-red-300 focus:ring-2 focus:ring-red-500"
+            : "ring-[var(--border)] focus:ring-2 focus:ring-[var(--brown)]"
         } ${className}`}
         {...props}
       />

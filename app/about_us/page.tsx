@@ -64,9 +64,9 @@ export default function AboutUsPage() {
           />
         </div>
         {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-linear-to-br from-slate-900/70 via-slate-900/60 to-slate-900/70 z-10"></div>
-        {/* Amber accent overlay */}
-        <div className="absolute inset-0 bg-linear-to-br from-amber-900/20 to-transparent z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/70 via-slate-900/60 to-slate-900/70 z-10"></div>
+        {/* Subtle gold accent overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--brown-soft)] to-transparent z-10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
           <div className="text-center">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 opacity-0 translate-y-8 delay-100">
@@ -99,13 +99,13 @@ export default function AboutUsPage() {
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 opacity-0 translate-y-8 delay-100">
               Why We Created This Platform
             </h2>
-            <div className="w-24 h-1 bg-amber-600 mx-auto mb-8 opacity-0 translate-y-8 delay-200"></div>
+            <div className="w-24 h-1 bg-[var(--brown)] mx-auto mb-8 opacity-0 translate-y-8 delay-200"></div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
             {/* Left Side - Mission Statement */}
             <div className="space-y-6">
-              <div className="bg-amber-50 rounded-2xl p-8 border-l-4 border-amber-600 opacity-0 -translate-x-8 delay-200 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+              <div className="bg-[var(--brown-soft)] rounded-2xl p-8 border-l-4 border-[var(--brown)] opacity-0 -translate-x-8 delay-200 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
                   Our Mission
                 </h3>
@@ -131,7 +131,7 @@ export default function AboutUsPage() {
             {/* Right Side - Benefits */}
             <div className="space-y-6">
               <div className="flex items-start space-x-4 opacity-0 translate-x-8 delay-300 hover:transform hover:scale-105 transition-all duration-300">
-                <div className="shrink-0 w-12 h-12 bg-amber-600 rounded-lg flex items-center justify-center group-hover:bg-amber-700 transition-colors">
+                <div className="shrink-0 w-12 h-12 bg-[var(--brown)] rounded-lg flex items-center justify-center group-hover:bg-[var(--brown-strong)] transition-colors">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                   </svg>
@@ -145,7 +145,7 @@ export default function AboutUsPage() {
               </div>
 
               <div className="flex items-start space-x-4 opacity-0 translate-x-8 delay-400 hover:transform hover:scale-105 transition-all duration-300">
-                <div className="shrink-0 w-12 h-12 bg-amber-600 rounded-lg flex items-center justify-center group-hover:bg-amber-700 transition-colors">
+                <div className="shrink-0 w-12 h-12 bg-[var(--brown)] rounded-lg flex items-center justify-center group-hover:bg-[var(--brown-strong)] transition-colors">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
@@ -159,7 +159,7 @@ export default function AboutUsPage() {
               </div>
 
               <div className="flex items-start space-x-4 opacity-0 translate-x-8 delay-500 hover:transform hover:scale-105 transition-all duration-300">
-                <div className="shrink-0 w-12 h-12 bg-amber-600 rounded-lg flex items-center justify-center group-hover:bg-amber-700 transition-colors">
+                <div className="shrink-0 w-12 h-12 bg-[var(--brown)] rounded-lg flex items-center justify-center group-hover:bg-[var(--brown-strong)] transition-colors">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
@@ -173,7 +173,7 @@ export default function AboutUsPage() {
               </div>
 
               <div className="flex items-start space-x-4 opacity-0 translate-x-8 delay-700 hover:transform hover:scale-105 transition-all duration-300">
-                <div className="shrink-0 w-12 h-12 bg-amber-600 rounded-lg flex items-center justify-center group-hover:bg-amber-700 transition-colors">
+                <div className="shrink-0 w-12 h-12 bg-[var(--brown)] rounded-lg flex items-center justify-center group-hover:bg-[var(--brown-strong)] transition-colors">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
@@ -200,7 +200,7 @@ export default function AboutUsPage() {
             <p className="text-lg text-gray-600 max-w-2xl mx-auto opacity-0 translate-y-8 delay-200">
               All documents and videos are carefully prepared by our experienced legal professional
             </p>
-            <div className="w-24 h-1 bg-amber-600 mx-auto mt-6 opacity-0 translate-y-8 delay-300"></div>
+            <div className="w-24 h-1 bg-[var(--brown)] mx-auto mt-6 opacity-0 translate-y-8 delay-300"></div>
           </div>
         </div>
       </section>
@@ -211,7 +211,7 @@ export default function AboutUsPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             {/* Left Side - Image */}
             <div className="flex justify-center lg:justify-start">
-              <div className="relative w-80 h-96 rounded-2xl overflow-hidden shadow-2xl border-4 border-amber-100 opacity-0 -translate-x-8 delay-200 hover:shadow-3xl transition-all duration-500 hover:scale-105 hover:border-amber-200">
+              <div className="relative w-80 h-96 rounded-2xl overflow-hidden shadow-2xl border-4 border-[rgb(var(--brown-rgb)/0.2)] opacity-0 -translate-x-8 delay-200 hover:shadow-3xl transition-all duration-500 hover:scale-105 hover:border-[rgb(var(--brown-rgb)/0.35)]">
                 <Image
                   src="/asset/teacherImage.png"
                   alt="Men Vuth"
@@ -229,7 +229,7 @@ export default function AboutUsPage() {
                 <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
                   Men Vuth
                 </h2>
-                <p className="text-xl text-amber-600 font-semibold mb-4">
+                <p className="text-xl text-[var(--brown-strong)] font-semibold mb-4">
                   Legal Expert
                 </p>
                 <p className="text-gray-600">
@@ -238,31 +238,31 @@ export default function AboutUsPage() {
               </div>
 
               {/* Specializations */}
-              <div className="bg-amber-50 rounded-xl p-6 border border-amber-200 opacity-0 translate-x-8 delay-400 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+              <div className="bg-[var(--brown-soft)] rounded-xl p-6 border border-[rgb(var(--brown-rgb)/0.25)] opacity-0 translate-x-8 delay-400 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Specializations</h3>
                 <ul className="space-y-2 text-gray-700">
                   <li className="flex items-start opacity-0 translate-y-4 delay-500 hover:translate-x-2 transition-all duration-300">
-                    <span className="text-amber-600 mr-2">•</span>
+                    <span className="text-[var(--brown-strong)] mr-2">•</span>
                     <span>Land Law</span>
                   </li>
                   <li className="flex items-start opacity-0 translate-y-4 delay-600 hover:translate-x-2 transition-all duration-300">
-                    <span className="text-amber-600 mr-2">•</span>
+                    <span className="text-[var(--brown-strong)] mr-2">•</span>
                     <span>Labor Law</span>
                   </li>
                   <li className="flex items-start opacity-0 translate-y-4 delay-700 hover:translate-x-2 transition-all duration-300">
-                    <span className="text-amber-600 mr-2">•</span>
+                    <span className="text-[var(--brown-strong)] mr-2">•</span>
                     <span>Corporate Law</span>
                   </li>
                   <li className="flex items-start opacity-0 translate-y-4 delay-800 hover:translate-x-2 transition-all duration-300">
-                    <span className="text-amber-600 mr-2">•</span>
+                    <span className="text-[var(--brown-strong)] mr-2">•</span>
                     <span>Investment Protection Law</span>
                   </li>
                   <li className="flex items-start opacity-0 translate-y-4 delay-900 hover:translate-x-2 transition-all duration-300">
-                    <span className="text-amber-600 mr-2">•</span>
+                    <span className="text-[var(--brown-strong)] mr-2">•</span>
                     <span>Court and Out-of-Court Litigation</span>
                   </li>
                   <li className="flex items-start opacity-0 translate-y-4 delay-1000 hover:translate-x-2 transition-all duration-300">
-                    <span className="text-amber-600 mr-2">•</span>
+                    <span className="text-[var(--brown-strong)] mr-2">•</span>
                     <span>Contract Preparation</span>
                   </li>
                 </ul>
@@ -320,23 +320,23 @@ export default function AboutUsPage() {
           <div className="mt-8 bg-white rounded-xl shadow-lg p-8 border border-gray-200 opacity-0 translate-y-8 delay-100 hover:shadow-2xl transition-all duration-300">
             <h3 className="text-2xl font-bold text-gray-900 mb-6">Professional Experience</h3>
             <div className="space-y-6">
-              <div className="border-l-4 border-amber-500 pl-6 opacity-0 translate-x-8 delay-200 hover:border-amber-600 hover:translate-x-2 transition-all duration-300">
+              <div className="border-l-4 border-[var(--brown)] pl-6 opacity-0 translate-x-8 delay-200 hover:border-[var(--brown-strong)] hover:translate-x-2 transition-all duration-300">
                 <p className="font-semibold text-gray-900">2022-2023</p>
                 <p className="text-gray-600">Practicing Lawyer at CPH LAW GROUP, Kingdom of Cambodia</p>
               </div>
-              <div className="border-l-4 border-amber-500 pl-6 opacity-0 translate-x-8 delay-300 hover:border-amber-600 hover:translate-x-2 transition-all duration-300">
+              <div className="border-l-4 border-[var(--brown)] pl-6 opacity-0 translate-x-8 delay-300 hover:border-[var(--brown-strong)] hover:translate-x-2 transition-all duration-300">
                 <p className="font-semibold text-gray-900">2012-2021</p>
                 <p className="text-gray-600">Legal Team at His Excellency Hun Manet's Office, Kampong Speu Province</p>
               </div>
-              <div className="border-l-4 border-amber-500 pl-6 opacity-0 translate-x-8 delay-400 hover:border-amber-600 hover:translate-x-2 transition-all duration-300">
+              <div className="border-l-4 border-[var(--brown)] pl-6 opacity-0 translate-x-8 delay-400 hover:border-[var(--brown-strong)] hover:translate-x-2 transition-all duration-300">
                 <p className="font-semibold text-gray-900">2010 - Present</p>
                 <p className="text-gray-600">Part-time Lecturer at Royal University of Law and Economics</p>
               </div>
-              <div className="border-l-4 border-amber-500 pl-6 opacity-0 translate-x-8 delay-500 hover:border-amber-600 hover:translate-x-2 transition-all duration-300">
+              <div className="border-l-4 border-[var(--brown)] pl-6 opacity-0 translate-x-8 delay-500 hover:border-[var(--brown-strong)] hover:translate-x-2 transition-all duration-300">
                 <p className="font-semibold text-gray-900">2012-2015</p>
                 <p className="text-gray-600">Head of Legal Affairs at CAMLIFE Insurance Company</p>
               </div>
-              <div className="border-l-4 border-amber-500 pl-6 opacity-0 translate-x-8 delay-700 hover:border-amber-600 hover:translate-x-2 transition-all duration-300">
+              <div className="border-l-4 border-[var(--brown)] pl-6 opacity-0 translate-x-8 delay-700 hover:border-[var(--brown-strong)] hover:translate-x-2 transition-all duration-300">
                 <p className="font-semibold text-gray-900">2010-2012</p>
                 <p className="text-gray-600">Legal Assistant at the Prosecutor's Office of the Phnom Penh Municipal Court</p>
               </div>
@@ -350,15 +350,15 @@ export default function AboutUsPage() {
               <h3 className="text-2xl font-bold text-gray-900 mb-6">Languages</h3>
               <div className="space-y-3">
                 <div className="flex items-center opacity-0 translate-x-8 delay-200 hover:translate-x-2 transition-all duration-300">
-                  <div className="w-3 h-3 bg-amber-500 rounded-full mr-3"></div>
+                  <div className="w-3 h-3 bg-[var(--brown)] rounded-full mr-3"></div>
                   <span className="text-gray-700">Khmer - Native</span>
                 </div>
                 <div className="flex items-center opacity-0 translate-x-8 delay-300 hover:translate-x-2 transition-all duration-300">
-                  <div className="w-3 h-3 bg-amber-500 rounded-full mr-3"></div>
+                  <div className="w-3 h-3 bg-[var(--brown)] rounded-full mr-3"></div>
                   <span className="text-gray-700">English</span>
                 </div>
                 <div className="flex items-center opacity-0 translate-x-8 delay-400 hover:translate-x-2 transition-all duration-300">
-                  <div className="w-3 h-3 bg-amber-500 rounded-full mr-3"></div>
+                  <div className="w-3 h-3 bg-[var(--brown)] rounded-full mr-3"></div>
                   <span className="text-gray-700">French</span>
                 </div>
               </div>
@@ -370,13 +370,13 @@ export default function AboutUsPage() {
               <div className="space-y-4 text-gray-700">
                 <div className="opacity-0 translate-y-4 delay-300">
                   <span className="font-semibold text-gray-900">Phone:</span>{" "}
-                  <a href="tel:012227202" className="text-amber-600 hover:text-amber-700 transition-colors">
+                  <a href="tel:012227202" className="text-[var(--brown-strong)] hover:text-[var(--brown)] transition-colors">
                     012 227 202
                   </a>
                 </div>
                 <div className="opacity-0 translate-y-4 delay-400">
                   <span className="font-semibold text-gray-900">Email:</span>{" "}
-                  <a href="mailto:vuthmen5@gmail.com" className="text-amber-600 hover:text-amber-700 transition-colors">
+                  <a href="mailto:vuthmen5@gmail.com" className="text-[var(--brown-strong)] hover:text-[var(--brown)] transition-colors">
                     vuthmen5@gmail.com
                   </a>
                 </div>

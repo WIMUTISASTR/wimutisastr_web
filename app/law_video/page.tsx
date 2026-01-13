@@ -3,10 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import PageContainer from "@/compounents/PageContainer";
+import Button from "@/compounents/Button";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { courses } from "./data";
 
 export default function LawVideoPage() {
+  const router = useRouter();
   const videosRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -75,9 +78,9 @@ export default function LawVideoPage() {
           />
         </div>
         {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-linear-to-br from-slate-900/70 via-slate-900/60 to-slate-900/70 z-10"></div>
-        {/* Amber accent overlay */}
-        <div className="absolute inset-0 bg-linear-to-br from-amber-900/20 to-transparent z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/70 via-slate-900/60 to-slate-900/70 z-10"></div>
+        {/* Subtle gold accent overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--brown-soft)] to-transparent z-10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
           <div className="text-center">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 opacity-0 translate-y-8 delay-100">
@@ -117,12 +120,16 @@ export default function LawVideoPage() {
                   placeholder="Search by title, author, description, or year..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent shadow-md hover:shadow-lg transition-all duration-200 text-lg"
+                  className="block w-full pl-12 pr-4 py-4 rounded-2xl bg-white/80 backdrop-blur text-slate-900 placeholder:text-slate-400 shadow-sm ring-1 ring-inset ring-slate-200 focus:outline-none focus:ring-2 focus:ring-[var(--brown)] transition-colors text-lg"
                 />
                 {searchQuery && (
-                  <button
+                  <Button
+                    type="button"
                     onClick={() => setSearchQuery("")}
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute inset-y-0 right-0 pr-3 text-gray-400 hover:text-gray-600"
+                    aria-label="Clear search"
                   >
                     <svg
                       className="h-5 w-5"
@@ -137,7 +144,7 @@ export default function LawVideoPage() {
                         d="M6 18L18 6M6 6l12 12"
                       />
                     </svg>
-                  </button>
+                  </Button>
                 )}
               </div>
               {searchQuery && (
@@ -173,7 +180,7 @@ export default function LawVideoPage() {
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center">
                           <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100 transition-all duration-200 shadow-lg">
                             <svg
-                              className="w-8 h-8 text-amber-600 ml-1"
+                              className="w-8 h-8 text-[var(--brown-strong)] ml-1"
                               fill="currentColor"
                               viewBox="0 0 20 20"
                             >
@@ -197,36 +204,37 @@ export default function LawVideoPage() {
                         </p>
                         <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
                           <span className="flex items-center">
-                            <svg className="w-4 h-4 mr-1 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4 mr-1 text-[var(--brown-strong)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
                             {course.author}
                           </span>
                           <span className="flex items-center">
-                            <svg className="w-4 h-4 mr-1 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4 mr-1 text-[var(--brown-strong)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                             {course.year}
                           </span>
                           <span className="flex items-center">
-                            <svg className="w-4 h-4 mr-1 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-4 h-4 mr-1 text-[var(--brown-strong)]" fill="currentColor" viewBox="0 0 20 20">
                               <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
                             </svg>
                             {course.totalVideos} videos
                           </span>
                           <span className="flex items-center">
-                            <svg className="w-4 h-4 mr-1 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4 mr-1 text-[var(--brown-strong)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             {course.totalDuration}
                           </span>
                         </div>
-                        <Link
-                          href={`/law_video/${course.id}`}
-                          className="inline-block px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-semibold"
+                        <Button
+                          onClick={() => router.push(`/law_video/${course.id}`)}
+                          variant="primary"
+                          className="px-6 py-2"
                         >
                           View {course.totalVideos} Videos
-                        </Link>
+                        </Button>
                       </div>
                     </div>
                   </div>
