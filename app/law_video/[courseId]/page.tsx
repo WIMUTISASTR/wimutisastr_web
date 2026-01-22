@@ -4,196 +4,296 @@ import Image from "next/image";
 import Link from "next/link";
 import PageContainer from "@/compounents/PageContainer";
 import Button from "@/compounents/Button";
-import { useEffect, useRef } from "react";
-import { courses } from "../data";
-import { useParams } from "next/navigation";
+import ProtectedRoute from "@/compounents/ProtectedRoute";
+import { useEffect, useMemo, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { fetchVideos, type VideoCategory, type VideoRow } from "@/lib/api/client";
+import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
 
-export default function CourseDetailPage() {
-  const params = useParams();
-  const courseId = parseInt(params.courseId as string);
-  const course = courses.find((c) => c.id === courseId);
+const FALLBACK_THUMB = "/asset/document_background.png";
 
-  useEffect(() => {
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: "0px 0px -50px 0px",
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("animate-in");
-          observer.unobserve(entry.target);
-        }
-      });
-    }, observerOptions);
-
-    const checkAndAnimate = () => {
-      const animatedElements = document.querySelectorAll(
-        '.opacity-0[class*="delay"], .opacity-0.translate-y-8, .opacity-0.translate-y-4, .opacity-0.translate-x-8, .opacity-0.-translate-x-8'
-      );
-      animatedElements.forEach((el) => {
-        observer.observe(el);
-        const rect = el.getBoundingClientRect();
-        if (rect.top < window.innerHeight && rect.bottom > 0) {
-          setTimeout(() => {
-            el.classList.add("animate-in");
-          }, 50);
-        }
-      });
-    };
-
-    checkAndAnimate();
-    setTimeout(checkAndAnimate, 100);
-
-    return () => observer.disconnect();
-  }, []);
-
-  if (!course) {
-    return (
-      <PageContainer>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Course Not Found</h1>
-            <Link
-              href="/law_video"
-              className="text-[var(--brown-strong)] hover:text-[var(--brown)] underline"
-            >
-              Back to Courses
-            </Link>
-          </div>
-        </div>
-      </PageContainer>
-    );
-  }
-
-  return (
-    <PageContainer>
-      {/* Hero Section */}
-      <section className="relative bg-slate-900 text-white py-20 overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/asset/document_background.png"
-            alt="Course background"
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
-            style={{ objectFit: 'cover' }}
-          />
-        </div>
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/70 via-slate-900/60 to-slate-900/70 z-10"></div>
-        {/* Subtle gold accent overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[var(--brown-soft)] to-transparent z-10"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
-          <div className="text-center">
-            <Link
-              href="/law_video"
-              className="inline-flex items-center text-gray-300 hover:text-white mb-4 transition-colors opacity-0 translate-y-8 delay-100"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to Courses
-            </Link>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 opacity-0 translate-y-8 delay-200 leading-tight line-clamp-2">
-              {course.title}
-            </h1>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto opacity-0 translate-y-8 delay-300">
-              {course.description}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Course Content */}
-      <section className="py-20 px-2 sm:px-4 lg:px-6">
-        <div className="max-w-7xl mx-auto">
-
-          {/* Videos List */}
-          <div className="space-y-0">
-            {course.videos.map((video, index) => (
-              <div
-                key={video.id}
-                className="w-full border-b border-gray-300 py-8 opacity-0 translate-y-8 hover:bg-gray-50 transition-colors duration-200"
-                style={{ animationDelay: `${(index + 1) * 100}ms` }}
-              >
-                <div className="grid md:grid-cols-3 gap-8">
-                  {/* Left Side - Video Thumbnail */}
-                  <div className="flex justify-center md:justify-start">
-                    <div className="relative w-full md:w-96 aspect-video rounded-md overflow-hidden group cursor-pointer">
-                      <Image
-                        src={video.thumbnail}
-                        alt={video.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, 384px"
-                      />
-                      {/* Play Button Overlay - YouTube style (appears on hover) */}
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center">
-                        <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100 transition-all duration-200 shadow-lg">
-                          <svg
-                            className="w-8 h-8 text-[var(--brown-strong)] ml-1"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                          </svg>
-                        </div>
-                      </div>
-                      {/* Duration Badge - YouTube style */}
-                      <div className="absolute bottom-2 right-2 bg-black/80 text-white px-1.5 py-0.5 rounded text-xs font-medium">
-                        {video.duration}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Right Side - Video Details */}
-                  <div className="md:col-span-2 flex flex-col justify-center space-y-4">
-                    <div>
-                      <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 leading-tight line-clamp-2">
-                        {index + 1}. {video.title}
-                      </h3>
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
-                        <span className="flex items-center">
-                          <svg className="w-4 h-4 mr-1 text-[var(--brown-strong)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                          </svg>
-                          {video.views.toLocaleString()} views
-                        </span>
-                        <span className="flex items-center">
-                          <svg className="w-4 h-4 mr-1 text-[var(--brown-strong)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          {video.duration}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="pt-2">
-                      <Button
-                        onClick={() =>
-                          window.open(video.videoUrl, "_blank", "noopener,noreferrer")
-                        }
-                        variant="primary"
-                        className="inline-flex items-center px-6 py-3"
-                      >
-                        <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                        </svg>
-                        Watch Video
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    </PageContainer>
-  );
+function formatDate(d: string | null | undefined) {
+  if (!d) return null;
+  const date = new Date(d);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" });
 }
 
+// Icon components
+const ChevronLeftIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+  </svg>
+);
+
+const PlayIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg className={className} fill="currentColor" viewBox="0 0 20 20">
+    <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+  </svg>
+);
+
+const ClockIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+);
+
+const BookOpenIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+  </svg>
+);
+
+const UserIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+  </svg>
+);
+
+export default function VideoCategoryPage() {
+  const params = useParams();
+  const router = useRouter();
+  const categoryId = params.courseId as string;
+
+  const [categories, setCategories] = useState<VideoCategory[]>([]);
+  const [videos, setVideos] = useState<VideoRow[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await fetchVideos(categoryId);
+        if (!cancelled) {
+          setCategories(data.categories);
+          setVideos(data.videos);
+        }
+      } catch (e: unknown) {
+        console.error(e);
+        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load videos.");
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [categoryId]);
+
+  const category = useMemo(() => categories.find((c) => c.id === categoryId) ?? null, [categories, categoryId]);
+
+  return (
+    <ProtectedRoute>
+      <PageContainer>
+        {/* Enhanced Hero Section */}
+        <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white py-20 overflow-hidden">
+          <div className="absolute inset-0 z-0">
+            {category?.cover_url && (
+              <Image
+                src={normalizeNextImageSrc(category.cover_url, FALLBACK_THUMB)}
+                alt="Course background"
+                fill
+                className="object-cover opacity-30"
+                priority
+                sizes="100vw"
+              />
+            )}
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900/90 via-gray-900/80 to-gray-900/90 z-10" />
+          
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
+            <div className="mb-6 animate-in">
+              <Link
+                href="/law_video"
+                className="inline-flex items-center gap-2 text-gray-300 hover:text-white transition-colors group mb-6"
+              >
+                <ChevronLeftIcon className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                <span>Back to Courses</span>
+              </Link>
+            </div>
+
+            <div className="max-w-4xl animate-in delay-100">
+              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
+                <BookOpenIcon className="w-4 h-4" />
+                <span className="text-sm font-semibold">Video Course</span>
+              </div>
+              
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+                {category?.name ?? "Course"}
+              </h1>
+              
+              {category?.description && (
+                <p className="text-lg sm:text-xl text-gray-300 leading-relaxed max-w-3xl mb-8">
+                  {category.description}
+                </p>
+              )}
+
+              <div className="flex flex-wrap items-center gap-6 text-sm text-gray-300">
+                <div className="flex items-center gap-2">
+                  <PlayIcon className="w-5 h-5" />
+                  <span>{videos.length} {videos.length === 1 ? "lesson" : "lessons"}</span>
+                </div>
+                {videos.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <ClockIcon className="w-5 h-5" />
+                    <span>Start learning today</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Course Content Section */}
+        <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50">
+          <div className="max-w-6xl mx-auto">
+            {isLoading ? (
+              <div className="space-y-6">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 animate-pulse"
+                  >
+                    <div className="flex gap-6">
+                      <div className="w-64 h-40 bg-gray-200 rounded-xl" />
+                      <div className="flex-1 space-y-4">
+                        <div className="h-6 bg-gray-200 rounded w-3/4" />
+                        <div className="h-4 bg-gray-200 rounded w-full" />
+                        <div className="h-4 bg-gray-200 rounded w-2/3" />
+                        <div className="h-10 bg-gray-200 rounded w-32" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : error ? (
+              <div className="text-center py-20">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-4">
+                  <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-xl font-semibold text-red-900 mb-2">Error loading videos</p>
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            ) : videos.length === 0 ? (
+              <div className="text-center py-20">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                  <BookOpenIcon className="w-8 h-8 text-gray-400" />
+                </div>
+                <p className="text-xl font-semibold text-gray-900 mb-2">No videos available</p>
+                <p className="text-sm text-gray-600">This course doesn't have any videos yet.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="mb-8">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Course Lessons</h2>
+                  <p className="text-gray-600">Click on any lesson to start watching</p>
+                </div>
+
+                {videos.map((video, index) => {
+                  const thumb = normalizeNextImageSrc(video.thumbnail_url, FALLBACK_THUMB);
+                  
+                  return (
+                    <div
+                      key={video.id}
+                      className="group bg-white rounded-2xl border-2 border-gray-200 shadow-lg hover:shadow-xl overflow-hidden transition-all duration-300 animate-scale-in"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <div className="p-6 sm:p-8">
+                        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+                          {/* Video Thumbnail */}
+                          <Link
+                            href={`/law_video/${categoryId}/watch/${video.id}`}
+                            className="relative w-full lg:w-80 xl:w-96 aspect-video rounded-xl overflow-hidden block bg-gray-100 flex-shrink-0 group/thumb"
+                          >
+                            <Image
+                              src={thumb}
+                              alt={video.title ?? "Video"}
+                              fill
+                              className="object-cover transition-transform duration-500 group-hover/thumb:scale-110"
+                              sizes="(max-width: 1024px) 100vw, 400px"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent opacity-0 group-hover/thumb:opacity-100 transition-opacity duration-300" />
+                            
+                            {/* Play Button */}
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/thumb:opacity-100 transition-opacity duration-300">
+                              <div className="w-20 h-20 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-2xl transform group-hover/thumb:scale-110 transition-transform">
+                                <PlayIcon className="w-10 h-10 text-[var(--brown)] ml-1" />
+                              </div>
+                            </div>
+
+                            {/* Lesson Number Badge */}
+                            <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-bold text-[var(--brown)] shadow-lg">
+                              Lesson {index + 1}
+                            </div>
+                          </Link>
+
+                          {/* Video Info */}
+                          <div className="flex-1 flex flex-col justify-between">
+                            <div>
+                              <Link
+                                href={`/law_video/${categoryId}/watch/${video.id}`}
+                                className="group/title"
+                              >
+                                <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 group-hover/title:text-[var(--brown)] transition-colors">
+                                  {index + 1}. {video.title ?? "Untitled Lesson"}
+                                </h3>
+                              </Link>
+
+                              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
+                                {video.presented_by && (
+                                  <div className="flex items-center gap-2">
+                                    <UserIcon className="w-4 h-4 text-[var(--brown)]" />
+                                    <span className="font-medium">Presented by:</span>
+                                    <span className="text-[var(--brown)] font-semibold">{video.presented_by}</span>
+                                  </div>
+                                )}
+                                {video.uploaded_at && (
+                                  <div className="flex items-center gap-2">
+                                    <ClockIcon className="w-4 h-4" />
+                                    <span>Uploaded {formatDate(video.uploaded_at)}</span>
+                                  </div>
+                                )}
+                                <div className="flex items-center gap-2">
+                                  <BookOpenIcon className="w-4 h-4" />
+                                  <span>Part of {category?.name ?? "Course"}</span>
+                                </div>
+                              </div>
+
+                              {video.description && (
+                                <p className="text-gray-700 leading-relaxed mb-6 line-clamp-3">
+                                  {video.description}
+                                </p>
+                              )}
+                            </div>
+
+                            {/* Action Button */}
+                            <div className="pt-4 border-t border-gray-100">
+                              <Button
+                                onClick={() => router.push(`/law_video/${categoryId}/watch/${video.id}`)}
+                                variant="primary"
+                                className="w-full sm:w-auto"
+                              >
+                                <PlayIcon className="w-5 h-5" />
+                                Watch Lesson
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </section>
+      </PageContainer>
+    </ProtectedRoute>
+  );
+}

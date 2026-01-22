@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense } from "react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/instance";
 import PageContainer from "@/compounents/PageContainer";
 import FormSection from "@/compounents/FormSection";
 import FormCard from "@/compounents/FormCard";
@@ -15,8 +16,11 @@ import Button from "@/compounents/Button";
 import Divider from "@/compounents/Divider";
 import FormLink from "@/compounents/FormLink";
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectParam = searchParams.get("redirect");
+  const redirectTo = redirectParam && redirectParam.startsWith("/") ? redirectParam : "/";
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -43,11 +47,11 @@ export default function LoginPage() {
         toast.success("Welcome back! Sign in successful.");
         // Redirect to home page or profile page
         setTimeout(() => {
-          router.push("/");
+          router.push(redirectTo);
           router.refresh();
         }, 1000);
       }
-    } catch (err) {
+    } catch {
       toast.error("An unexpected error occurred. Please try again.");
       setLoading(false);
     }
@@ -116,7 +120,7 @@ export default function LoginPage() {
 
           <div className="text-center">
             <p className="text-gray-600">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <FormLink href="/auth/register">Sign up</FormLink>
             </p>
           </div>
@@ -131,5 +135,24 @@ export default function LoginPage() {
         </div>
       </FormSection>
     </PageContainer>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <PageContainer>
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--brown)] mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading...</p>
+            </div>
+          </div>
+        </PageContainer>
+      }
+    >
+      <LoginPageContent />
+    </Suspense>
   );
 }

@@ -4,7 +4,7 @@ import Image from "next/image";
 import PageContainer from "@/compounents/PageContainer";
 import Button from "@/compounents/Button";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 interface PricingPlan {
   id: string;
@@ -17,58 +17,40 @@ interface PricingPlan {
   popular?: boolean;
 }
 
-const pricingPlans: PricingPlan[] = [
-  {
-    id: "monthly",
-    name: "Monthly Plan",
-    duration: "1 Month",
-    price: 3,
-    features: [
-      "Access to all legal documents",
-      "Access to all video courses",
-      "Download PDF documents",
-      "Email support",
-      "Cancel anytime",
-    ],
-  },
-  {
-    id: "six-months",
-    name: "6 Months Plan",
-    duration: "6 Months",
-    price: 15,
-    originalPrice: 18,
-    discount: "Save 17%",
-    features: [
-      "Access to all legal documents",
-      "Access to all video courses",
-      "Download PDF documents",
-      "Priority email support",
-      "Cancel anytime",
-      "Best value for money",
-    ],
-    popular: true,
-  },
-  {
-    id: "yearly",
-    name: "Yearly Plan",
-    duration: "1 Year",
-    price: 25,
-    originalPrice: 36,
-    discount: "Save 31%",
-    features: [
-      "Access to all legal documents",
-      "Access to all video courses",
-      "Download PDF documents",
-      "Priority email support",
-      "Cancel anytime",
-      "Maximum savings",
-      "Exclusive content access",
-    ],
-  },
-];
-
 export default function PricingPage() {
   const router = useRouter();
+  const [remotePlans, setRemotePlans] = useState<PricingPlan[] | null>(null);
+  const [isPlansLoading, setIsPlansLoading] = useState(true);
+  const [plansError, setPlansError] = useState<string | null>(null);
+
+  const plans = useMemo(() => remotePlans ?? [], [remotePlans]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        setIsPlansLoading(true);
+        setPlansError(null);
+        const res = await fetch("/api/pricing-plans", { cache: "no-store" });
+        const json = (await res.json().catch(() => ({}))) as { plans?: PricingPlan[]; error?: string };
+        if (!res.ok) {
+          if (!cancelled) setPlansError(json.error || "Failed to load plans.");
+          return;
+        }
+        if (!cancelled) setRemotePlans(Array.isArray(json.plans) ? json.plans : []);
+      } catch (e) {
+        console.error(e);
+        if (!cancelled) setPlansError("Failed to load plans.");
+      } finally {
+        if (!cancelled) setIsPlansLoading(false);
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   useEffect(() => {
     const observerOptions = {
       threshold: 0.1,
@@ -103,7 +85,7 @@ export default function PricingPage() {
     setTimeout(checkAndAnimate, 100);
 
     return () => observer.disconnect();
-  }, []);
+  }, [plans]);
 
   return (
     <PageContainer>
@@ -140,86 +122,94 @@ export default function PricingPage() {
       {/* Pricing Plans */}
       <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-            {pricingPlans.map((plan, index) => (
-              <div
-                key={plan.id}
-                className={`relative rounded-2xl border border-[var(--border)] bg-[var(--surface-strong)] backdrop-blur-xl shadow-[var(--shadow-elev-1)] overflow-hidden transition-all duration-300 hover:shadow-[var(--shadow-elev-2)] hover:-translate-y-1 opacity-0 translate-y-8 ${
-                  plan.popular
-                    ? "ring-2 ring-[rgb(var(--brown-rgb)/0.35)] md:scale-[1.03]"
-                    : ""
-                }`}
-                style={{ animationDelay: `${(index + 1) * 100}ms` }}
-              >
-                <div className="p-8">
-                  {plan.popular && (
-                    <div className="absolute top-5 right-5">
-                      <span className="inline-flex items-center rounded-full bg-[rgb(var(--brown-rgb)/0.16)] text-[var(--brown-strong)] ring-1 ring-[rgb(var(--brown-rgb)/0.25)] px-3 py-1 text-xs font-semibold">
-                        Most popular
-                      </span>
-                    </div>
-                  )}
+          {isPlansLoading ? (
+            <div className="text-center text-gray-600 py-16">Loading plans…</div>
+          ) : plansError ? (
+            <div className="text-center text-red-600 py-16">{plansError}</div>
+          ) : plans.length === 0 ? (
+            <div className="text-center text-gray-600 py-16">No subscription plans available.</div>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+              {plans.map((plan, index) => (
+                <div
+                  key={plan.id}
+                  className={`relative rounded-2xl border border-[var(--border)] bg-[var(--surface-strong)] backdrop-blur-xl shadow-[var(--shadow-elev-1)] overflow-hidden transition-all duration-300 hover:shadow-[var(--shadow-elev-2)] hover:-translate-y-1 opacity-0 translate-y-8 ${
+                    plan.popular
+                      ? "ring-2 ring-[rgb(var(--brown-rgb)/0.35)] md:scale-[1.03]"
+                      : ""
+                  }`}
+                  style={{ animationDelay: `${(index + 1) * 100}ms` }}
+                >
+                  <div className="p-8">
+                    {plan.popular && (
+                      <div className="absolute top-5 right-5">
+                        <span className="inline-flex items-center rounded-full bg-[rgb(var(--brown-rgb)/0.16)] text-[var(--brown-strong)] ring-1 ring-[rgb(var(--brown-rgb)/0.25)] px-3 py-1 text-xs font-semibold">
+                          Most popular
+                        </span>
+                      </div>
+                    )}
 
-                  <h3 className="text-2xl font-bold text-slate-900 mb-2">
-                    {plan.name}
-                  </h3>
-                  <p className="text-slate-600 mb-6">{plan.duration}</p>
-
-                  <div className="mb-6">
-                    <div className="flex items-baseline gap-3">
-                      <span className="text-5xl font-bold text-slate-900 tracking-tight">
-                        ${plan.price}
-                      </span>
-                      {plan.originalPrice && (
-                        <span className="text-lg text-slate-400 line-through">
-                          ${plan.originalPrice}
+                    <h3 className="text-2xl font-bold text-slate-900 mb-2">
+                      {plan.name}
+                    </h3>
+                    <p className="text-slate-600 mb-6">{plan.duration}</p>
+                    
+                    <div className="mb-6">
+                      <div className="flex items-baseline gap-3">
+                        <span className="text-5xl font-bold text-slate-900 tracking-tight">
+                          ${plan.price}
+                        </span>
+                        {plan.originalPrice && (
+                          <span className="text-lg text-slate-400 line-through">
+                            ${plan.originalPrice}
+                          </span>
+                        )}
+                      </div>
+                      {plan.discount && (
+                        <span className="inline-flex mt-3 items-center px-3 py-1 bg-[var(--brown-soft)] text-[var(--brown-strong)] rounded-full text-sm font-semibold">
+                          {plan.discount}
                         </span>
                       )}
                     </div>
-                    {plan.discount && (
-                      <span className="inline-flex mt-3 items-center px-3 py-1 bg-[var(--brown-soft)] text-[var(--brown-strong)] rounded-full text-sm font-semibold">
-                        {plan.discount}
-                      </span>
-                    )}
-                  </div>
 
-                  <ul className="space-y-3 mb-8">
-                    {plan.features.map((feature, featureIndex) => (
-                      <li
-                        key={featureIndex}
-                        className="flex items-start opacity-0 translate-y-4"
-                        style={{ animationDelay: `${(index + 1) * 100 + (featureIndex + 1) * 50}ms` }}
-                      >
-                        <svg
-                          className="w-5 h-5 text-[var(--brown-strong)] mr-3 shrink-0 mt-0.5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                    <ul className="space-y-3 mb-8">
+                      {plan.features.map((feature, featureIndex) => (
+                        <li
+                          key={featureIndex}
+                          className="flex items-start opacity-0 translate-y-4"
+                          style={{ animationDelay: `${(index + 1) * 100 + (featureIndex + 1) * 50}ms` }}
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                        <span className="text-slate-700">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                          <svg
+                            className="w-5 h-5 text-[var(--brown-strong)] mr-3 shrink-0 mt-0.5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                          <span className="text-slate-700">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
 
-                  <Button
-                    onClick={() => router.push(`/payment?plan=${plan.id}`)}
-                    variant={plan.popular ? "primary" : "outline"}
-                    fullWidth
-                    className="px-6 py-3"
-                  >
-                    Get Started
-                  </Button>
+                    <Button
+                      onClick={() => router.push(`/payment?plan=${plan.id}`)}
+                      variant={plan.popular ? "primary" : "outline"}
+                      fullWidth
+                      className="px-6 py-3"
+                    >
+                      Get Started
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           {/* Additional Info */}
           <div className="mt-16 text-center opacity-0 translate-y-8 delay-500">

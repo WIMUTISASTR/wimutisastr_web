@@ -1,0 +1,11 @@
+export { default as AnimatedCounter } from "./AnimatedCounter";
+export { default as HeroSection } from "./HeroSection";
+export { default as FeaturesSection } from "./FeaturesSection";
+export { default as FeaturedCoursesSection } from "./FeaturedCoursesSection";
+export { default as FeaturedDocumentsSection } from "./FeaturedDocumentsSection";
+export { default as StatisticsSection } from "./StatisticsSection";
+export { default as TrustedBySection } from "./TrustedBySection";
+export { default as TestimonialsSection } from "./TestimonialsSection";
+export { default as AccreditationSection } from "./AccreditationSection";
+export { default as CallToActionSection } from "./CallToActionSection";
+export { default as Footer } from "./Footer";

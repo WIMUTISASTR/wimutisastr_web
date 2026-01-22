@@ -1,19 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { uploadToR2 } from '@/lib/r2-client';
+import { uploadToR2 } from '@/lib/storage/r2-client';
 import { createClient } from '@supabase/supabase-js';
-import { sendTelegramMessage } from '@/lib/telegram';
+import { sendTelegramMessage } from '@/lib/utils/telegram';
+import { env } from '@/lib/utils/env';
+import { logger } from '@/lib/utils/logger';
+import { rateLimit, createRateLimitResponse, RateLimitPresets } from '@/lib/rate-limit/redis';
+import { validateFileBuffer, sanitizeFilename } from '@/lib/storage/file-validation';
 
-// Create Supabase client for server-side operations
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
-// Help TypeScript understand these are defined after the runtime guard above
-const SUPABASE_URL: string = supabaseUrl;
-const SUPABASE_ANON_KEY: string = supabaseAnonKey;
+const log = logger.child({ module: 'api/payment/upload-proof' });
 
 function addMonths(date: Date, months: number) {
   const d = new Date(date);
@@ -40,6 +34,15 @@ function computeMembershipEnd(planId: string, startsAt: Date) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting - strict for file uploads
+    const rateLimitResult = await rateLimit(request, RateLimitPresets.upload);
+    if (!rateLimitResult.success) {
+      log.warn('Rate limit exceeded for upload-proof', {
+        ip: request.headers.get('x-forwarded-for') || 'unknown',
+      });
+      return createRateLimitResponse(rateLimitResult);
+    }
+
     // Get authorization header for user authentication
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -52,7 +55,7 @@ export async function POST(request: NextRequest) {
     const token = authHeader.replace('Bearer ', '');
     
     // Create Supabase client with user's access token
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    const supabase = createClient(env.supabase.url(), env.supabase.anonKey(), {
       global: {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -83,7 +86,7 @@ export async function POST(request: NextRequest) {
       .limit(1);
 
     if (pendingErr) {
-      console.error("Error checking pending proofs:", pendingErr);
+      log.error("Error checking pending proofs", pendingErr, { userId: user.id });
     }
 
     if (pendingExisting && pendingExisting.length > 0) {
@@ -103,7 +106,7 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (verifiedErr) {
-      console.error("Error checking verified proofs:", verifiedErr);
+      log.error("Error checking verified proofs", verifiedErr, { userId: user.id });
     }
 
     const membershipEndsAt = activeVerified?.membership_ends_at
@@ -137,41 +140,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      return NextResponse.json(
-        { error: 'File must be an image' },
-        { status: 400 }
-      );
-    }
-
-    // Validate file size (5MB max)
-    if (file.size > 5 * 1024 * 1024) {
-      return NextResponse.json(
-        { error: 'File size must be less than 5MB' },
-        { status: 400 }
-      );
-    }
-
-    // Convert file to buffer
+    // Convert file to buffer for validation
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Generate unique filename
-    const timestamp = Date.now();
-    const fileExtension = file.name.split('.').pop();
-    const filename = `${reference}-${timestamp}.${fileExtension}`;
-    const key = `proofs/${filename}`;
-
-    // Upload to R2 bucket
-    const bucketName = process.env.R2_PROOF_OF_PAYMENT_BUCKET_NAME;
-    if (!bucketName) {
+    // Enhanced file validation - checks magic numbers, not just MIME type
+    const validation = validateFileBuffer(buffer, file.name, file.type, 'paymentProof');
+    if (!validation.valid) {
+      log.warn('File validation failed', {
+        userId: user.id,
+        filename: file.name,
+        mimeType: file.type,
+        error: validation.error,
+      });
       return NextResponse.json(
-        { error: 'R2 bucket configuration missing' },
-        { status: 500 }
+        { error: validation.error || 'Invalid file' },
+        { status: 400 }
       );
     }
 
+    // Generate secure filename
+    const timestamp = Date.now();
+    const sanitizedOriginalName = sanitizeFilename(file.name);
+    const fileExtension = sanitizedOriginalName.split('.').pop() || 'jpg';
+    const filename = `${sanitizeFilename(reference)}-${timestamp}.${fileExtension}`;
+    const key = `proofs/${filename}`;
+
+    log.info('File validation passed', {
+      userId: user.id,
+      detectedType: validation.detectedType,
+      filename,
+    });
+
+    // Upload to R2 bucket
+    const bucketName = env.r2.proofOfPaymentBucket();
     const publicUrl = await uploadToR2(
       bucketName,
       key,
@@ -216,13 +218,14 @@ export async function POST(request: NextRequest) {
     try {
       await sendTelegramMessage(telegramText);
     } catch (err) {
-      console.error("Telegram notification failed:", err);
+      log.error("Telegram notification failed", err);
     }
 
     if (dbError) {
-      console.error('Error saving payment proof to database:', dbError);
-      // If table doesn't exist, log the error but still return success for the upload
-      // You'll need to create the table in Supabase
+      log.error('Error saving payment proof to database', dbError, {
+        userId: user.id,
+        reference,
+      });
       return NextResponse.json({
         success: true,
         message: 'Proof of payment uploaded successfully, but failed to save to database. Please contact support.',
@@ -232,6 +235,12 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    log.info('Payment proof uploaded successfully', {
+      userId: user.id,
+      reference,
+      proofId: paymentProof?.id,
+    });
+
     return NextResponse.json({
       success: true,
       message: 'Proof of payment uploaded successfully',
@@ -240,7 +249,7 @@ export async function POST(request: NextRequest) {
       paymentProofId: paymentProof?.id,
     });
   } catch (error) {
-    console.error('Error uploading proof of payment:', error);
+    log.error('Error uploading proof of payment', error);
     return NextResponse.json(
       { error: 'Failed to upload proof of payment' },
       { status: 500 }

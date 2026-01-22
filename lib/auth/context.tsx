@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, Session } from "@supabase/supabase-js";
-import { supabase } from "./supabase";
+import { supabase } from "../supabase/instance";
 import { useRouter } from "next/navigation";
 
 interface AuthContextType {

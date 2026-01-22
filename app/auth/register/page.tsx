@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/instance";
 import PageContainer from "@/compounents/PageContainer";
 import FormSection from "@/compounents/FormSection";
 import FormCard from "@/compounents/FormCard";

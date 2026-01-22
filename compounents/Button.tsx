@@ -32,7 +32,6 @@ export default function Button({
     // Paper button
     outline:
       "bg-white/80 backdrop-blur text-[var(--ink)] ring-slate-200 shadow-sm hover:bg-white hover:shadow-md hover:-translate-y-[1px]",
-    // Minimal button (for icon/utility controls)
     ghost:
       "bg-transparent text-slate-700 ring-transparent shadow-none hover:bg-slate-100 hover:text-slate-900",
   };

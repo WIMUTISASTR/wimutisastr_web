@@ -1,271 +1,371 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import PageContainer from "@/compounents/PageContainer";
-import Button from "@/compounents/Button";
+import ProtectedRoute from "@/compounents/ProtectedRoute";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { courses } from "./data";
+import { useEffect, useMemo, useState } from "react";
+import { fetchVideos, type VideoCategory, type VideoRow } from "@/lib/api/client";
+import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
+
+const FALLBACK_THUMB = "/asset/document_background.png";
+
+const STORAGE = {
+  watched: "wimutisastr:watchedVideos:v1",
+} as const;
+
+function formatDate(d: string | null | undefined) {
+  if (!d) return null;
+  const date = new Date(d);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" });
+}
+
+function clamp(n: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, n));
+}
+
+// Icon components
+const SearchIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+  </svg>
+);
+
+const PlayIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg className={className} fill="currentColor" viewBox="0 0 20 20">
+    <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+  </svg>
+);
+
+const BookOpenIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+  </svg>
+);
+
+const CheckIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+  </svg>
+);
 
 export default function LawVideoPage() {
   const router = useRouter();
-  const videosRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
-
-  // Filter courses based on search query
-  const filteredCourses = courses.filter((course) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      course.title.toLowerCase().includes(query) ||
-      course.description.toLowerCase().includes(query) ||
-      course.author.toLowerCase().includes(query) ||
-      course.year.toString().includes(query) ||
-      course.videos.some((video) => video.title.toLowerCase().includes(query))
-    );
-  });
+  const [categories, setCategories] = useState<VideoCategory[]>([]);
+  const [videos, setVideos] = useState<VideoRow[]>([]);
+  const [watchedIds, setWatchedIds] = useState<Set<string>>(new Set());
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: "0px 0px -50px 0px",
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("animate-in");
-          observer.unobserve(entry.target);
+    let cancelled = false;
+    const load = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await fetchVideos();
+        if (!cancelled) {
+          setCategories(data.categories);
+          setVideos(data.videos);
         }
-      });
-    }, observerOptions);
-
-    const checkAndAnimate = () => {
-      const animatedElements = document.querySelectorAll(
-        '.opacity-0[class*="delay"], .opacity-0.translate-y-8, .opacity-0.translate-y-4, .opacity-0.translate-x-8, .opacity-0.-translate-x-8'
-      );
-      animatedElements.forEach((el) => {
-        observer.observe(el);
-        const rect = el.getBoundingClientRect();
-        if (rect.top < window.innerHeight && rect.bottom > 0) {
-          setTimeout(() => {
-            el.classList.add("animate-in");
-          }, 50);
-        }
-      });
+      } catch (e: unknown) {
+        console.error(e);
+        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load videos.");
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
     };
-
-    checkAndAnimate();
-    setTimeout(checkAndAnimate, 100);
-
-    return () => observer.disconnect();
+    load();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  return (
-    <PageContainer>
-      {/* Hero Section */}
-      <section className="relative bg-slate-900 text-white py-20 overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/asset/document_background.png"
-            alt="Legal videos background"
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
-            style={{ objectFit: 'cover' }}
-          />
-        </div>
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/70 via-slate-900/60 to-slate-900/70 z-10"></div>
-        {/* Subtle gold accent overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[var(--brown-soft)] to-transparent z-10"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
-          <div className="text-center">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 opacity-0 translate-y-8 delay-100">
-              Legal Videos
-            </h1>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto opacity-0 translate-y-8 delay-300">
-              Learn Cambodian law through comprehensive video tutorials
-            </p>
-          </div>
-        </div>
-      </section>
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE.watched);
+      if (raw) {
+        const parsed: unknown = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          const ids = parsed.filter((x): x is string => typeof x === "string");
+          setWatchedIds(new Set(ids));
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
-      {/* Videos List Section */}
-      <section className="py-20 px-2 sm:px-4 lg:px-6">
-        <div className="max-w-7xl mx-auto">
-          {/* Search Bar */}
-          <div className="mb-12 opacity-0 translate-y-8 delay-100">
-            <div className="relative max-w-2xl mx-auto">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <svg
-                    className="h-5 w-5 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
+  const videoStatsByCategory = useMemo(() => {
+    const map = new Map<
+      string,
+      { count: number; lastUpdated: string | null; watchedCount: number; progressPct: number }
+    >();
+    for (const v of videos) {
+      const catId = v.category_id ?? "";
+      if (!catId) continue;
+      const prev = map.get(catId) ?? {
+        count: 0,
+        lastUpdated: null,
+        watchedCount: 0,
+        progressPct: 0,
+      };
+      const t = v.uploaded_at ? new Date(v.uploaded_at).getTime() : 0;
+      const prevT = prev.lastUpdated ? new Date(prev.lastUpdated).getTime() : 0;
+      const watchedCount = prev.watchedCount + (watchedIds.has(v.id) ? 1 : 0);
+      const count = prev.count + 1;
+      const progressPct = count > 0 ? clamp(Math.round((watchedCount / count) * 100), 0, 100) : 0;
+
+      map.set(catId, {
+        count: prev.count + 1,
+        lastUpdated: t > prevT ? v.uploaded_at ?? null : prev.lastUpdated,
+        watchedCount,
+        progressPct,
+      });
+    }
+    return map;
+  }, [videos, watchedIds]);
+
+  const filteredCategories = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    let list = categories;
+    if (q) {
+      list = list.filter((c) => {
+        const name = (c.name ?? "").toLowerCase();
+        const desc = (c.description ?? "").toLowerCase();
+        return name.includes(q) || desc.includes(q);
+      });
+    }
+
+    return list;
+  }, [categories, searchQuery]);
+
+  return (
+    <ProtectedRoute>
+      <PageContainer>
+        <section className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8 min-h-screen">
+          <div className="max-w-7xl mx-auto">
+            {/* Hero Header Section */}
+            <div className="mb-10 animate-in">
+              <div className="flex flex-col gap-6">
+                <div>
+                  <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-3">
+                    Video Courses
+                  </h1>
+                  <p className="text-lg text-gray-600 max-w-2xl">
+                    Explore our comprehensive collection of legal education courses designed for professionals and students.
+                  </p>
                 </div>
-                <input
-                  type="text"
-                  placeholder="Search by title, author, description, or year..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-12 pr-4 py-4 rounded-2xl bg-white/80 backdrop-blur text-slate-900 placeholder:text-slate-400 shadow-sm ring-1 ring-inset ring-slate-200 focus:outline-none focus:ring-2 focus:ring-[var(--brown)] transition-colors text-lg"
-                />
-                {searchQuery && (
-                  <Button
-                    type="button"
-                    onClick={() => setSearchQuery("")}
-                    variant="ghost"
-                    size="icon"
-                    className="absolute inset-y-0 right-0 pr-3 text-gray-400 hover:text-gray-600"
-                    aria-label="Clear search"
-                  >
-                    <svg
-                      className="h-5 w-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </Button>
+
+                {/* Enhanced Search Bar */}
+                <div className="relative max-w-2xl">
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <SearchIcon className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Search courses by name or description..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-12 pr-4 py-4 rounded-xl border-2 border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--brown)] focus:border-[var(--brown)] transition-all duration-200 text-base"
+                    />
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setSearchQuery("")}
+                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                        aria-label="Clear search"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Results Count */}
+            {!isLoading && !error && (
+              <div className="mb-6 text-sm text-gray-600 animate-in delay-100">
+                {filteredCategories.length === 0 ? (
+                  <span>No courses found</span>
+                ) : (
+                  <span>
+                    {filteredCategories.length} {filteredCategories.length === 1 ? "course" : "courses"} available
+                  </span>
                 )}
               </div>
-              {searchQuery && (
-                <p className="mt-3 text-sm text-gray-600 text-center">
-                  Found {filteredCourses.length} course{filteredCourses.length !== 1 ? 's' : ''}
-                </p>
-              )}
-            </div>
-          </div>
+            )}
 
-          {/* Courses List */}
-          <div className="space-y-6">
-            {filteredCourses.length > 0 ? (
-              filteredCourses.map((course, index) => (
-                <div
-                  key={course.id}
-                  className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden opacity-0 translate-y-8"
-                  style={{ animationDelay: `${(index + 1) * 100}ms` }}
+            {/* Loading State */}
+            {isLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden animate-pulse"
+                  >
+                    <div className="aspect-video bg-gray-200" />
+                    <div className="p-6 space-y-4">
+                      <div className="h-5 bg-gray-200 rounded w-3/4" />
+                      <div className="h-4 bg-gray-200 rounded w-full" />
+                      <div className="h-4 bg-gray-200 rounded w-2/3" />
+                      <div className="h-2 bg-gray-200 rounded w-full" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : error ? (
+              <div className="mt-12 rounded-2xl border-2 border-red-200 bg-red-50 p-8 text-center animate-scale-in">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-4">
+                  <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-xl font-semibold text-red-900 mb-2">Couldn't load courses</p>
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            ) : filteredCategories.length === 0 ? (
+              <div className="mt-12 rounded-2xl border-2 border-gray-200 bg-white p-12 text-center shadow-sm animate-scale-in">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                  <SearchIcon className="w-8 h-8 text-gray-400" />
+                </div>
+                <p className="text-xl font-semibold text-gray-900 mb-2">No courses found</p>
+                <p className="text-sm text-gray-600 mb-6">Try adjusting your search terms or browse all courses.</p>
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="inline-flex items-center gap-2 rounded-xl bg-[var(--brown)] text-white px-6 py-3 text-sm font-semibold hover:bg-[var(--brown-strong)] transition-colors shadow-sm hover:shadow-md"
                 >
-                  {/* Course Header */}
-                  <div className="p-6 border-b border-gray-200">
-                    <div className="flex flex-col md:flex-row gap-6">
+                  Clear Search
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredCategories.map((cat, index) => {
+                  const thumb = normalizeNextImageSrc(cat.cover_url, FALLBACK_THUMB);
+                  const stats = videoStatsByCategory.get(cat.id);
+                  const total = stats?.count ?? 0;
+                  const pct = stats?.progressPct ?? 0;
+                  const updated = stats?.lastUpdated ?? null;
+
+                  const handleOpen = () => {
+                    router.push(`/law_video/${cat.id}`);
+                  };
+
+                  return (
+                    <div
+                      key={cat.id}
+                      className="group bg-white border-2 border-gray-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer animate-scale-in"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                      role="button"
+                      tabIndex={0}
+                      onClick={handleOpen}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") handleOpen();
+                      }}
+                    >
                       {/* Course Thumbnail */}
-                      <div className="relative w-full md:w-80 aspect-video rounded-md overflow-hidden shrink-0 group cursor-pointer">
+                      <div className="relative w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
                         <Image
-                          src={course.thumbnail}
-                          alt={course.title}
+                          src={thumb}
+                          alt={cat.name ?? "Course"}
                           fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, 320px"
+                          className="object-cover transition-transform duration-500 group-hover:scale-110"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         />
-                        {/* Play Button Overlay - YouTube style (appears on hover) */}
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center">
-                          <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100 transition-all duration-200 shadow-lg">
-                            <svg
-                              className="w-8 h-8 text-[var(--brown-strong)] ml-1"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                            </svg>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        
+                        {/* Play Button Overlay */}
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <div className="w-20 h-20 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform">
+                            <PlayIcon className="w-10 h-10 text-[var(--brown)] ml-1" />
                           </div>
                         </div>
-                        {/* Duration Badge - YouTube style */}
-                        <div className="absolute bottom-2 right-2 bg-black/80 text-white px-1.5 py-0.5 rounded text-xs font-medium">
-                          {course.totalDuration}
-                        </div>
+
+                        {/* Progress Badge */}
+                        {pct > 0 && (
+                          <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 text-xs font-bold text-[var(--brown)] shadow-lg">
+                            {pct}% Complete
+                          </div>
+                        )}
+
+                        {/* Video Count Badge */}
+                        {total > 0 && (
+                          <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-lg flex items-center gap-1.5">
+                            <BookOpenIcon className="w-3.5 h-3.5" />
+                            <span>{total} {total === 1 ? "video" : "videos"}</span>
+                          </div>
+                        )}
                       </div>
 
                       {/* Course Info */}
-                      <div className="flex-1">
-                        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 leading-tight line-clamp-2">
-                          {course.title}
-                        </h2>
-                        <p className="text-gray-600 mb-4">
-                          {course.description}
-                        </p>
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
-                          <span className="flex items-center">
-                            <svg className="w-4 h-4 mr-1 text-[var(--brown-strong)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                            {course.author}
-                          </span>
-                          <span className="flex items-center">
-                            <svg className="w-4 h-4 mr-1 text-[var(--brown-strong)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            {course.year}
-                          </span>
-                          <span className="flex items-center">
-                            <svg className="w-4 h-4 mr-1 text-[var(--brown-strong)]" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
-                            </svg>
-                            {course.totalVideos} videos
-                          </span>
-                          <span className="flex items-center">
-                            <svg className="w-4 h-4 mr-1 text-[var(--brown-strong)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            {course.totalDuration}
-                          </span>
+                      <div className="p-6">
+                        <div className="mb-4">
+                          <h3 className="text-lg font-bold text-gray-900 leading-tight line-clamp-2 mb-2 group-hover:text-[var(--brown)] transition-colors">
+                            {cat.name ?? "Untitled Course"}
+                          </h3>
+                          {cat.description && (
+                            <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
+                              {cat.description}
+                            </p>
+                          )}
                         </div>
-                        <Button
-                          onClick={() => router.push(`/law_video/${course.id}`)}
-                          variant="primary"
-                          className="px-6 py-2"
-                        >
-                          View {course.totalVideos} Videos
-                        </Button>
+
+                        {/* Progress Bar */}
+                        {total > 0 && (
+                          <div className="mb-4">
+                            {pct === 0 ? (
+                              <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">
+                                <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+                                <span>Not Started</span>
+                              </div>
+                            ) : (
+                              <>
+                                <div className="h-2 rounded-full bg-gray-200 overflow-hidden mb-2">
+                                  <div
+                                    className="h-full bg-gradient-to-r from-[var(--brown)] to-[var(--brown-strong)] rounded-full transition-all duration-500"
+                                    style={{ width: `${pct}%` }}
+                                  />
+                                </div>
+                                <div className="flex items-center justify-between text-xs text-gray-600">
+                                  <span className="font-medium">{pct}% complete</span>
+                                  {updated && (
+                                    <span className="text-gray-500">Updated {formatDate(updated)}</span>
+                                  )}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Action Button */}
+                        <div className="pt-4 border-t border-gray-100">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-semibold text-[var(--brown)] group-hover:text-[var(--brown-strong)] transition-colors">
+                              {pct === 0 ? "Start Course" : pct === 100 ? "Review Course" : "Continue Learning"}
+                            </span>
+                            <div className="w-8 h-8 rounded-full bg-[var(--brown)]/10 flex items-center justify-center group-hover:bg-[var(--brown)]/20 transition-colors">
+                              <svg className="w-4 h-4 text-[var(--brown)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-16 opacity-0 translate-y-8 delay-100">
-                <svg
-                  className="mx-auto h-16 w-16 text-gray-400 mb-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                  />
-                </svg>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  No courses found
-                </h3>
-                <p className="text-gray-600">
-                  Try adjusting your search terms
-                </p>
+                  );
+                })}
               </div>
             )}
           </div>
-        </div>
-      </section>
-    </PageContainer>
+        </section>
+      </PageContainer>
+    </ProtectedRoute>
   );
 }

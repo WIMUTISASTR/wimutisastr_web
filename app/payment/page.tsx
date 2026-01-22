@@ -5,11 +5,10 @@ import Link from "next/link";
 import { Suspense } from "react";
 import PageContainer from "@/compounents/PageContainer";
 import Button from "@/compounents/Button";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { QRCodeSVG } from "qrcode.react";
-import { useAuth } from "@/lib/auth-context";
-import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/lib/auth/context";
+import { supabase } from "@/lib/supabase/instance";
 import { toast } from "react-toastify";
 
 interface PlanDetails {
@@ -17,44 +16,31 @@ interface PlanDetails {
   name: string;
   duration: string;
   price: number;
+  description?: string | null;
+  currency?: string | null;
+  qrCodeUrl?: string | null;
   originalPrice?: number;
   discount?: string;
 }
-
-const plans: Record<string, PlanDetails> = {
-  monthly: {
-    id: "monthly",
-    name: "Monthly Plan",
-    duration: "1 Month",
-    price: 3,
-  },
-  "six-months": {
-    id: "six-months",
-    name: "6 Months Plan",
-    duration: "6 Months",
-    price: 15,
-    originalPrice: 18,
-    discount: "Save 17%",
-  },
-  yearly: {
-    id: "yearly",
-    name: "Yearly Plan",
-    duration: "1 Year",
-    price: 25,
-    originalPrice: 36,
-    discount: "Save 31%",
-  },
-};
 
 function PaymentPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const planId = searchParams.get("plan") || "monthly";
-  const selectedPlan = plans[planId] || plans.monthly;
+  const planId = searchParams.get("plan") || "";
+  const [plans, setPlans] = useState<PlanDetails[]>([]);
+  const [isPlansLoading, setIsPlansLoading] = useState(true);
+  const [plansError, setPlansError] = useState<string | null>(null);
+
+  const selectedPlan = useMemo(() => {
+    if (!plans.length) return null;
+    if (planId) return plans.find((p) => p.id === planId) ?? null;
+    return plans[0] ?? null;
+  }, [plans, planId]);
+
+  const qrImageUrl = selectedPlan?.qrCodeUrl ?? null;
 
   const [paymentReference, setPaymentReference] = useState<string>("");
-  const [qrData, setQrData] = useState<string>("");
   const [paymentStatus, setPaymentStatus] = useState<"pending" | "completed" | "failed">("pending");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [proofImage, setProofImage] = useState<File | null>(null);
@@ -63,6 +49,32 @@ function PaymentPageContent() {
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadPlans = async () => {
+      try {
+        setIsPlansLoading(true);
+        setPlansError(null);
+        const res = await fetch("/api/pricing-plans", { cache: "no-store" });
+        const json = (await res.json().catch(() => ({}))) as { plans?: PlanDetails[]; error?: string };
+        if (!res.ok) {
+          if (!cancelled) setPlansError(json.error || "Failed to load plans.");
+          return;
+        }
+        if (!cancelled) setPlans(Array.isArray(json.plans) ? json.plans : []);
+      } catch (e) {
+        console.error(e);
+        if (!cancelled) setPlansError("Failed to load plans.");
+      } finally {
+        if (!cancelled) setIsPlansLoading(false);
+      }
+    };
+    loadPlans();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const observerOptions = {
@@ -100,38 +112,22 @@ function PaymentPageContent() {
     return () => observer.disconnect();
   }, []);
 
-  // Generate payment session and QR code when component mounts
+  // Supabase-only flow:
+  // QR comes from selectedPlan.qrCodeUrl (stored in Supabase).
+  // We generate a client-side reference for proof upload.
   useEffect(() => {
-    const createPaymentSession = async () => {
-      try {
-        const response = await fetch("/api/payment", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            planId: selectedPlan.id,
-            amount: selectedPlan.price,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to create payment session");
-        }
-
-        const data = await response.json();
-        setPaymentReference(data.reference);
-        setQrData(data.qrData);
-        setPaymentStatus("pending");
-      } catch (error) {
-        console.error("Error creating payment session:", error);
-        setErrorMessage("Failed to initialize payment. Please try again.");
-        setPaymentStatus("failed");
-      }
-    };
-
-    createPaymentSession();
-  }, [selectedPlan.id, selectedPlan.price]);
+    if (!selectedPlan) return;
+    if (!qrImageUrl) {
+      setPaymentStatus("failed");
+      setErrorMessage("QR code is missing for this plan. Please contact admin.");
+      return;
+    }
+    if (!paymentReference) {
+      const ref = `REF-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+      setPaymentReference(ref);
+    }
+    setPaymentStatus("pending");
+  }, [selectedPlan, qrImageUrl, paymentReference]);
 
   // Auto-checking removed - payment verification will be done manually after proof upload
 
@@ -200,7 +196,12 @@ function PaymentPageContent() {
       const formData = new FormData();
       formData.append('proof', proofImage);
       formData.append('reference', paymentReference);
-      formData.append('planId', planId);
+      if (!selectedPlan) {
+        setErrorMessage("Plan not loaded. Please go back and select a plan again.");
+        toast.error("Plan not loaded. Please select a plan again.");
+        return;
+      }
+      formData.append('planId', selectedPlan.id);
       formData.append('amount', selectedPlan.price.toString());
 
       const response = await fetch('/api/payment/upload-proof', {
@@ -238,13 +239,6 @@ function PaymentPageContent() {
     }
   };
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/auth/login?redirect=/payment?plan=" + planId);
-    }
-  }, [user, authLoading, router, planId]);
-
   if (authLoading) {
     return (
       <PageContainer>
@@ -258,8 +252,48 @@ function PaymentPageContent() {
     );
   }
 
-  if (!user) {
-    return null; // Will redirect
+  if (isPlansLoading) {
+    return (
+      <PageContainer>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--brown)] mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading plans...</p>
+          </div>
+        </div>
+      </PageContainer>
+    );
+  }
+
+  if (plansError) {
+    return (
+      <PageContainer>
+        <div className="min-h-screen flex items-center justify-center p-6">
+          <div className="text-center max-w-md">
+            <p className="text-red-600 font-semibold mb-2">{plansError}</p>
+            <Button onClick={() => router.push("/pricing_page")} variant="primary">
+              Back to Pricing
+            </Button>
+          </div>
+        </div>
+      </PageContainer>
+    );
+  }
+
+  if (!selectedPlan) {
+    return (
+      <PageContainer>
+        <div className="min-h-screen flex items-center justify-center p-6">
+          <div className="text-center max-w-md">
+            <p className="text-gray-700 font-semibold mb-2">Plan not found</p>
+            <p className="text-sm text-gray-600 mb-4">Please select a plan on the pricing page.</p>
+            <Button onClick={() => router.push("/pricing_page")} variant="primary">
+              Back to Pricing
+            </Button>
+          </div>
+        </div>
+      </PageContainer>
+    );
   }
 
   return (
@@ -284,10 +318,10 @@ function PaymentPageContent() {
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--brown-soft)] to-transparent z-10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
           <div className="text-center">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 opacity-0 translate-y-8 delay-100">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4">
               Complete Your Payment
             </h1>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto opacity-0 translate-y-8 delay-300">
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               Secure payment processing for your subscription
             </p>
           </div>
@@ -300,7 +334,7 @@ function PaymentPageContent() {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Left Side - Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 sticky top-24 opacity-0 translate-y-8 delay-100">
+              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 sticky top-24">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Order Summary</h2>
                 
                 <div className="space-y-4 mb-6 pb-6 border-b border-gray-200">
@@ -346,7 +380,7 @@ function PaymentPageContent() {
 
             {/* Right Side - Payment Form */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 opacity-0 translate-y-8 delay-200">
+              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Payment Information</h2>
 
                 <div className="space-y-6">                  
@@ -358,14 +392,15 @@ function PaymentPageContent() {
                     <div className="bg-gray-50 rounded-xl p-8 border-2 border-[rgb(var(--brown-rgb)/0.3)]">
                       <div className="flex flex-col items-center">
                         <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
-                          {qrData ? (
+                          {qrImageUrl ? (
                             <div className="flex flex-col items-center">
-                              <QRCodeSVG
-                                value={qrData}
-                                size={256}
-                                level="H"
-                                includeMargin={true}
+                              <Image
+                                src={qrImageUrl}
+                                alt="KHQR code"
+                                width={256}
+                                height={256}
                                 className="rounded-lg"
+                                sizes="256px"
                               />
                               {paymentReference && (
                                 <p className="text-xs text-gray-500 mt-2 font-mono">
@@ -380,7 +415,7 @@ function PaymentPageContent() {
                                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
-                                <p className="text-sm text-gray-500">Generating QR Code...</p>
+                                <p className="text-sm text-gray-500">QR code not available</p>
                               </div>
                             </div>
                           )}
@@ -416,6 +451,25 @@ function PaymentPageContent() {
                     <p className="text-sm text-gray-600 mb-4">
                       After completing your payment, you can upload a screenshot or photo of your payment confirmation for faster verification.
                     </p>
+                    {!user ? (
+                      <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+                        <p className="font-semibold">Login required to upload proof</p>
+                        <p className="mt-1 text-amber-800/90">
+                          You can still scan and pay now, but you must log in to upload proof for admin verification.
+                        </p>
+                        <div className="mt-3">
+                          <Button
+                            variant="primary"
+                            onClick={() => {
+                              const redirectPath = `/payment${planId ? `?plan=${encodeURIComponent(planId)}` : ""}`;
+                              router.push(`/auth/login?redirect=${encodeURIComponent(redirectPath)}`);
+                            }}
+                          >
+                            Login
+                          </Button>
+                        </div>
+                      </div>
+                    ) : null}
 
                     {!proofImagePreview ? (
                       <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-[var(--brown)] transition-colors">
@@ -457,6 +511,7 @@ function PaymentPageContent() {
                             width={600}
                             height={400}
                             className="w-full h-auto object-contain bg-gray-50"
+                            unoptimized
                           />
                           <button
                             onClick={handleRemoveImage}
@@ -511,7 +566,7 @@ function PaymentPageContent() {
                               </svg>
                               <div>
                                 <p className="text-green-700 font-semibold">Proof uploaded successfully!</p>
-                                <p className="text-green-600 text-sm mt-1">We'll verify your payment shortly. You can also wait for automatic verification.</p>
+                                <p className="text-green-600 text-sm mt-1">We&apos;ll verify your payment shortly. You can also wait for automatic verification.</p>
                               </div>
                             </div>
                           </div>
@@ -537,7 +592,7 @@ function PaymentPageContent() {
                     </svg>
                     <div className="text-sm text-gray-600">
                       <p className="font-semibold text-gray-900 mb-1">Secure Payment</p>
-                      <p>KHQR Bakong is Cambodia's national payment system. Your payment is processed securely through your banking app.</p>
+                      <p>KHQR Bakong is Cambodia&apos;s national payment system. Your payment is processed securely through your banking app.</p>
                     </div>
                   </div>
 
@@ -547,7 +602,6 @@ function PaymentPageContent() {
                       onClick={() => {
                         setPaymentStatus("pending");
                         setErrorMessage("");
-                        setQrData("");
                         setPaymentReference("");
                         // Trigger re-initialization
                         window.location.reload();
@@ -561,13 +615,13 @@ function PaymentPageContent() {
                   )}
 
                   {/* Status Message */}
-                  {qrData && (
+                  {qrImageUrl ? (
                     <div className="bg-[var(--brown-soft)] border border-[rgb(var(--brown-rgb)/0.25)] rounded-lg p-4">
                       <p className="text-sm text-slate-800 text-center">
                         Scan the QR code with your Bakong app to complete payment. After payment, upload proof of payment below for manual verification.
                       </p>
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </div>
