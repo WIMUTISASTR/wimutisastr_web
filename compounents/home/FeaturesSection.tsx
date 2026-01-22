@@ -2,85 +2,161 @@
 
 import Link from "next/link";
 
+const features = [
+  {
+    href: "/law_video",
+    icon: (
+      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    title: "Video Courses",
+    description: "Learn from expert legal professionals through comprehensive, professionally produced video tutorials covering all aspects of Cambodian law.",
+    cta: "Explore Courses",
+    bgColor: "var(--primary)",
+  },
+  {
+    href: "/law_documents",
+    icon: (
+      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    ),
+    title: "Legal Documents",
+    description: "Access comprehensive legal documents, statutes, case studies, and reference materials to deepen your understanding of Cambodian legal frameworks.",
+    cta: "Browse Documents",
+    bgColor: "var(--accent)",
+  },
+];
+
 export default function FeaturesSection() {
   return (
-    <section className="py-24 px-4 sm:px-6 lg:px-8 bg-linear-to-b from-white to-gray-50 relative overflow-hidden">
-      {/* Background Decoration */}
-      <div className="absolute top-0 left-0 w-full h-full opacity-5">
-        <div className="absolute top-20 left-10 w-96 h-96 bg-(--brown) rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-(--brown) rounded-full blur-3xl" />
+    <section className="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden bg-white">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--primary)] opacity-5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[var(--accent)] opacity-8 rounded-full blur-3xl" />
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="text-center mb-16 scroll-animate opacity-0 translate-y-8">
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-4">
-            Everything You Need to <span className="text-(--brown)">Excel</span>
+        {/* Section Header */}
+        <div className="text-center mb-20 scroll-animate opacity-0 translate-y-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)]/20 border-2 border-[var(--primary)] rounded-full mb-6">
+            <div className="w-2 h-2 bg-[var(--primary)] rounded-full animate-pulse" />
+            <span className="text-sm font-bold text-[var(--primary)] uppercase tracking-wide">Our Features</span>
+          </div>
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[var(--ink)] mb-6 leading-tight">
+            Everything You Need to{" "}
+            <span className="text-[var(--primary)]">Excel</span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-[var(--gray-700)] max-w-3xl mx-auto font-medium">
             Comprehensive legal education resources at your fingertips
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Video Feature Card */}
-          <Link 
-            href="/law_video"
-            className="group card-3d scroll-animate opacity-0 translate-y-8 delay-100"
-          >
-            <div className="relative h-full p-8 rounded-3xl bg-white border-2 border-gray-100 hover:border-(--brown) transition-all duration-500 shadow-lg hover:shadow-2xl overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-(--brown)/10 to-transparent rounded-bl-full" />
-              <div className="relative z-10">
-                <div className="w-16 h-16 bg-linear-to-br from-(--brown) to-(--brown-strong) rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                  <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                  </svg>
+        {/* Feature Cards */}
+        <div className="grid md:grid-cols-2 gap-8 lg:gap-10">
+          {features.map((feature, index) => (
+            <Link 
+              key={feature.href}
+              href={feature.href}
+              className={`group relative scroll-animate opacity-0 translate-y-8 delay-${(index + 1) * 100}`}
+            >
+              <div className="relative h-full p-8 lg:p-10 rounded-3xl bg-white border-2 border-[var(--gray-200)] hover:border-[var(--primary)] transition-all duration-500 shadow-lg hover:shadow-2xl overflow-hidden card-lift">
+                {/* Solid Color Overlay on Hover */}
+                <div className="absolute inset-0 bg-[var(--accent)] opacity-0 group-hover:opacity-5 transition-opacity duration-500" />
+                
+                <div className="relative z-10">
+                  {/* Icon */}
+                  <div 
+                    className="w-16 h-16 lg:w-20 lg:h-20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg"
+                    style={{ backgroundColor: feature.bgColor }}
+                  >
+                    <div className="text-white">
+                      {feature.icon}
+                    </div>
+                  </div>
+                  
+                  {/* Title */}
+                  <h3 className="text-3xl lg:text-4xl font-bold text-[var(--ink)] mb-4 group-hover:text-[var(--primary)] transition-colors duration-300">
+                    {feature.title}
+                  </h3>
+                  
+                  {/* Description */}
+                  <p className="text-[var(--gray-700)] text-lg leading-relaxed mb-6 font-medium">
+                    {feature.description}
+                  </p>
+                  
+                  {/* CTA */}
+                  <div className="flex items-center gap-2 text-[var(--primary)] font-bold group-hover:gap-4 transition-all duration-300">
+                    <span>{feature.cta}</span>
+                    <svg className="w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </div>
                 </div>
-                <h3 className="text-3xl font-bold text-gray-900 mb-3 group-hover:text-(--brown) transition-colors">
-                  Video Courses
-                </h3>
-                <p className="text-gray-600 text-lg leading-relaxed mb-6">
-                  Learn from expert legal professionals through comprehensive, professionally produced video tutorials 
-                  covering all aspects of Cambodian law.
-                </p>
-                <div className="flex items-center text-(--brown) font-semibold group-hover:translate-x-2 transition-transform">
-                  Explore Courses
-                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </Link>
 
-          {/* Documents Feature Card */}
-          <Link 
-            href="/law_documents"
-            className="group card-3d scroll-animate opacity-0 translate-y-8 delay-200"
-          >
-            <div className="relative h-full p-8 rounded-3xl bg-white border-2 border-gray-100 hover:border-(--brown) transition-all duration-500 shadow-lg hover:shadow-2xl overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-(--brown)/10 to-transparent rounded-bl-full" />
-              <div className="relative z-10">
-                <div className="w-16 h-16 bg-linear-to-br from-(--brown) to-(--brown-strong) rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <h3 className="text-3xl font-bold text-gray-900 mb-3 group-hover:text-(--brown) transition-colors">
-                  Legal Documents
-                </h3>
-                <p className="text-gray-600 text-lg leading-relaxed mb-6">
-                  Access comprehensive legal documents, statutes, case studies, and reference materials 
-                  to deepen your understanding of Cambodian legal frameworks.
-                </p>
-                <div className="flex items-center text-(--brown) font-semibold group-hover:translate-x-2 transition-transform">
-                  Browse Documents
-                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                {/* Shimmer Effect */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                  <div className="absolute inset-0 animate-shimmer-slow bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                 </div>
               </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Additional Features Grid */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-16 scroll-animate opacity-0 translate-y-8 delay-300">
+          {[
+            { 
+              icon: (
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                </svg>
+              ),
+              title: "Expert-Led",
+              desc: "Taught by professionals",
+            },
+            { 
+              icon: (
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              ),
+              title: "Mobile Access",
+              desc: "Learn anywhere, anytime",
+            },
+            { 
+              icon: (
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              ),
+              title: "Certified",
+              desc: "Official certifications",
+            },
+            { 
+              icon: (
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              ),
+              title: "24/7 Support",
+              desc: "Always here to help",
+            },
+          ].map((item, index) => (
+            <div 
+              key={index}
+              className="p-6 rounded-2xl bg-white border-2 border-[var(--gray-200)] hover:border-[var(--primary)] transition-all duration-300 hover:shadow-lg group"
+            >
+              <div className="w-12 h-12 bg-[var(--accent)]/20 rounded-xl flex items-center justify-center mb-4 text-[var(--primary)] group-hover:scale-110 transition-transform duration-300">
+                {item.icon}
+              </div>
+              <h4 className="font-bold text-[var(--ink)] mb-1 text-lg">{item.title}</h4>
+              <p className="text-sm text-[var(--gray-700)]">{item.desc}</p>
             </div>
-          </Link>
+          ))}
         </div>
       </div>
     </section>

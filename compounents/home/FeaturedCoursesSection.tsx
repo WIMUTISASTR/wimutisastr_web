@@ -21,91 +21,130 @@ export default function FeaturedCoursesSection({
   const router = useRouter();
 
   return (
-    <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white relative">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16 scroll-animate opacity-0 translate-y-8">
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-4">
-            Featured <span className="text-(--brown)">Courses</span>
+    <section className="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden bg-[var(--gray-50)]">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 right-0 w-96 h-96 bg-[var(--primary)] opacity-5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-[var(--accent)] opacity-8 rounded-full blur-3xl" />
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Section Header */}
+        <div className="text-center mb-20 scroll-animate opacity-0 translate-y-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)]/20 border-2 border-[var(--primary)] rounded-full mb-6">
+            <div className="w-2 h-2 bg-[var(--primary)] rounded-full animate-pulse" />
+            <span className="text-sm font-bold text-[var(--primary)] uppercase tracking-wide">Popular Courses</span>
+          </div>
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[var(--ink)] mb-6 leading-tight">
+            Featured{" "}
+            <span className="text-[var(--primary)]">Courses</span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-[var(--gray-700)] max-w-3xl mx-auto font-medium">
             Explore our most popular legal education courses
           </p>
         </div>
 
         {/* Carousel Container */}
         <div className="relative mb-12">
-          <div className="relative overflow-hidden rounded-3xl">
+          <div className="relative overflow-hidden bg-white">
             <div 
-              className="flex transition-transform duration-700 ease-in-out"
+              className="flex transition-transform duration-700 ease-out"
               style={{ transform: `translateX(-${currentCourseIndex * 100}%)` }}
             >
               {(home?.categories ?? []).map((cat) => (
                 <div key={cat.id} className="min-w-full">
                   <Link href={`/law_video/${cat.id}`} className="block">
-                    <div className="grid md:grid-cols-2 gap-12 p-8 md:p-12 bg-linear-to-br from-gray-50 to-white rounded-3xl hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-(--brown)/30">
+                    <div className="relative grid md:grid-cols-2 gap-10 lg:gap-12 p-8 lg:p-12 bg-white hover:bg-[var(--accent)]/5 transition-all duration-500 group">
                       {/* Left Side - Course Thumbnail */}
-                      <div className="relative group">
-                        <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl">
+                      <div className="relative">
+                        <div className="relative w-full aspect-video overflow-hidden">
+                          {/* Image */}
                           <Image
                             src={normalizeNextImageSrc(cat.cover_url, "/asset/document_background.png")}
                             alt={cat.name ?? "Category"}
                             fill
-                            className="object-cover group-hover:scale-110 transition-transform duration-500"
+                            className="object-cover group-hover:scale-105 transition-transform duration-700"
                             sizes="(max-width: 768px) 100vw, 50vw"
                           />
-                          <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
-                          <div className="absolute bottom-4 right-4 bg-black/80 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg text-sm font-semibold">
+                          
+                          {/* Dark Overlay */}
+                          <div className="absolute inset-0 bg-black/30" />
+                          
+                          {/* Video Count Badge */}
+                          <div className="absolute top-4 right-4 bg-[var(--primary)] text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg flex items-center gap-2">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                            </svg>
                             {cat.videoCount} videos
                           </div>
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
-                            <div className="w-20 h-20 bg-white/95 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100 transition-all duration-300 shadow-xl">
-                              <svg className="w-10 h-10 text-(--brown) ml-1" fill="currentColor" viewBox="0 0 20 20">
+                          
+                          {/* Play Button Overlay */}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-20 h-20 bg-white/95 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transform scale-75 group-hover:scale-100 transition-all duration-500 shadow-2xl">
+                              <svg className="w-10 h-10 text-[var(--primary)] ml-1" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
                               </svg>
                             </div>
                           </div>
                         </div>
+                        
+                        {/* Decorative Element */}
+                        <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-[var(--accent)] opacity-20 rounded-3xl blur-2xl group-hover:scale-110 transition-transform duration-500" />
                       </div>
 
                       {/* Right Side - Course Details */}
                       <div className="flex flex-col justify-center space-y-6">
+                        {/* Title */}
                         <div>
-                          <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+                          <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[var(--ink)] mb-4 leading-tight group-hover:text-[var(--primary)] transition-colors duration-300">
                             {cat.name ?? "Untitled"}
                           </h3>
-                          <div className="flex items-center space-x-6 text-gray-600 mb-4">
-                            <span className="flex items-center font-medium">
-                              <svg className="w-5 h-5 mr-2 text-(--brown)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          
+                          {/* Meta Info */}
+                          <div className="flex flex-wrap items-center gap-6 text-[var(--gray-700)] mb-4">
+                            <span className="flex items-center gap-2 font-semibold text-sm">
+                              <svg className="w-5 h-5 text-[var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                               </svg>
                               WIMUTISASTR
                             </span>
-                            <span className="flex items-center font-medium">
-                              <svg className="w-5 h-5 mr-2 text-(--brown)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            <span className="flex items-center gap-2 font-semibold text-sm">
+                              <svg className="w-5 h-5 text-[var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg>
                               {new Date().getFullYear()}
                             </span>
                           </div>
                         </div>
 
-                        <p className="text-gray-700 text-lg leading-relaxed">
-                          {cat.description ?? " "}
+                        {/* Description */}
+                        <p className="text-[var(--gray-700)] text-lg leading-relaxed font-medium">
+                          {cat.description || "Comprehensive legal education covering essential topics in Cambodian law."}
                         </p>
 
+                        {/* CTA */}
                         <div className="flex items-center gap-4 pt-4">
                           <Button
                             onClick={(e) => {
                               e.stopPropagation();
+                              e.preventDefault();
                               router.push(`/law_video/${cat.id}`);
                             }}
-                            variant="primary"
-                            className="px-8 py-4 text-lg"
+                            variant="gradient"
+                            size="lg"
+                            className="group/btn"
                           >
-                            Start Learning
+                            <span className="flex items-center gap-2">
+                              Start Learning
+                              <svg className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                              </svg>
+                            </span>
                           </Button>
-                          <div className="text-sm text-gray-600">
-                            <span className="font-semibold text-gray-900">{cat.videoCount}</span> videos
+                          
+                          <div className="px-4 py-3 glass rounded-xl border border-[var(--gray-200)]">
+                            <div className="text-xs text-[var(--gray-700)] font-semibold uppercase tracking-wide mb-1">Total Videos</div>
+                            <div className="text-2xl font-bold text-[var(--primary)]">{cat.videoCount}</div>
                           </div>
                         </div>
                       </div>
@@ -117,20 +156,22 @@ export default function FeaturedCoursesSection({
           </div>
 
           {/* Navigation Dots */}
-          <div className="flex justify-center items-center gap-3 mt-8">
-            {(home?.categories ?? []).map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentCourseIndex(index)}
-                className={`transition-all duration-300 rounded-full ${
-                  index === currentCourseIndex
-                    ? 'w-12 h-3 bg-(--brown) shadow-lg'
-                    : 'w-3 h-3 bg-gray-300 hover:bg-gray-400'
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
+          {(home?.categories ?? []).length > 1 && (
+            <div className="flex justify-center items-center gap-3 mt-10">
+              {(home?.categories ?? []).map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentCourseIndex(index)}
+                  className={`transition-all duration-300 rounded-full ${
+                    index === currentCourseIndex
+                      ? 'w-12 h-3 bg-[var(--primary)] shadow-lg'
+                      : 'w-3 h-3 bg-[var(--gray-300)] hover:bg-[var(--primary)] hover:scale-125'
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>

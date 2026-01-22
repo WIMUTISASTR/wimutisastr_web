@@ -1,8 +1,8 @@
 import React from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline" | "ghost";
-  size?: "sm" | "md" | "icon";
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "gradient";
+  size?: "sm" | "md" | "lg" | "icon";
   fullWidth?: boolean;
   children: React.ReactNode;
 }
@@ -20,26 +20,26 @@ export default function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    "inline-flex items-center justify-center gap-2 rounded-xl font-semibold tracking-tight transition-all duration-200 ring-1 ring-inset focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brown)] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
+    "relative inline-flex items-center justify-center gap-2 font-semibold tracking-tight transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden group";
 
   const variants = {
-    // Professional brown primary
     primary:
-      "bg-[var(--brown)] text-white ring-[var(--brown)]/25 shadow-sm hover:shadow-md hover:-translate-y-[1px] hover:bg-[var(--brown-strong)]",
-    // Charcoal button for serious actions
+      "bg-[var(--primary)] text-white rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] hover:bg-[var(--primary-light)] active:scale-[0.98] transition-all duration-300",
     secondary:
-      "bg-[var(--ink)] text-white ring-[var(--ink)]/10 shadow-sm hover:shadow-md hover:-translate-y-[1px] hover:opacity-90",
-    // Paper button
+      "bg-[var(--ink)] text-white rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] hover:bg-[var(--gray-700)] active:scale-[0.98] transition-all duration-300",
     outline:
-      "bg-white/80 backdrop-blur text-[var(--ink)] ring-slate-200 shadow-sm hover:bg-white hover:shadow-md hover:-translate-y-[1px]",
+      "bg-white/90 backdrop-blur-sm text-[var(--ink)] border-2 border-[var(--gray-200)] rounded-xl shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[var(--primary)] hover:text-[var(--primary)] active:scale-[0.98] transition-all duration-300",
     ghost:
-      "bg-transparent text-slate-700 ring-transparent shadow-none hover:bg-slate-100 hover:text-slate-900",
+      "bg-transparent text-[var(--gray-700)] rounded-xl hover:bg-[var(--gray-100)] hover:text-[var(--ink)] active:scale-[0.98] transition-all duration-300",
+    gradient:
+      "bg-[var(--accent)] text-white rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.02] hover:bg-[var(--accent-dark)] active:scale-[0.98] transition-all duration-300",
   };
 
   const sizes = {
-    sm: "px-4 py-2.5 text-sm",
-    md: "px-5 py-3 text-sm sm:text-base",
-    icon: "p-2",
+    sm: "px-4 py-2 text-sm rounded-lg",
+    md: "px-6 py-3 text-base",
+    lg: "px-8 py-4 text-lg",
+    icon: "p-2.5 rounded-lg",
   };
 
   const widthClass = fullWidth ? "w-full" : "";
