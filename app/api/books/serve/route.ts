@@ -3,6 +3,7 @@ import { GetObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
 import { Readable } from "stream";
 import { r2Client } from "@/lib/storage/r2-client";
 import { verifyContentToken } from "@/lib/security/tokens/content";
+import { env } from "@/lib/utils/env";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -86,10 +87,11 @@ export async function GET(req: NextRequest) {
   const payload = token ? verifyContentToken(token) : null;
 
   if (!payload) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (payload.bucket !== "book") return NextResponse.json({ error: "Invalid bucket" }, { status: 400 });
   if (!isSafeKey(payload.key)) return NextResponse.json({ error: "Invalid key" }, { status: 400 });
 
-  const bucketName = process.env.R2_BUCKET_NAME;
-  if (!bucketName) return NextResponse.json({ error: "Storage not configured" }, { status: 500 });
+  // Use validated env naming (R2_BOOK_BUCKET_NAME)
+  const bucketName = env.r2.bookBucket();
 
   try {
     const head = await r2Client.send(

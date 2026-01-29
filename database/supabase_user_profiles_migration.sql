@@ -2,18 +2,12 @@
 CREATE TABLE IF NOT EXISTS public.user_profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   membership_status TEXT NOT NULL DEFAULT 'pending' CHECK (membership_status IN ('pending', 'approved', 'denied')),
-  full_name TEXT,
-  email TEXT,
   membership_approved_at TIMESTAMP WITH TIME ZONE,
   membership_denied_at TIMESTAMP WITH TIME ZONE,
   membership_notes TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
--- If table already exists, add identity columns (safe to re-run)
-ALTER TABLE public.user_profiles ADD COLUMN IF NOT EXISTS full_name TEXT;
-ALTER TABLE public.user_profiles ADD COLUMN IF NOT EXISTS email TEXT;
 
 -- Create index for faster queries
 CREATE INDEX IF NOT EXISTS idx_user_profiles_membership_status ON public.user_profiles(membership_status);
@@ -23,14 +17,12 @@ CREATE INDEX IF NOT EXISTS idx_user_profiles_created_at ON public.user_profiles(
 ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
 
 -- Create policy to allow service role full access
-DROP POLICY IF EXISTS "Service role can manage user profiles" ON public.user_profiles;
 CREATE POLICY "Service role can manage user profiles" ON public.user_profiles
   FOR ALL
   USING (auth.role() = 'service_role')
   WITH CHECK (auth.role() = 'service_role');
 
 -- Create policy to allow users to read their own profile
-DROP POLICY IF EXISTS "Users can read own profile" ON public.user_profiles;
 CREATE POLICY "Users can read own profile" ON public.user_profiles
   FOR SELECT
   USING (auth.uid() = id);
@@ -39,13 +31,8 @@ CREATE POLICY "Users can read own profile" ON public.user_profiles
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.user_profiles (id, membership_status, full_name, email)
-  VALUES (
-    NEW.id,
-    'pending',
-    COALESCE((NEW.raw_user_meta_data ->> 'full_name'), NULL),
-    COALESCE(NEW.email, NULL)
-  );
+  INSERT INTO public.user_profiles (id, membership_status)
+  VALUES (NEW.id, 'pending');
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

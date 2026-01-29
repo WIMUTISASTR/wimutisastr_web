@@ -170,7 +170,7 @@ export default function LawVideoPage() {
                       placeholder="Search courses by name or description..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 rounded-xl border-2 border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--brown)] focus:border-[var(--brown)] transition-all duration-200 text-base"
+                      className="w-full pl-12 pr-4 py-4 rounded-xl border-2 border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-(--brown) focus:border-(--brown) transition-all duration-200 text-base"
                     />
                     {searchQuery && (
                       <button
@@ -227,7 +227,7 @@ export default function LawVideoPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <p className="text-xl font-semibold text-red-900 mb-2">Couldn't load courses</p>
+                <p className="text-xl font-semibold text-red-900 mb-2">Couldn&apos;t load courses</p>
                 <p className="text-sm text-red-700">{error}</p>
               </div>
             ) : filteredCategories.length === 0 ? (
@@ -271,7 +271,7 @@ export default function LawVideoPage() {
                       }}
                     >
                       {/* Course Thumbnail */}
-                      <div className="relative w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
+                      <div className="relative w-full aspect-video bg-gray-100 overflow-hidden">
                         <Image
                           src={thumb}
                           alt={cat.name ?? "Course"}
@@ -279,7 +279,7 @@ export default function LawVideoPage() {
                           className="object-cover transition-transform duration-500 group-hover:scale-110"
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         
                         {/* Play Button Overlay */}
                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -329,7 +329,7 @@ export default function LawVideoPage() {
                               <>
                                 <div className="h-2 rounded-full bg-gray-200 overflow-hidden mb-2">
                                   <div
-                                    className="h-full bg-gradient-to-r from-[var(--brown)] to-[var(--brown-strong)] rounded-full transition-all duration-500"
+                                    className="h-full bg-[var(--brown)] rounded-full transition-all duration-500"
                                     style={{ width: `${pct}%` }}
                                   />
                                 </div>

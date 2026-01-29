@@ -129,16 +129,35 @@ async function authHeaders() {
 
 export async function apiGet<T>(url: string): Promise<T> {
   const headers = await authHeaders();
-  const res = await fetch(url, { headers, cache: "no-store" });
-  const json: unknown = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const message =
-      typeof (json as { error?: unknown })?.error === "string"
-        ? ((json as { error?: unknown }).error as string)
-        : `HTTP ${res.status}`;
-    throw Object.assign(new Error(message), { status: res.status, payload: json });
+  
+  // Add timeout to prevent hanging requests
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+  
+  try {
+    const res = await fetch(url, { 
+      headers, 
+      cache: "no-store",
+      signal: controller.signal 
+    });
+    clearTimeout(timeoutId);
+    
+    const json: unknown = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const message =
+        typeof (json as { error?: unknown })?.error === "string"
+          ? ((json as { error?: unknown }).error as string)
+          : `HTTP ${res.status}`;
+      throw Object.assign(new Error(message), { status: res.status, payload: json });
+    }
+    return json as T;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Request timeout - please try again');
+    }
+    throw error;
   }
-  return json as T;
 }
 
 function withOptionalDebugParam(url: string): string {

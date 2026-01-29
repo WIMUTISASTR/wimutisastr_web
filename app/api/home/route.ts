@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,19 +21,47 @@ type HomeBook = {
   cover_url: string | null;
 };
 
+type VideoCategoryRow = {
+  id: string;
+  name: string | null;
+  description: string | null;
+  cover_url: string | null;
+  created_at: string | null;
+};
+
+type VideoRow = {
+  id: string;
+  category_id: string | null;
+};
+
+type BookRow = {
+  id: string;
+  title: string;
+  description: string | null;
+  author: string;
+  year: number;
+  cover_url: string | null;
+  uploaded_at: string | null;
+};
+
 export async function GET() {
   try {
-    const supabase = createServerClient();
+    // Home is public; use service role to avoid RLS hiding content.
+    // Only select safe public fields (never return file URLs).
+    const supabase = createAdminClient();
 
     const [
       { data: videoCategories, error: vcErr },
       { data: videos, error: vErr, count: videosCount },
       { data: books, error: bErr, count: booksCount },
     ] = await Promise.all([
-      supabase.from("video_categories").select("id,name,description,cover_url,created_at").order("created_at", { ascending: false }),
-      supabase.from("videos").select("id,category_id", { count: "exact" }),
       supabase
-        .from("books")
+        .from<VideoCategoryRow>("video_categories")
+        .select("id,name,description,cover_url,created_at")
+        .order("created_at", { ascending: false }),
+      supabase.from<VideoRow>("videos").select("id,category_id", { count: "exact" }),
+      supabase
+        .from<BookRow>("books")
         .select("id,title,description,author,year,cover_url,uploaded_at", { count: "exact" })
         .order("uploaded_at", { ascending: false })
         .limit(6),
@@ -46,20 +74,20 @@ export async function GET() {
 
     const counts = new Map<string, number>();
     for (const v of videos ?? []) {
-      const cid = (v as { category_id?: string | null }).category_id ?? "";
+      const cid = v.category_id ?? "";
       if (!cid) continue;
       counts.set(cid, (counts.get(cid) ?? 0) + 1);
     }
 
     const categories: HomeVideoCategory[] = (videoCategories ?? []).map((c) => ({
-      id: (c as any).id,
-      name: (c as any).name ?? null,
-      description: (c as any).description ?? null,
-      cover_url: (c as any).cover_url ?? null,
-      videoCount: counts.get((c as any).id) ?? 0,
+      id: c.id,
+      name: c.name ?? null,
+      description: c.description ?? null,
+      cover_url: c.cover_url ?? null,
+      videoCount: counts.get(c.id) ?? 0,
     }));
 
-    const featuredBooks: HomeBook[] = (books ?? []).map((b: any) => ({
+    const featuredBooks: HomeBook[] = (books ?? []).map((b) => ({
       id: b.id,
       title: b.title,
       description: b.description ?? null,

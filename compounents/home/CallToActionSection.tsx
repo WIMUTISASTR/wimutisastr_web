@@ -9,10 +9,9 @@ export default function CallToActionSection() {
   return (
     <section className="relative py-32 px-4 sm:px-6 lg:px-8 overflow-hidden">
       {/* Sophisticated Background */}
-      <div className="absolute inset-0 bg-[var(--primary)]">
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[var(--accent)] opacity-20 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[var(--primary-light)] opacity-15 rounded-full blur-3xl" />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwgMC4wMykiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-20" />
+      <div className="absolute inset-0 bg-(--primary)">
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-(--accent) opacity-20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-(--primary-light) opacity-15 rounded-full blur-3xl" />
       </div>
 
       {/* Decorative Elements */}
@@ -33,8 +32,8 @@ export default function CallToActionSection() {
       <div className="relative max-w-5xl mx-auto text-center z-10">
         {/* Badge */}
         <div className="inline-block mb-8 animate-bounce-in">
-          <div className="flex items-center gap-2 px-5 py-2.5 bg-white/10 backdrop-blur-sm rounded-full border-2 border-[var(--accent)] shadow-xl">
-            <div className="w-2 h-2 bg-[var(--accent)] rounded-full animate-pulse" />
+          <div className="flex items-center gap-2 px-5 py-2.5 bg-white/10 backdrop-blur-sm rounded-full border-2 border-(--accent) shadow-xl">
+            <div className="w-2 h-2 bg-(--accent) rounded-full animate-pulse" />
             <span className="text-sm font-bold text-white uppercase tracking-wide">Start Your Journey</span>
           </div>
         </div>
@@ -42,7 +41,7 @@ export default function CallToActionSection() {
         {/* Main Heading */}
         <h2 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-8 leading-tight">
           Ready to Elevate Your{" "}
-          <span className="text-[var(--accent)]">Legal Expertise?</span>
+          <span className="text-(--accent)">Legal Expertise?</span>
         </h2>
 
         {/* Subheading */}
@@ -83,7 +82,7 @@ export default function CallToActionSection() {
             }
           ].map((benefit, index) => (
             <div key={index} className="flex flex-col items-center text-center gap-4 p-6 rounded-2xl bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 group border border-white/10">
-              <div className="w-14 h-14 rounded-2xl bg-[var(--accent)] flex items-center justify-center text-white shadow-xl group-hover:scale-110 transition-transform duration-300">
+              <div className="w-14 h-14 rounded-2xl bg-(--accent) flex items-center justify-center text-white shadow-xl group-hover:scale-110 transition-transform duration-300">
                 {benefit.icon}
               </div>
               <div>
@@ -98,7 +97,7 @@ export default function CallToActionSection() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-14">
           <Button
             onClick={() => router.push("/auth/register")}
-            variant="gradient"
+            variant="primary"
             size="lg"
             className="group/btn shadow-2xl"
           >
@@ -151,7 +150,7 @@ export default function CallToActionSection() {
               }
             ].map((indicator, index) => (
               <div key={index} className="flex items-center gap-2 font-medium">
-                <div className="text-[var(--accent)]">
+                <div className="text-(--accent)">
                   {indicator.icon}
                 </div>
                 <span>{indicator.text}</span>

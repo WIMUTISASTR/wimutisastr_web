@@ -268,7 +268,7 @@ export default function WatchVideoPage() {
 
             {isLoading ? (
               <div className="text-center text-gray-600 py-20">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[var(--brown)] border-t-transparent mb-4"></div>
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-(--brown) border-t-transparent mb-4"></div>
                 <p className="text-lg">Loading course content...</p>
               </div>
             ) : error ? (
@@ -279,11 +279,11 @@ export default function WatchVideoPage() {
             ) : !current ? (
               <div className="text-center text-gray-600 py-20">
                 <div className="text-xl font-semibold mb-2">Video not found</div>
-                <p>The video you're looking for doesn't exist.</p>
+                <p>The video you&apos;re looking for doesn&apos;t exist.</p>
               </div>
             ) : membershipLoading ? (
               <div className="text-center text-gray-600 py-20">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[var(--brown)] border-t-transparent mb-4"></div>
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-(--brown) border-t-transparent mb-4"></div>
                 <p>Checking membership status...</p>
               </div>
             ) : (
@@ -317,7 +317,7 @@ export default function WatchVideoPage() {
                             className="object-cover opacity-60"
                             sizes="100vw"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
+                          <div className="absolute inset-0 bg-black/55" />
                           <div className="absolute inset-0 flex items-center justify-center p-8 text-center text-white">
                             <div className="max-w-lg animate-slide-up-fade">
                               <div className="text-3xl font-bold mb-4">Membership Required</div>
@@ -368,7 +368,7 @@ export default function WatchVideoPage() {
                     </div>
 
                     {/* Video Info Bar */}
-                    <div className="px-6 py-4 border-t border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+                    <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div className="flex items-center gap-4 text-sm">
                           <div className="flex items-center gap-2 text-gray-700">
@@ -398,7 +398,7 @@ export default function WatchVideoPage() {
 
                   {/* Enhanced Tabs Section */}
                   <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden animate-scale-in delay-200">
-                    <div className="px-6 pt-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+                    <div className="px-6 pt-4 border-b border-gray-200 bg-gray-50">
                       <div className="flex gap-6 overflow-x-auto scrollbar-hide">
                         {[
                           { key: "overview" as const, label: "Overview", icon: BookOpenIcon },
@@ -414,7 +414,7 @@ export default function WatchVideoPage() {
                               onClick={() => setActiveTab(t.key)}
                               className={`pb-4 px-1 text-sm font-semibold whitespace-nowrap border-b-2 transition-all duration-200 flex items-center gap-2 ${
                                 activeTab === t.key
-                                  ? "border-[var(--brown)] text-[var(--brown)]"
+                                  ? "border-(--brown) text-[var(--brown)]"
                                   : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
                               }`}
                             >
@@ -439,7 +439,7 @@ export default function WatchVideoPage() {
                               )}
                             </div>
 
-                            <div className="rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white p-6 shadow-sm">
+                            <div className="rounded-xl border border-gray-200 bg-gray-50 p-6 shadow-sm">
                               <div className="flex items-start gap-4">
                                 <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-[var(--brown)]/10 flex items-center justify-center">
                                   <PlayIcon className="w-6 h-6 text-[var(--brown)]" />
@@ -486,7 +486,7 @@ export default function WatchVideoPage() {
                   } lg:block space-y-6 animate-slide-up-fade delay-300`}
                 >
                   <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden sticky top-6">
-                    <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-[var(--brown)]/5 to-white">
+                    <div className="px-6 py-4 border-b border-gray-200 bg-[var(--brown)]/5">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-lg font-bold text-gray-900">Course Content</h3>
                         {courseProgress > 0 && (
@@ -511,7 +511,7 @@ export default function WatchVideoPage() {
                               onClick={() => handleGo(video.id)}
                               className={`w-full text-left p-4 rounded-xl transition-all duration-200 group ${
                                 isActive
-                                  ? "bg-[var(--brown)]/10 border-2 border-[var(--brown)] shadow-md"
+                                  ? "bg-[var(--brown)]/10 border-2 border-(--brown) shadow-md"
                                   : "hover:bg-gray-50 border-2 border-transparent hover:border-gray-200"
                               }`}
                             >

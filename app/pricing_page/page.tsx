@@ -104,9 +104,9 @@ export default function PricingPage() {
           />
         </div>
         {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/70 via-slate-900/60 to-slate-900/70 z-10"></div>
-        {/* Subtle gold accent overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[var(--brown-soft)] to-transparent z-10"></div>
+        <div className="absolute inset-0 bg-slate-900/65 z-10"></div>
+        {/* Subtle brown accent overlay */}
+        <div className="absolute inset-0 bg-(--brown-soft) opacity-20 z-10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
           <div className="text-center">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 opacity-0 translate-y-8 delay-100">
@@ -133,7 +133,7 @@ export default function PricingPage() {
               {plans.map((plan, index) => (
                 <div
                   key={plan.id}
-                  className={`relative rounded-2xl border border-[var(--border)] bg-[var(--surface-strong)] backdrop-blur-xl shadow-[var(--shadow-elev-1)] overflow-hidden transition-all duration-300 hover:shadow-[var(--shadow-elev-2)] hover:-translate-y-1 opacity-0 translate-y-8 ${
+                  className={`relative rounded-2xl border border-(--border) bg-(--surface-strong) backdrop-blur-xl shadow-[var(--shadow-elev-1)] overflow-hidden transition-all duration-300 hover:shadow-[var(--shadow-elev-2)] hover:-translate-y-1 opacity-0 translate-y-8 ${
                     plan.popular
                       ? "ring-2 ring-[rgb(var(--brown-rgb)/0.35)] md:scale-[1.03]"
                       : ""
@@ -166,7 +166,7 @@ export default function PricingPage() {
                         )}
                       </div>
                       {plan.discount && (
-                        <span className="inline-flex mt-3 items-center px-3 py-1 bg-[var(--brown-soft)] text-[var(--brown-strong)] rounded-full text-sm font-semibold">
+                        <span className="inline-flex mt-3 items-center px-3 py-1 bg-(--brown-soft) text-[var(--brown-strong)] rounded-full text-sm font-semibold">
                           {plan.discount}
                         </span>
                       )}

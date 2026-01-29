@@ -58,7 +58,7 @@ export default function DocumentCategoryPage() {
           <div className="absolute inset-0 z-0">
             <Image src="/asset/document_background.png" alt="Documents background" fill className="object-cover" priority sizes="100vw" />
           </div>
-          <div className="absolute inset-0 bg-linear-to-br from-slate-900/70 via-slate-900/60 to-slate-900/70 z-10" />
+          <div className="absolute inset-0 bg-slate-900/65 z-10" />
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
             <Link href="/law_documents" className="inline-flex items-center text-gray-300 hover:text-white mb-4 transition-colors">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,7 +100,7 @@ export default function DocumentCategoryPage() {
                             sizes="(max-width: 768px) 100vw, 33vw"
                             unoptimized={unoptimized}
                           />
-                          <div className="absolute inset-0 bg-linear-to-t from-black/30 via-black/5 to-transparent opacity-70 group-hover:opacity-90 transition-opacity" />
+                          <div className="absolute inset-0 bg-black/20 opacity-70 group-hover:opacity-90 transition-opacity" />
                           <div className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-full bg-white/90 text-slate-900 px-3 py-1 text-xs font-semibold shadow">
                             <span>Read</span>
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

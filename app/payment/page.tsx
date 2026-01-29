@@ -244,7 +244,7 @@ function PaymentPageContent() {
       <PageContainer>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--brown)] mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-(--brown) mx-auto mb-4"></div>
             <p className="text-gray-600">Loading...</p>
           </div>
         </div>
@@ -257,7 +257,7 @@ function PaymentPageContent() {
       <PageContainer>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--brown)] mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-(--brown) mx-auto mb-4"></div>
             <p className="text-gray-600">Loading plans...</p>
           </div>
         </div>
@@ -313,9 +313,9 @@ function PaymentPageContent() {
           />
         </div>
         {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/70 via-slate-900/60 to-slate-900/70 z-10"></div>
-        {/* Subtle gold accent overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[var(--brown-soft)] to-transparent z-10"></div>
+        <div className="absolute inset-0 bg-slate-900/65 z-10"></div>
+        {/* Subtle brown accent overlay */}
+        <div className="absolute inset-0 bg-(--brown-soft) opacity-20 z-10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
           <div className="text-center">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4">
@@ -472,7 +472,7 @@ function PaymentPageContent() {
                     ) : null}
 
                     {!proofImagePreview ? (
-                      <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-[var(--brown)] transition-colors">
+                      <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-(--brown) transition-colors">
                         <input
                           ref={fileInputRef}
                           type="file"
@@ -616,7 +616,7 @@ function PaymentPageContent() {
 
                   {/* Status Message */}
                   {qrImageUrl ? (
-                    <div className="bg-[var(--brown-soft)] border border-[rgb(var(--brown-rgb)/0.25)] rounded-lg p-4">
+                    <div className="bg-(--brown-soft) border border-[rgb(var(--brown-rgb)/0.25)] rounded-lg p-4">
                       <p className="text-sm text-slate-800 text-center">
                         Scan the QR code with your Bakong app to complete payment. After payment, upload proof of payment below for manual verification.
                       </p>
@@ -638,7 +638,7 @@ export default function PaymentPage() {
       <PageContainer>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--brown)] mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-(--brown) mx-auto mb-4"></div>
             <p className="text-gray-600">Loading...</p>
           </div>
         </div>

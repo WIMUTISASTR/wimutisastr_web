@@ -47,10 +47,10 @@ export default function Nav() {
               />
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-lg sm:text-xl font-bold text-[var(--ink)] tracking-tight group-hover:text-[var(--primary)] transition-colors">
+              <h1 className="text-lg sm:text-xl font-bold text-[var(--ink)] tracking-tight group-hover:text-(--primary) transition-colors">
                 WIMUTISASTR
               </h1>
-              <p className="text-xs text-[var(--gray-700)] font-medium">Law Office</p>
+              <p className="text-xs text-(--gray-700) font-medium">Law Office</p>
             </div>
           </Link>
 
@@ -60,8 +60,8 @@ export default function Nav() {
               href="/"
               className={`px-5 py-2.5 rounded-xl transition-all duration-300 font-semibold text-sm ${
                 pathname === "/"
-                  ? "bg-[var(--primary)] text-white shadow-md"
-                  : "text-[var(--gray-700)] hover:text-[var(--primary)] hover:bg-[var(--accent)]/20"
+                  ? "bg-(--primary) text-white shadow-md"
+                  : "text-(--gray-700) hover:text-(--primary) hover:bg-(--accent)/20"
               }`}
             >
               Home
@@ -70,8 +70,8 @@ export default function Nav() {
               href="/law_video"
               className={`px-5 py-2.5 rounded-xl transition-all duration-300 font-semibold text-sm ${
                 pathname === "/law_video"
-                  ? "bg-[var(--primary)] text-white shadow-md"
-                  : "text-[var(--gray-700)] hover:text-[var(--primary)] hover:bg-[var(--accent)]/20"
+                  ? "bg-(--primary) text-white shadow-md"
+                  : "text-(--gray-700) hover:text-(--primary) hover:bg-(--accent)/20"
               }`}
             >
               Videos
@@ -80,8 +80,8 @@ export default function Nav() {
               href="/law_documents"
               className={`px-5 py-2.5 rounded-xl transition-all duration-300 font-semibold text-sm ${
                 pathname === "/law_documents"
-                  ? "bg-[var(--primary)] text-white shadow-md"
-                  : "text-[var(--gray-700)] hover:text-[var(--primary)] hover:bg-[var(--accent)]/20"
+                  ? "bg-(--primary) text-white shadow-md"
+                  : "text-(--gray-700) hover:text-(--primary) hover:bg-(--accent)/20"
               }`}
             >
               Documents
@@ -90,8 +90,8 @@ export default function Nav() {
               href="/about_us"
               className={`px-5 py-2.5 rounded-xl transition-all duration-300 font-semibold text-sm ${
                 pathname === "/about_us"
-                  ? "bg-[var(--primary)] text-white shadow-md"
-                  : "text-[var(--gray-700)] hover:text-[var(--primary)] hover:bg-[var(--accent)]/20"
+                  ? "bg-(--primary) text-white shadow-md"
+                  : "text-(--gray-700) hover:text-(--primary) hover:bg-(--accent)/20"
               }`}
             >
               About Us
@@ -180,8 +180,8 @@ export default function Nav() {
               onClick={() => setIsMenuOpen(false)}
               className={`px-4 py-3 rounded-xl transition-all duration-300 font-semibold text-sm ${
                 pathname === "/"
-                  ? "bg-[var(--primary)] text-white shadow-md"
-                  : "text-[var(--gray-700)] hover:bg-[var(--accent)]/20 hover:text-[var(--primary)]"
+                  ? "bg-(--primary) text-white shadow-md"
+                  : "text-(--gray-700) hover:bg-(--accent)/20 hover:text-(--primary)"
               }`}
             >
               Home
@@ -191,8 +191,8 @@ export default function Nav() {
               onClick={() => setIsMenuOpen(false)}
               className={`px-4 py-3 rounded-xl transition-all duration-300 font-semibold text-sm ${
                 pathname === "/law_video"
-                  ? "bg-[var(--primary)] text-white shadow-md"
-                  : "text-[var(--gray-700)] hover:bg-[var(--accent)]/20 hover:text-[var(--primary)]"
+                  ? "bg-(--primary) text-white shadow-md"
+                  : "text-(--gray-700) hover:bg-(--accent)/20 hover:text-(--primary)"
               }`}
             >
               Videos
@@ -202,8 +202,8 @@ export default function Nav() {
               onClick={() => setIsMenuOpen(false)}
               className={`px-4 py-3 rounded-xl transition-all duration-300 font-semibold text-sm ${
                 pathname === "/law_documents"
-                  ? "bg-[var(--primary)] text-white shadow-md"
-                  : "text-[var(--gray-700)] hover:bg-[var(--accent)]/20 hover:text-[var(--primary)]"
+                  ? "bg-(--primary) text-white shadow-md"
+                  : "text-(--gray-700) hover:bg-(--accent)/20 hover:text-(--primary)"
               }`}
             >
               Documents
@@ -213,8 +213,8 @@ export default function Nav() {
               onClick={() => setIsMenuOpen(false)}
               className={`px-4 py-3 rounded-xl transition-all duration-300 font-semibold text-sm ${
                 pathname === "/about_us"
-                  ? "bg-[var(--primary)] text-white shadow-md"
-                  : "text-[var(--gray-700)] hover:bg-[var(--accent)]/20 hover:text-[var(--primary)]"
+                  ? "bg-(--primary) text-white shadow-md"
+                  : "text-(--gray-700) hover:bg-(--accent)/20 hover:text-(--primary)"
               }`}
             >
               About Us

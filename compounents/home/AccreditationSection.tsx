@@ -37,7 +37,7 @@ export default function AccreditationSection() {
   ];
 
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white border-y border-gray-200">
+    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 border-y border-gray-200">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -57,7 +57,7 @@ export default function AccreditationSection() {
               className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-white border border-gray-200 hover:border-(--brown)/30 hover:shadow-lg transition-all duration-300 scroll-animate opacity-0 translate-y-4 group"
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-(--brown)/10 to-(--brown)/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-md">
+              <div className="w-16 h-16 rounded-full bg-(--brown)/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-md">
                 {cert.icon}
               </div>
               <p className="text-sm font-semibold text-gray-900 text-center">{cert.name}</p>

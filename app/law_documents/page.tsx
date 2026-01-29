@@ -74,8 +74,8 @@ export default function LawDocumentsPage() {
           <div className="absolute inset-0 z-0">
             <Image src="/asset/document_background.png" alt="Legal documents background" fill className="object-cover" priority sizes="100vw" />
           </div>
-          <div className="absolute inset-0 bg-linear-to-br from-slate-900/70 via-slate-900/60 to-slate-900/70 z-10" />
-          <div className="absolute inset-0 bg-linear-to-br from-(--brown-soft) to-transparent z-10" />
+          <div className="absolute inset-0 bg-slate-900/65 z-10" />
+          <div className="absolute inset-0 bg-(--brown-soft) opacity-20 z-10" />
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
             <div className="text-center">
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4">Legal Documents</h1>
@@ -93,7 +93,7 @@ export default function LawDocumentsPage() {
                   placeholder="Search categories..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full px-5 py-4 rounded-2xl bg-white/80 backdrop-blur text-slate-900 placeholder:text-slate-400 shadow-sm ring-1 ring-inset ring-slate-200 focus:outline-none focus:ring-2 focus:ring-[var(--brown)] transition-colors text-lg"
+                  className="block w-full px-5 py-4 rounded-2xl bg-white/80 backdrop-blur text-slate-900 placeholder:text-slate-400 shadow-sm ring-1 ring-inset ring-slate-200 focus:outline-none focus:ring-2 focus:ring-(--brown) transition-colors text-lg"
                 />
               </div>
             </div>

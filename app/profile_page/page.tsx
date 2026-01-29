@@ -117,7 +117,7 @@ export default function ProfilePage() {
       <PageContainer>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--brown)] mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-(--brown) mx-auto mb-4"></div>
             <p className="text-gray-600">Loading...</p>
           </div>
         </div>
@@ -129,7 +129,7 @@ export default function ProfilePage() {
     return (
       <PageContainer>
         <div className="min-h-screen flex items-center justify-center p-6">
-          <div className="max-w-md w-full rounded-2xl border border-[var(--border)] bg-[var(--surface-strong)] shadow-[var(--shadow-elev-1)] p-6 text-center">
+          <div className="max-w-md w-full rounded-2xl border border-(--border) bg-(--surface-strong) shadow-(--shadow-elev-1) p-6 text-center">
             <h1 className="text-2xl font-semibold text-gray-900">Sign in to view your profile</h1>
             <p className="mt-2 text-sm text-gray-600">Your membership status and payment history are linked to your account.</p>
             <div className="mt-5">
@@ -148,7 +148,7 @@ export default function ProfilePage() {
       <PageContainer>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--brown)] mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-(--brown) mx-auto mb-4"></div>
             <p className="text-gray-600">Loading profile...</p>
           </div>
         </div>
@@ -162,8 +162,8 @@ export default function ProfilePage() {
         <div className="absolute inset-0 z-0">
           <Image src="/asset/aboutUs.png" alt="Profile background" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/75 via-slate-900/65 to-slate-900/75 z-10" />
-        <div className="absolute inset-0 bg-gradient-to-br from-[var(--brown-soft)] to-transparent z-10" />
+        <div className="absolute inset-0 bg-slate-900/65 z-10" />
+        <div className="absolute inset-0 bg-(--brown-soft) opacity-20 z-10" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
           <div className="text-center">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-3">My Profile</h1>
@@ -180,9 +180,9 @@ export default function ProfilePage() {
             <aside className="lg:col-span-1">
               <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sticky top-24">
                 <div className="text-center">
-                  <div className="relative w-28 h-28 mx-auto mb-4 rounded-full overflow-hidden border-4 border-[var(--brown)]/25">
-                    <div className="w-full h-full bg-[var(--brown-soft)] flex items-center justify-center">
-                      <span className="text-4xl font-bold text-[var(--brown-strong)]">{displayName.charAt(0).toUpperCase()}</span>
+                  <div className="relative w-28 h-28 mx-auto mb-4 rounded-full overflow-hidden border-4 border-(--brown)/25">
+                    <div className="w-full h-full bg-(--brown-soft) flex items-center justify-center">
+                      <span className="text-4xl font-bold text-(--brown-strong)">{displayName.charAt(0).toUpperCase()}</span>
                     </div>
                   </div>
 
@@ -264,7 +264,7 @@ export default function ProfilePage() {
                             href={profile.latestProof.proofUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="font-semibold text-[var(--brown)] hover:underline"
+                            className="font-semibold text-(--brown) hover:underline"
                           >
                             View uploaded image
                           </a>
@@ -318,7 +318,7 @@ export default function ProfilePage() {
                         type="text"
                         value={edit.fullName}
                         onChange={(e) => setEdit((p) => ({ ...p, fullName: e.target.value }))}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--brown)]"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-(--brown)"
                       />
                     ) : (
                       <p className="text-gray-900">{displayName}</p>
@@ -338,7 +338,7 @@ export default function ProfilePage() {
                         type="tel"
                         value={edit.phone}
                         onChange={(e) => setEdit((p) => ({ ...p, phone: e.target.value }))}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--brown)]"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-(--brown)"
                       />
                     ) : (
                       <p className="text-gray-900">{edit.phone || "—"}</p>
@@ -378,7 +378,7 @@ export default function ProfilePage() {
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input type="checkbox" className="sr-only peer" defaultChecked />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[var(--brown)]/25 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--brown)]"></div>
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-(--brown)/25 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-(--brown)"></div>
                     </label>
                   </div>
                   <div className="flex justify-between items-center p-4">

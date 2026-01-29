@@ -3,6 +3,7 @@ import { GetObjectCommand, type GetObjectCommandOutput } from "@aws-sdk/client-s
 import { Readable } from "stream";
 import { r2Client } from "@/lib/storage/r2-client";
 import { verifyStorageToken } from "@/lib/security/tokens/storage";
+import { env } from "@/lib/utils/env";
 
 export const runtime = "nodejs";
 
@@ -61,11 +62,11 @@ function isImageKey(key: string): boolean {
 function resolveBucket(bucketParam: string | null): string | null {
   switch (bucketParam) {
     case "book":
-      return process.env.R2_BUCKET_NAME ?? null;
+      return env.r2.bookBucket();
     case "video":
-      return process.env.R2_VIDEO_BUCKET_NAME ?? null;
+      return env.r2.videoBucket();
     case "proof-payment":
-      return process.env.R2_PROOF_OF_PAYMENT_BUCKET_NAME ?? null;
+      return env.r2.proofOfPaymentBucket();
     default:
       return null;
   }

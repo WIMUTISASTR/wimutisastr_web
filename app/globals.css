@@ -353,29 +353,29 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .animate-shimmer {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.3) 50%,
-    transparent 100%
-  );
-  background-size: 1000px 100%;
-  animation: shimmer 2.5s infinite;
+  background: rgba(255, 255, 255, 0.12);
+  animation: shimmerOpacity 2.5s ease-in-out infinite;
 }
 
 .animate-shimmer-slow {
-  background: linear-gradient(
-    110deg,
-    transparent 0%,
-    transparent 40%,
-    rgba(255, 255, 255, 0.15) 50%,
-    transparent 60%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmerSlow 3s infinite;
+  background: rgba(255, 255, 255, 0.08);
+  animation: shimmerOpacity 3.2s ease-in-out infinite;
 }
 
+.animate-shimmer,
+.animate-shimmer-slow {
+  border-radius: inherit;
+}
+
+@keyframes shimmerOpacity {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
 .animate-rotate-3d {
   animation: rotate3d 25s ease-in-out infinite;
 }
@@ -510,16 +510,19 @@ html {
 
 /* Loading states */
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--gray-200) 25%,
-    var(--gray-100) 50%,
-    var(--gray-200) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  background: var(--gray-200);
+  animation: skeletonPulse 1.4s ease-in-out infinite;
 }
 
+@keyframes skeletonPulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
 /* Interactive elements */
 .interactive {
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);

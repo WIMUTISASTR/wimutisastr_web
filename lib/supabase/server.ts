@@ -20,6 +20,13 @@ export function createServerClient() {
         headers: {
           'X-Client-Info': 'wimutisastr-web/1.0',
         },
+        fetch: (url, init) => {
+          return fetch(url, {
+            ...init,
+            // Add timeout to prevent hanging Supabase queries
+            signal: init?.signal ?? AbortSignal.timeout(20000), // 20 second timeout
+          });
+        },
       },
     }
   );
@@ -50,6 +57,13 @@ export function createAdminClient() {
       global: {
         headers: {
           'X-Client-Info': 'wimutisastr-admin/1.0',
+        },
+        fetch: (url, init) => {
+          return fetch(url, {
+            ...init,
+            // Add timeout to prevent hanging Supabase queries
+            signal: init?.signal ?? AbortSignal.timeout(20000), // 20 second timeout
+          });
         },
       },
     }

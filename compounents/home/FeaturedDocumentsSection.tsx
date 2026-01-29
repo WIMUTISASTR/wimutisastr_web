@@ -27,22 +27,22 @@ export default function FeaturedDocumentsSection({
     <section className="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden bg-white">
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--accent)] opacity-8 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[var(--primary)] opacity-5 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-(--accent) opacity-8 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-(--primary) opacity-5 rounded-full blur-3xl" />
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Header */}
         <div className="text-center mb-20 scroll-animate opacity-0 translate-y-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)]/20 border-2 border-[var(--accent-dark)] rounded-full mb-6">
-            <div className="w-2 h-2 bg-[var(--accent-dark)] rounded-full animate-pulse" />
-            <span className="text-sm font-bold text-[var(--accent-dark)] uppercase tracking-wide">Legal Resources</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-(--accent)/20 border-2 border-(--accent-dark) rounded-full mb-6">
+            <div className="w-2 h-2 bg-(--accent-dark) rounded-full animate-pulse" />
+            <span className="text-sm font-bold text-(--accent-dark) uppercase tracking-wide">Legal Resources</span>
           </div>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[var(--ink)] mb-6 leading-tight">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-(--ink) mb-6 leading-tight">
             Legal{" "}
-            <span className="text-[var(--accent-dark)]">Documents</span>
+            <span className="text-(--accent-dark)">Documents</span>
           </h2>
-          <p className="text-xl text-[var(--gray-700)] max-w-3xl mx-auto font-medium">
+          <p className="text-xl text-(--gray-700) max-w-3xl mx-auto font-medium">
             Access comprehensive legal documents and resources
           </p>
         </div>
@@ -64,7 +64,7 @@ export default function FeaturedDocumentsSection({
                       <div className="relative flex items-center justify-center">
                       <div className="relative w-full max-w-sm">
                         {/* Decorative Background */}
-                        <div className="absolute -inset-4 bg-[var(--accent)] opacity-20 rounded-3xl blur-2xl group-hover:blur-3xl transition-all duration-500" />
+                        <div className="absolute -inset-4 bg-(--accent) opacity-20 rounded-3xl blur-2xl group-hover:blur-3xl transition-all duration-500" />
                         
                         {/* Book Cover */}
                         <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl group-hover:shadow-3xl transition-all duration-500 card-lift">
@@ -81,7 +81,7 @@ export default function FeaturedDocumentsSection({
                           {!hasPaid && (
                             <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center">
                               <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center shadow-xl">
-                                <svg className="w-8 h-8 text-[var(--accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-8 h-8 text-(--accent)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                 </svg>
                               </div>
@@ -95,20 +95,20 @@ export default function FeaturedDocumentsSection({
                     <div className="flex flex-col justify-center space-y-6">
                       {/* Title */}
                       <div>
-                        <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[var(--ink)] mb-4 leading-tight group-hover:text-[var(--accent)] transition-colors duration-300">
+                        <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[var(--ink)] mb-4 leading-tight group-hover:text-(--accent) transition-colors duration-300">
                           {book.title}
                         </h3>
                         
                         {/* Meta Info */}
-                        <div className="flex flex-wrap items-center gap-6 text-[var(--gray-700)] mb-4">
+                        <div className="flex flex-wrap items-center gap-6 text-(--gray-700) mb-4">
                           <span className="flex items-center gap-2 font-semibold text-sm">
-                            <svg className="w-5 h-5 text-[var(--accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-5 h-5 text-(--accent)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
                             {book.author}
                           </span>
                           <span className="flex items-center gap-2 font-semibold text-sm">
-                            <svg className="w-5 h-5 text-[var(--accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-5 h-5 text-(--accent)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                             {book.year}
@@ -117,7 +117,7 @@ export default function FeaturedDocumentsSection({
                       </div>
 
                       {/* Description */}
-                      <p className="text-[var(--gray-700)] text-lg leading-relaxed font-medium">
+                      <p className="text-(--gray-700) text-lg leading-relaxed font-medium">
                         {book.description}
                       </p>
 
@@ -129,7 +129,7 @@ export default function FeaturedDocumentsSection({
                               e.stopPropagation();
                               router.push("/law_documents");
                             }}
-                            variant="gradient"
+                            variant="primary"
                             size="lg"
                             className="group/btn"
                           >
@@ -146,7 +146,7 @@ export default function FeaturedDocumentsSection({
                               e.stopPropagation();
                               router.push("/pricing_page");
                             }}
-                            variant="gradient"
+                            variant="primary"
                             size="lg"
                             className="group/btn"
                           >
@@ -178,8 +178,8 @@ export default function FeaturedDocumentsSection({
                   onClick={() => setCurrentBookIndex(index)}
                   className={`transition-all duration-300 rounded-full ${
                     index === currentBookIndex
-                      ? 'w-12 h-3 bg-[var(--accent-dark)] shadow-lg'
-                      : 'w-3 h-3 bg-[var(--gray-300)] hover:bg-[var(--accent-dark)] hover:scale-125'
+                      ? 'w-12 h-3 bg-(--accent-dark) shadow-lg'
+                      : 'w-3 h-3 bg-(--gray-300) hover:bg-(--accent-dark) hover:scale-125'
                   }`}
                   aria-label={`Go to slide ${index + 1}`}
                 />

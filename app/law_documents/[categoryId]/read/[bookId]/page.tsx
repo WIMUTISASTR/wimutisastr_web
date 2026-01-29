@@ -4,8 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import mammoth from "mammoth";
-import DOMPurify from "isomorphic-dompurify";
 import PageContainer from "@/compounents/PageContainer";
 import Button from "@/compounents/Button";
 import ProtectedRoute from "@/compounents/ProtectedRoute";
@@ -33,8 +31,6 @@ export default function ReadDocumentPage() {
   const [viewToken, setViewToken] = useState<string | null>(null);
   const [viewExt, setViewExt] = useState<string | null>(null);
   const [viewFilename, setViewFilename] = useState<string | null>(null);
-  const [docxHtml, setDocxHtml] = useState<string | null>(null);
-  const [docxLoading, setDocxLoading] = useState(false);
   const { status: membershipStatus, isLoading: membershipLoading } = useMembership();
 
   useEffect(() => {
@@ -77,7 +73,6 @@ export default function ReadDocumentPage() {
         setViewToken(null);
         setViewExt(null);
         setViewFilename(null);
-        setDocxHtml(null);
         if (!bookId) return;
         if (membershipStatus !== "approved") return;
         const res = await apiPost<{ token: string; ext?: string; filename?: string }>("/api/books/view-token", { bookId });
@@ -97,31 +92,16 @@ export default function ReadDocumentPage() {
     };
   }, [bookId, membershipStatus]);
 
-  useEffect(() => {
-    let cancelled = false;
-    const run = async () => {
-      if (!viewToken) return;
-      if (viewExt !== "docx") return;
-      try {
-        setDocxLoading(true);
-        setDocxHtml(null);
-        const res = await fetch(`/api/books/serve?token=${encodeURIComponent(viewToken)}`, { cache: "no-store" });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const arrayBuffer = await res.arrayBuffer();
-        const { value } = await mammoth.convertToHtml({ arrayBuffer });
-        if (!cancelled) setDocxHtml(value || "");
-      } catch (e) {
-        console.error(e);
-        if (!cancelled) setDocxHtml(null);
-      } finally {
-        if (!cancelled) setDocxLoading(false);
-      }
-    };
-    run();
-    return () => {
-      cancelled = true;
-    };
-  }, [viewToken, viewExt]);
+  const serveUrl = useMemo(() => {
+    if (!viewToken) return null;
+    if (typeof window === "undefined") return null;
+    return `${window.location.origin}/api/books/serve?token=${encodeURIComponent(viewToken)}`;
+  }, [viewToken]);
+
+  const officeEmbedUrl = useMemo(() => {
+    if (!serveUrl) return null;
+    return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(serveUrl)}`;
+  }, [serveUrl]);
 
   return (
     <ProtectedRoute>
@@ -165,7 +145,7 @@ export default function ReadDocumentPage() {
                   <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                     <div className="relative w-full aspect-4/3 bg-black">
                       <Image src={cover} alt={current.title} fill className="object-cover opacity-65" sizes="100vw" unoptimized={coverUnoptimized} />
-                      <div className="absolute inset-0 bg-linear-to-t from-black/55 via-black/30 to-black/20" />
+                      <div className="absolute inset-0 bg-black/40" />
                       <div className="absolute inset-0 flex items-center justify-center p-6 text-center text-white">
                         <div>
                           <div className="text-xl font-semibold mb-2">Membership required</div>
@@ -227,50 +207,34 @@ export default function ReadDocumentPage() {
                     </div>
 
                     <div className="bg-slate-50">
-                      {/* Use iframe for broad PDF support without extra dependencies */}
+                      {/* Use native viewers (PDF browser viewer / Office viewer) */}
                       {viewToken ? (
-                        viewExt === "docx" ? (
+                        viewExt === "docx" || viewExt === "doc" ? (
                           <div className="w-full h-[75vh] bg-white overflow-auto p-5">
                             <div className="flex items-center justify-between gap-3 pb-4 border-b border-gray-200">
                               <div className="min-w-0">
-                                <div className="text-sm font-semibold text-gray-900 truncate">DOCX Viewer</div>
+                                <div className="text-sm font-semibold text-gray-900 truncate">Document Viewer</div>
                                 {viewFilename ? <div className="text-xs text-gray-500 truncate">{viewFilename}</div> : null}
                               </div>
                               <a
                                 className="text-xs font-semibold text-(--brown) hover:underline shrink-0"
-                                href={`/api/books/serve?token=${encodeURIComponent(viewToken)}`}
+                                href={serveUrl ?? `/api/books/serve?token=${encodeURIComponent(viewToken)}`}
+                                target="_blank"
+                                rel="noreferrer"
                               >
-                                Download
+                                Open / Download
                               </a>
                             </div>
-                            {docxLoading ? (
-                              <div className="py-10 text-center text-gray-700">
-                                <div className="font-semibold mb-2">Rendering DOCX…</div>
-                                <div className="text-sm text-gray-600">Please wait a moment.</div>
-                              </div>
-                            ) : docxHtml !== null ? (
-                              <div 
-                                className="prose prose-slate max-w-none pt-4" 
-                                dangerouslySetInnerHTML={{ 
-                                  __html: DOMPurify.sanitize(docxHtml, {
-                                    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 
-                                                   'ul', 'ol', 'li', 'a', 'span', 'div', 'table', 'thead', 'tbody', 
-                                                   'tr', 'td', 'th', 'img', 'blockquote', 'pre', 'code'],
-                                    ALLOWED_ATTR: ['href', 'class', 'style', 'src', 'alt', 'title'],
-                                    ALLOW_DATA_ATTR: false,
-                                  })
-                                }} 
+                            {officeEmbedUrl ? (
+                              <iframe
+                                title={current.title}
+                                src={officeEmbedUrl}
+                                className="w-full h-[65vh] bg-white mt-4 rounded-lg border border-gray-200"
                               />
                             ) : (
                               <div className="py-10 text-center text-gray-700">
-                                <div className="font-semibold mb-2">Unable to render DOCX</div>
-                                <div className="text-sm text-gray-600 mb-4">You can still download and view it in Word.</div>
-                                <a
-                                  className="inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold text-white bg-(--brown) hover:opacity-95"
-                                  href={`/api/books/serve?token=${encodeURIComponent(viewToken)}`}
-                                >
-                                  Download DOCX
-                                </a>
+                                <div className="font-semibold mb-2">Preparing viewer…</div>
+                                <div className="text-sm text-gray-600">Please wait a moment.</div>
                               </div>
                             )}
                           </div>

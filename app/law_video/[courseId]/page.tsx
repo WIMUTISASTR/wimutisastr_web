@@ -90,7 +90,7 @@ export default function VideoCategoryPage() {
     <ProtectedRoute>
       <PageContainer>
         {/* Enhanced Hero Section */}
-        <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white py-20 overflow-hidden">
+        <section className="relative bg-gray-900 text-white py-20 overflow-hidden">
           <div className="absolute inset-0 z-0">
             {category?.cover_url && (
               <Image
@@ -103,7 +103,7 @@ export default function VideoCategoryPage() {
               />
             )}
           </div>
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-900/90 via-gray-900/80 to-gray-900/90 z-10" />
+          <div className="absolute inset-0 bg-gray-900/80 z-10" />
           
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
             <div className="mb-6 animate-in">
@@ -149,7 +149,7 @@ export default function VideoCategoryPage() {
         </section>
 
         {/* Course Content Section */}
-        <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50">
+        <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
           <div className="max-w-6xl mx-auto">
             {isLoading ? (
               <div className="space-y-6">
@@ -186,7 +186,7 @@ export default function VideoCategoryPage() {
                   <BookOpenIcon className="w-8 h-8 text-gray-400" />
                 </div>
                 <p className="text-xl font-semibold text-gray-900 mb-2">No videos available</p>
-                <p className="text-sm text-gray-600">This course doesn't have any videos yet.</p>
+                <p className="text-sm text-gray-600">This course doesn&apos;t have any videos yet.</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -218,7 +218,7 @@ export default function VideoCategoryPage() {
                               className="object-cover transition-transform duration-500 group-hover/thumb:scale-110"
                               sizes="(max-width: 1024px) 100vw, 400px"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent opacity-0 group-hover/thumb:opacity-100 transition-opacity duration-300" />
+                            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover/thumb:opacity-100 transition-opacity duration-300" />
                             
                             {/* Play Button */}
                             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/thumb:opacity-100 transition-opacity duration-300">

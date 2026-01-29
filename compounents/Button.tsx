@@ -24,15 +24,15 @@ export default function Button({
 
   const variants = {
     primary:
-      "bg-[var(--primary)] text-white rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] hover:bg-[var(--primary-light)] active:scale-[0.98] transition-all duration-300",
+      "bg-(--primary) text-white rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] hover:bg-[var(--primary-light)] active:scale-[0.98] transition-all duration-300",
     secondary:
       "bg-[var(--ink)] text-white rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] hover:bg-[var(--gray-700)] active:scale-[0.98] transition-all duration-300",
     outline:
-      "bg-white/90 backdrop-blur-sm text-[var(--ink)] border-2 border-[var(--gray-200)] rounded-xl shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[var(--primary)] hover:text-[var(--primary)] active:scale-[0.98] transition-all duration-300",
+      "bg-white/90 backdrop-blur-sm text-[var(--ink)] border-2 border-[var(--gray-200)] rounded-xl shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[var(--primary)] hover:text-(--primary) active:scale-[0.98] transition-all duration-300",
     ghost:
-      "bg-transparent text-[var(--gray-700)] rounded-xl hover:bg-[var(--gray-100)] hover:text-[var(--ink)] active:scale-[0.98] transition-all duration-300",
+      "bg-transparent text-(--gray-700) rounded-xl hover:bg-[var(--gray-100)] hover:text-[var(--ink)] active:scale-[0.98] transition-all duration-300",
     gradient:
-      "bg-[var(--accent)] text-white rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.02] hover:bg-[var(--accent-dark)] active:scale-[0.98] transition-all duration-300",
+      "bg-(--accent) text-white rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.02] hover:bg-(--accent-dark) active:scale-[0.98] transition-all duration-300",
   };
 
   const sizes = {
