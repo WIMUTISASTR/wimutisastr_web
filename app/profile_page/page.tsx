@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth/context";
 import { supabase } from "@/lib/supabase/instance";
 import PageContainer from "@/compounents/PageContainer";
 import Button from "@/compounents/Button";
+import LoadingState from "@/compounents/LoadingState";
 import { useEffect, useMemo, useState } from "react";
 import { fetchProfileMe, type ProfileMeResponse } from "@/lib/api/client";
 
@@ -116,10 +117,7 @@ export default function ProfilePage() {
     return (
       <PageContainer>
         <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-(--brown) mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading...</p>
-          </div>
+          <LoadingState label="Loading..." />
         </div>
       </PageContainer>
     );
@@ -147,10 +145,7 @@ export default function ProfilePage() {
     return (
       <PageContainer>
         <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-(--brown) mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading profile...</p>
-          </div>
+          <LoadingState label="Loading profile..." />
         </div>
       </PageContainer>
     );

@@ -13,13 +13,14 @@ import FormHeader from "@/compounents/FormHeader";
 import Input from "@/compounents/Input";
 import Checkbox from "@/compounents/Checkbox";
 import Button from "@/compounents/Button";
+import LoadingState from "@/compounents/LoadingState";
 import Divider from "@/compounents/Divider";
 import FormLink from "@/compounents/FormLink";
 
 function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectParam = searchParams.get("redirect");
+  const redirectParam = searchParams.get("redirect") ?? searchParams.get("redirectTo");
   const redirectTo = redirectParam && redirectParam.startsWith("/") ? redirectParam : "/";
   const [formData, setFormData] = useState({
     email: "",
@@ -97,7 +98,7 @@ function LoginPageContent() {
               rightElement={
                 <Link
                   href="#"
-                  className="text-sm text-[var(--brown-strong)] hover:text-[var(--brown)] font-medium"
+                  className="text-sm text-(--brown-strong) hover:text-(--brown) font-medium"
                 >
                   Forgot password?
                 </Link>
@@ -144,10 +145,7 @@ export default function LoginPage() {
       fallback={
         <PageContainer>
           <div className="min-h-screen flex items-center justify-center">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-(--brown) mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading...</p>
-            </div>
+            <LoadingState label="Loading..." />
           </div>
         </PageContainer>
       }

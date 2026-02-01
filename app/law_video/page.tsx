@@ -145,49 +145,61 @@ export default function LawVideoPage() {
   return (
     <ProtectedRoute>
       <PageContainer>
-        <section className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8 min-h-screen">
-          <div className="max-w-7xl mx-auto">
-            {/* Hero Header Section */}
-            <div className="mb-10 animate-in">
-              <div className="flex flex-col gap-6">
-                <div>
-                  <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-3">
-                    Video Courses
-                  </h1>
-                  <p className="text-lg text-gray-600 max-w-2xl">
-                    Explore our comprehensive collection of legal education courses designed for professionals and students.
-                  </p>
-                </div>
+        {/* Hero banner (match Documents style) */}
+        <section className="relative bg-slate-900 text-white py-14 overflow-hidden">
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/asset/document_background.png"
+              alt="Video courses background"
+              fill
+              className="object-cover"
+              priority
+              sizes="100vw"
+            />
+          </div>
+          <div className="absolute inset-0 bg-slate-900/65 z-10" />
 
-                {/* Enhanced Search Bar */}
-                <div className="relative max-w-2xl">
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <SearchIcon className="w-5 h-5 text-gray-400" />
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="Search courses by name or description..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 rounded-xl border-2 border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-(--brown) focus:border-(--brown) transition-all duration-200 text-base"
-                    />
-                    {searchQuery && (
-                      <button
-                        type="button"
-                        onClick={() => setSearchQuery("")}
-                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
-                        aria-label="Clear search"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    )}
-                  </div>
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
+            <h1 className="text-3xl sm:text-4xl font-semibold">Video Courses</h1>
+            <p className="text-gray-300 max-w-3xl mt-2">
+              Explore legal education courses designed for professionals and students.
+            </p>
+
+            <div className="mt-8 max-w-2xl">
+              <label className="text-sm font-semibold text-gray-200" htmlFor="law-video-search">
+                Search courses
+              </label>
+              <div className="mt-2 relative">
+                <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center">
+                  <SearchIcon className="w-5 h-5 text-gray-300" />
                 </div>
+                <input
+                  id="law-video-search"
+                  type="text"
+                  placeholder="Search courses by name or description..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-12 pr-12 py-3 rounded-xl bg-white/90 text-slate-900 placeholder:text-slate-500 shadow-sm ring-1 ring-inset ring-white/20 focus:outline-none focus:ring-2 focus:ring-(--primary) transition-colors"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-slate-700 transition-colors"
+                    aria-label="Clear search"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
               </div>
             </div>
+          </div>
+        </section>
+
+        <section className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8 min-h-screen">
+          <div className="max-w-7xl mx-auto">
 
             {/* Results Count */}
             {!isLoading && !error && (
@@ -208,7 +220,7 @@ export default function LawVideoPage() {
                 {Array.from({ length: 8 }).map((_, i) => (
                   <div
                     key={i}
-                    className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden animate-pulse"
+                    className="bg-white rounded-none border border-gray-200 shadow-lg overflow-hidden animate-pulse"
                   >
                     <div className="aspect-video bg-gray-200" />
                     <div className="p-6 space-y-4">
@@ -240,7 +252,7 @@ export default function LawVideoPage() {
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
-                  className="inline-flex items-center gap-2 rounded-xl bg-[var(--brown)] text-white px-6 py-3 text-sm font-semibold hover:bg-[var(--brown-strong)] transition-colors shadow-sm hover:shadow-md"
+                  className="inline-flex items-center gap-2 rounded-xl bg-(--brown) text-white px-6 py-3 text-sm font-semibold hover:bg-(--brown-strong) transition-colors shadow-sm hover:shadow-md"
                 >
                   Clear Search
                 </button>
@@ -261,7 +273,7 @@ export default function LawVideoPage() {
                   return (
                     <div
                       key={cat.id}
-                      className="group bg-white border-2 border-gray-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer animate-scale-in"
+                      className="group bg-white border-2 border-gray-200 rounded-none overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer animate-scale-in"
                       style={{ animationDelay: `${index * 50}ms` }}
                       role="button"
                       tabIndex={0}
@@ -284,13 +296,13 @@ export default function LawVideoPage() {
                         {/* Play Button Overlay */}
                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                           <div className="w-20 h-20 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform">
-                            <PlayIcon className="w-10 h-10 text-[var(--brown)] ml-1" />
+                              <PlayIcon className="w-10 h-10 text-(--brown) ml-1" />
                           </div>
                         </div>
 
                         {/* Progress Badge */}
                         {pct > 0 && (
-                          <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 text-xs font-bold text-[var(--brown)] shadow-lg">
+                          <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 text-xs font-bold text-(--brown) shadow-lg">
                             {pct}% Complete
                           </div>
                         )}
@@ -307,7 +319,7 @@ export default function LawVideoPage() {
                       {/* Course Info */}
                       <div className="p-6">
                         <div className="mb-4">
-                          <h3 className="text-lg font-bold text-gray-900 leading-tight line-clamp-2 mb-2 group-hover:text-[var(--brown)] transition-colors">
+                          <h3 className="text-lg font-bold text-gray-900 leading-tight line-clamp-2 mb-2 group-hover:text-(--brown) transition-colors">
                             {cat.name ?? "Untitled Course"}
                           </h3>
                           {cat.description && (
@@ -329,7 +341,7 @@ export default function LawVideoPage() {
                               <>
                                 <div className="h-2 rounded-full bg-gray-200 overflow-hidden mb-2">
                                   <div
-                                    className="h-full bg-[var(--brown)] rounded-full transition-all duration-500"
+                                    className="h-full bg-(--brown) rounded-full transition-all duration-500"
                                     style={{ width: `${pct}%` }}
                                   />
                                 </div>
@@ -347,11 +359,11 @@ export default function LawVideoPage() {
                         {/* Action Button */}
                         <div className="pt-4 border-t border-gray-100">
                           <div className="flex items-center justify-between">
-                            <span className="text-sm font-semibold text-[var(--brown)] group-hover:text-[var(--brown-strong)] transition-colors">
+                            <span className="text-sm font-semibold text-(--brown) group-hover:text-(--brown-strong) transition-colors">
                               {pct === 0 ? "Start Course" : pct === 100 ? "Review Course" : "Continue Learning"}
                             </span>
-                            <div className="w-8 h-8 rounded-full bg-[var(--brown)]/10 flex items-center justify-center group-hover:bg-[var(--brown)]/20 transition-colors">
-                              <svg className="w-4 h-4 text-[var(--brown)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="w-8 h-8 rounded-full bg-(--brown)/10 flex items-center justify-center group-hover:bg-(--brown)/20 transition-colors">
+                              <svg className="w-4 h-4 text-(--brown)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                               </svg>
                             </div>

@@ -56,16 +56,20 @@ export async function GET() {
       { data: books, error: bErr, count: booksCount },
     ] = await Promise.all([
       supabase
-        .from<VideoCategoryRow>("video_categories")
+        .from("video_categories")
         .select("id,name,description,cover_url,created_at")
         .order("created_at", { ascending: false }),
-      supabase.from<VideoRow>("videos").select("id,category_id", { count: "exact" }),
+      supabase.from("videos").select("id,category_id", { count: "exact" }),
       supabase
-        .from<BookRow>("books")
+        .from("books")
         .select("id,title,description,author,year,cover_url,uploaded_at", { count: "exact" })
         .order("uploaded_at", { ascending: false })
         .limit(6),
     ]);
+
+    const typedVideoCategories = videoCategories as VideoCategoryRow[] | null;
+    const typedVideos = videos as VideoRow[] | null;
+    const typedBooks = books as BookRow[] | null;
 
     if (vcErr || vErr || bErr) {
       console.error("GET /api/home failed:", { vcErr, vErr, bErr });
@@ -73,13 +77,13 @@ export async function GET() {
     }
 
     const counts = new Map<string, number>();
-    for (const v of videos ?? []) {
+    for (const v of typedVideos ?? []) {
       const cid = v.category_id ?? "";
       if (!cid) continue;
       counts.set(cid, (counts.get(cid) ?? 0) + 1);
     }
 
-    const categories: HomeVideoCategory[] = (videoCategories ?? []).map((c) => ({
+    const categories: HomeVideoCategory[] = (typedVideoCategories ?? []).map((c) => ({
       id: c.id,
       name: c.name ?? null,
       description: c.description ?? null,
@@ -87,7 +91,7 @@ export async function GET() {
       videoCount: counts.get(c.id) ?? 0,
     }));
 
-    const featuredBooks: HomeBook[] = (books ?? []).map((b) => ({
+    const featuredBooks: HomeBook[] = (typedBooks ?? []).map((b) => ({
       id: b.id,
       title: b.title,
       description: b.description ?? null,
@@ -102,8 +106,8 @@ export async function GET() {
         featuredBooks,
         stats: {
           categoriesCount: categories.length,
-          videosCount: videosCount ?? (videos?.length ?? 0),
-          booksCount: booksCount ?? (books?.length ?? 0),
+          videosCount: videosCount ?? (typedVideos?.length ?? 0),
+          booksCount: booksCount ?? (typedBooks?.length ?? 0),
         },
       },
       { status: 200 }

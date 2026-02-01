@@ -54,9 +54,9 @@ export default function HeroSection({ isVisible, mousePosition, home, homeLoadin
             
             {/* Main Headline */}
             <h1 className="text-[2.75rem] leading-[1.05] tracking-tight text-[var(--ink)] sm:text-6xl lg:text-7xl">
-              <span className="font-extrabold">Master</span>{" "}
+              <span className="font-extrabold">Learn</span>{" "}
               <span className="font-extrabold text-(--primary)">Cambodian</span>{" "}
-              <span className="font-extrabold">Law</span>
+              <span className="font-extrabold">Legal From Experts</span>
             </h1>
             
             {/* Description */}

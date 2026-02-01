@@ -98,26 +98,26 @@ export async function GET(req: NextRequest) {
       // Special virtual categories
       if (!categoryId || categoryId === ALL_CATEGORY_ID) {
         return supabase
-          .from<PublicBookRow>("books")
+          .from("books")
           .select("id,title,author,year,description,cover_url,category_id,uploaded_at")
           .order("uploaded_at", { ascending: false });
       }
       if (categoryId === UNCATEGORIZED_ID) {
         return supabase
-          .from<PublicBookRow>("books")
+          .from("books")
           .select("id,title,author,year,description,cover_url,category_id,uploaded_at")
           .is("category_id", null)
           .order("uploaded_at", { ascending: false });
       }
       return supabase
-        .from<PublicBookRow>("books")
+        .from("books")
         .select("id,title,author,year,description,cover_url,category_id,uploaded_at")
         .eq("category_id", categoryId)
         .order("uploaded_at", { ascending: false });
     })();
 
     console.log('[books-public] Executing books query...');
-    const { data: books, error: bookErr } = await booksQuery;
+    const { data: books, error: bookErr } = (await booksQuery) as { data: PublicBookRow[] | null; error: unknown };
     console.log('[books-public] Books query completed. Count:', books?.length ?? 0);
     
     if (bookErr) {
@@ -131,12 +131,12 @@ export async function GET(req: NextRequest) {
     
     console.log('[books-public] Building categories query...');
     const categoriesQuery = supabase
-      .from<PublicCategoryRow>("categories")
+      .from("categories")
       .select("*")
       .order("created_at", { ascending: false });
 
     console.log('[books-public] Executing categories query...');
-    const { data: categories, error: catErr } = await categoriesQuery;
+    const { data: categories, error: catErr } = (await categoriesQuery) as { data: PublicCategoryRow[] | null; error: unknown };
     console.log('[books-public] Categories query completed. Count:', categories?.length ?? 0);
 
     if (catErr) {

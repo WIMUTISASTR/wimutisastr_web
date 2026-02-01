@@ -89,62 +89,31 @@ export default function VideoCategoryPage() {
   return (
     <ProtectedRoute>
       <PageContainer>
-        {/* Enhanced Hero Section */}
-        <section className="relative bg-gray-900 text-white py-20 overflow-hidden">
+        {/* Header (match Documents category header style) */}
+        <section className="relative bg-slate-900 text-white py-14 overflow-hidden">
           <div className="absolute inset-0 z-0">
-            {category?.cover_url && (
-              <Image
-                src={normalizeNextImageSrc(category.cover_url, FALLBACK_THUMB)}
-                alt="Course background"
-                fill
-                className="object-cover opacity-30"
-                priority
-                sizes="100vw"
-              />
-            )}
+            <Image
+              src="/asset/document_background.png"
+              alt="Courses background"
+              fill
+              className="object-cover"
+              priority
+              sizes="100vw"
+            />
           </div>
-          <div className="absolute inset-0 bg-gray-900/80 z-10" />
-          
+          <div className="absolute inset-0 bg-slate-900/65 z-10" />
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
-            <div className="mb-6 animate-in">
-              <Link
-                href="/law_video"
-                className="inline-flex items-center gap-2 text-gray-300 hover:text-white transition-colors group mb-6"
-              >
-                <ChevronLeftIcon className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                <span>Back to Courses</span>
-              </Link>
-            </div>
-
-            <div className="max-w-4xl animate-in delay-100">
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
-                <BookOpenIcon className="w-4 h-4" />
-                <span className="text-sm font-semibold">Video Course</span>
-              </div>
-              
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-                {category?.name ?? "Course"}
-              </h1>
-              
-              {category?.description && (
-                <p className="text-lg sm:text-xl text-gray-300 leading-relaxed max-w-3xl mb-8">
-                  {category.description}
-                </p>
-              )}
-
-              <div className="flex flex-wrap items-center gap-6 text-sm text-gray-300">
-                <div className="flex items-center gap-2">
-                  <PlayIcon className="w-5 h-5" />
-                  <span>{videos.length} {videos.length === 1 ? "lesson" : "lessons"}</span>
-                </div>
-                {videos.length > 0 && (
-                  <div className="flex items-center gap-2">
-                    <ClockIcon className="w-5 h-5" />
-                    <span>Start learning today</span>
-                  </div>
-                )}
-              </div>
-            </div>
+            <Link
+              href="/law_video"
+              className="inline-flex items-center text-gray-300 hover:text-white mb-4 transition-colors"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back to Courses
+            </Link>
+            <h1 className="text-3xl font-semibold">{category?.name ?? "Course"}</h1>
+            <p className="text-gray-300 max-w-3xl">{category?.description ?? ""}</p>
           </div>
         </section>
 
@@ -209,7 +178,7 @@ export default function VideoCategoryPage() {
                           {/* Video Thumbnail */}
                           <Link
                             href={`/law_video/${categoryId}/watch/${video.id}`}
-                            className="relative w-full lg:w-80 xl:w-96 aspect-video rounded-xl overflow-hidden block bg-gray-100 flex-shrink-0 group/thumb"
+                            className="relative w-full lg:w-80 xl:w-96 aspect-video rounded-xl overflow-hidden block bg-gray-100 shrink-0 group/thumb"
                           >
                             <Image
                               src={thumb}
@@ -222,13 +191,13 @@ export default function VideoCategoryPage() {
                             
                             {/* Play Button */}
                             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/thumb:opacity-100 transition-opacity duration-300">
-                              <div className="w-20 h-20 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-2xl transform group-hover/thumb:scale-110 transition-transform">
-                                <PlayIcon className="w-10 h-10 text-[var(--brown)] ml-1" />
+                            <div className="w-20 h-20 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-2xl transform group-hover/thumb:scale-110 transition-transform">
+                                <PlayIcon className="w-10 h-10 text-(--brown) ml-1" />
                               </div>
                             </div>
 
                             {/* Lesson Number Badge */}
-                            <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-bold text-[var(--brown)] shadow-lg">
+                            <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-bold text-(--brown) shadow-lg">
                               Lesson {index + 1}
                             </div>
                           </Link>
@@ -240,7 +209,7 @@ export default function VideoCategoryPage() {
                                 href={`/law_video/${categoryId}/watch/${video.id}`}
                                 className="group/title"
                               >
-                                <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 group-hover/title:text-[var(--brown)] transition-colors">
+                                <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 group-hover/title:text-(--brown) transition-colors">
                                   {index + 1}. {video.title ?? "Untitled Lesson"}
                                 </h3>
                               </Link>
@@ -248,9 +217,9 @@ export default function VideoCategoryPage() {
                               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
                                 {video.presented_by && (
                                   <div className="flex items-center gap-2">
-                                    <UserIcon className="w-4 h-4 text-[var(--brown)]" />
+                                    <UserIcon className="w-4 h-4 text-(--brown)" />
                                     <span className="font-medium">Presented by:</span>
-                                    <span className="text-[var(--brown)] font-semibold">{video.presented_by}</span>
+                                    <span className="text-(--brown) font-semibold">{video.presented_by}</span>
                                   </div>
                                 )}
                                 {video.uploaded_at && (

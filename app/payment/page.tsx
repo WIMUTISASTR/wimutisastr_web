@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import PageContainer from "@/compounents/PageContainer";
 import Button from "@/compounents/Button";
+import LoadingState from "@/compounents/LoadingState";
 import { useEffect, useMemo, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/context";
@@ -243,10 +244,7 @@ function PaymentPageContent() {
     return (
       <PageContainer>
         <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-(--brown) mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading...</p>
-          </div>
+          <LoadingState label="Loading..." />
         </div>
       </PageContainer>
     );
@@ -256,10 +254,7 @@ function PaymentPageContent() {
     return (
       <PageContainer>
         <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-(--brown) mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading plans...</p>
-          </div>
+          <LoadingState label="Loading plans..." />
         </div>
       </PageContainer>
     );
@@ -637,10 +632,7 @@ export default function PaymentPage() {
     <Suspense fallback={
       <PageContainer>
         <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-(--brown) mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading...</p>
-          </div>
+          <LoadingState label="Loading..." />
         </div>
       </PageContainer>
     }>

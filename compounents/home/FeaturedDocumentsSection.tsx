@@ -37,11 +37,7 @@ export default function FeaturedDocumentsSection({
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-(--accent)/20 border-2 border-(--accent-dark) rounded-full mb-6">
             <div className="w-2 h-2 bg-(--accent-dark) rounded-full animate-pulse" />
             <span className="text-sm font-bold text-(--accent-dark) uppercase tracking-wide">Legal Resources</span>
-          </div>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-(--ink) mb-6 leading-tight">
-            Legal{" "}
-            <span className="text-(--accent-dark)">Documents</span>
-          </h2>
+          </div>         
           <p className="text-xl text-(--gray-700) max-w-3xl mx-auto font-medium">
             Access comprehensive legal documents and resources
           </p>
@@ -49,7 +45,7 @@ export default function FeaturedDocumentsSection({
 
         {/* Carousel Container */}
         <div className="relative mb-12">
-          <div className="relative overflow-hidden rounded-3xl shadow-2xl bg-white">
+          <div className="relative overflow-hidden">
             <div 
               className="flex transition-transform duration-700 ease-out"
               style={{ transform: `translateX(-${currentBookIndex * 100}%)` }}
@@ -67,7 +63,7 @@ export default function FeaturedDocumentsSection({
                         <div className="absolute -inset-4 bg-(--accent) opacity-20 rounded-3xl blur-2xl group-hover:blur-3xl transition-all duration-500" />
                         
                         {/* Book Cover */}
-                        <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl group-hover:shadow-3xl transition-all duration-500 card-lift">
+                        <div className="relative aspect-3/4 overflow-hidden shadow-2xl group-hover:shadow-3xl transition-all duration-500 card-lift">
                           <Image
                             src={normalizeNextImageSrc(book.cover_url, FALLBACK_COVER)}
                             alt={book.title}

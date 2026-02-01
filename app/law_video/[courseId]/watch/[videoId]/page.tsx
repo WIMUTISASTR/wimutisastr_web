@@ -372,7 +372,7 @@ export default function WatchVideoPage() {
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div className="flex items-center gap-4 text-sm">
                           <div className="flex items-center gap-2 text-gray-700">
-                            <div className="w-2 h-2 rounded-full bg-[var(--brown)]"></div>
+                            <div className="w-2 h-2 rounded-full bg-(--brown)"></div>
                             <span className="font-medium">Lesson {currentIndex >= 0 ? currentIndex + 1 : "—"}</span>
                           </div>
                           <div className="text-gray-500">
@@ -384,7 +384,7 @@ export default function WatchVideoPage() {
                             <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600">
                               <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
                                 <div
-                                  className="h-full bg-[var(--brown)] rounded-full transition-all duration-500"
+                                  className="h-full bg-(--brown) rounded-full transition-all duration-500"
                                   style={{ width: `${courseProgress}%` }}
                                 ></div>
                               </div>
@@ -441,7 +441,7 @@ export default function WatchVideoPage() {
 
                             <div className="rounded-xl border border-gray-200 bg-gray-50 p-6 shadow-sm">
                               <div className="flex items-start gap-4">
-                                <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-[var(--brown)]/10 flex items-center justify-center">
+                                <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-(--brown)/10 flex items-center justify-center">
                                   <PlayIcon className="w-6 h-6 text-[var(--brown)]" />
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -486,11 +486,11 @@ export default function WatchVideoPage() {
                   } lg:block space-y-6 animate-slide-up-fade delay-300`}
                 >
                   <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden sticky top-6">
-                    <div className="px-6 py-4 border-b border-gray-200 bg-[var(--brown)]/5">
+                    <div className="px-6 py-4 border-b border-gray-200 bg-(--brown)/5">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-lg font-bold text-gray-900">Course Content</h3>
                         {courseProgress > 0 && (
-                          <span className="text-xs font-semibold text-[var(--brown)] bg-[var(--brown)]/10 px-3 py-1 rounded-full">
+                          <span className="text-xs font-semibold text-[var(--brown)] bg-(--brown)/10 px-3 py-1 rounded-full">
                             {courseProgress}% Complete
                           </span>
                         )}
@@ -511,21 +511,21 @@ export default function WatchVideoPage() {
                               onClick={() => handleGo(video.id)}
                               className={`w-full text-left p-4 rounded-xl transition-all duration-200 group ${
                                 isActive
-                                  ? "bg-[var(--brown)]/10 border-2 border-(--brown) shadow-md"
+                                  ? "bg-(--brown)/10 border-2 border-(--brown) shadow-md"
                                   : "hover:bg-gray-50 border-2 border-transparent hover:border-gray-200"
                               }`}
                             >
                               <div className="flex items-start gap-3">
                                 <div className="flex-shrink-0 mt-0.5">
                                   {isWatched ? (
-                                    <div className="w-6 h-6 rounded-full bg-[var(--brown)] flex items-center justify-center">
+                                    <div className="w-6 h-6 rounded-full bg-(--brown) flex items-center justify-center">
                                       <CheckIcon className="w-4 h-4 text-white" />
                                     </div>
                                   ) : (
                                     <div
                                       className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-semibold ${
                                         isActive
-                                          ? "bg-[var(--brown)] text-white"
+                                          ? "bg-(--brown) text-white"
                                           : "bg-gray-200 text-gray-600 group-hover:bg-gray-300"
                                       }`}
                                     >
@@ -545,7 +545,7 @@ export default function WatchVideoPage() {
                                     <div className="mt-2">
                                       <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
                                         <div
-                                          className="h-full bg-[var(--brown)] rounded-full transition-all duration-300"
+                                          className="h-full bg-(--brown) rounded-full transition-all duration-300"
                                           style={{ width: `${progress * 100}%` }}
                                         ></div>
                                       </div>

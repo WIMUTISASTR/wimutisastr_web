@@ -101,36 +101,6 @@ export default function AboutUsPage() {
 
   return (
     <PageContainer>
-      {/* Hero Section */}
-      <section className="relative bg-slate-900 text-white py-20 overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/asset/aboutUs.png"
-            alt="Legal background"
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
-            style={{ objectFit: 'cover' }}
-          />
-        </div>
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-slate-900/65 z-10"></div>
-        {/* Subtle brown accent overlay */}
-        <div className="absolute inset-0 bg-(--brown-soft) opacity-20 z-10"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
-          <div className="text-center">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 opacity-0 translate-y-8 delay-100">
-              About Us
-            </h1>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto opacity-0 translate-y-8 delay-300">
-              Empowering Cambodians with accessible legal knowledge
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Website Mission Section */}
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-white overflow-hidden">
         {/* Background Image */}
@@ -151,7 +121,7 @@ export default function AboutUsPage() {
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 opacity-0 translate-y-8 delay-100">
               Why We Created This Platform
             </h2>
-            <div className="w-24 h-1 bg-[var(--brown)] mx-auto mb-8 opacity-0 translate-y-8 delay-200"></div>
+            <div className="w-24 h-1 bg-(--brown) mx-auto mb-8 opacity-0 translate-y-8 delay-200"></div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
@@ -183,7 +153,7 @@ export default function AboutUsPage() {
             {/* Right Side - Benefits */}
             <div className="space-y-6">
               <div className="flex items-start space-x-4 opacity-0 translate-x-8 delay-300 hover:transform hover:scale-105 transition-all duration-300">
-                <div className="shrink-0 w-12 h-12 bg-[var(--brown)] rounded-lg flex items-center justify-center group-hover:bg-[var(--brown-strong)] transition-colors">
+                <div className="shrink-0 w-12 h-12 bg-(--brown) rounded-lg flex items-center justify-center group-hover:bg-[var(--brown-strong)] transition-colors">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                   </svg>
@@ -197,7 +167,7 @@ export default function AboutUsPage() {
               </div>
 
               <div className="flex items-start space-x-4 opacity-0 translate-x-8 delay-400 hover:transform hover:scale-105 transition-all duration-300">
-                <div className="shrink-0 w-12 h-12 bg-[var(--brown)] rounded-lg flex items-center justify-center group-hover:bg-[var(--brown-strong)] transition-colors">
+                <div className="shrink-0 w-12 h-12 bg-(--brown) rounded-lg flex items-center justify-center group-hover:bg-[var(--brown-strong)] transition-colors">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
@@ -371,7 +341,7 @@ export default function AboutUsPage() {
             <p className="text-lg text-gray-600 max-w-2xl mx-auto opacity-0 translate-y-8 delay-200">
               All documents and videos are carefully prepared by our experienced legal professional
             </p>
-            <div className="w-24 h-1 bg-[var(--brown)] mx-auto mt-6 opacity-0 translate-y-8 delay-300"></div>
+            <div className="w-24 h-1 bg-(--brown) mx-auto mt-6 opacity-0 translate-y-8 delay-300"></div>
           </div>
         </div>
       </section>
@@ -521,15 +491,15 @@ export default function AboutUsPage() {
               <h3 className="text-2xl font-bold text-gray-900 mb-6">Languages</h3>
               <div className="space-y-3">
                 <div className="flex items-center opacity-0 translate-x-8 delay-200 hover:translate-x-2 transition-all duration-300">
-                  <div className="w-3 h-3 bg-[var(--brown)] rounded-full mr-3"></div>
+                  <div className="w-3 h-3 bg-(--brown) rounded-full mr-3"></div>
                   <span className="text-gray-700">Khmer - Native</span>
                 </div>
                 <div className="flex items-center opacity-0 translate-x-8 delay-300 hover:translate-x-2 transition-all duration-300">
-                  <div className="w-3 h-3 bg-[var(--brown)] rounded-full mr-3"></div>
+                  <div className="w-3 h-3 bg-(--brown) rounded-full mr-3"></div>
                   <span className="text-gray-700">English</span>
                 </div>
                 <div className="flex items-center opacity-0 translate-x-8 delay-400 hover:translate-x-2 transition-all duration-300">
-                  <div className="w-3 h-3 bg-[var(--brown)] rounded-full mr-3"></div>
+                  <div className="w-3 h-3 bg-(--brown) rounded-full mr-3"></div>
                   <span className="text-gray-700">French</span>
                 </div>
               </div>

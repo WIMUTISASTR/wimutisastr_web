@@ -7,6 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import PageContainer from "@/compounents/PageContainer";
 import Button from "@/compounents/Button";
 import ProtectedRoute from "@/compounents/ProtectedRoute";
+import LoadingState from "@/compounents/LoadingState";
 import { apiPost, fetchBooks, type BookCategory, type BookRow } from "@/lib/api/client";
 import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
 import { useMembership } from "@/lib/hooks/useMembership";
@@ -132,13 +133,17 @@ export default function ReadDocumentPage() {
             </div>
 
             {isLoading ? (
-              <div className="text-center text-gray-600 py-16">Loading…</div>
+              <div className="py-16">
+                <LoadingState label="Loading document..." />
+              </div>
             ) : error ? (
               <div className="text-center text-red-600 py-16">{error}</div>
             ) : !current ? (
               <div className="text-center text-gray-600 py-16">Document not found.</div>
             ) : membershipLoading ? (
-              <div className="text-center text-gray-600 py-16">Checking membership…</div>
+              <div className="py-16">
+                <LoadingState label="Checking membership..." />
+              </div>
             ) : membershipStatus !== "approved" ? (
               <div className="grid lg:grid-cols-12 gap-6">
                 <div className="lg:col-span-8">
@@ -158,52 +163,30 @@ export default function ReadDocumentPage() {
                     </div>
                   </div>
                 </div>
-
-                <aside className="lg:col-span-4">
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                    <div className="px-5 py-4 border-b border-gray-200">
-                      <div className="font-semibold text-gray-900">Documents</div>
-                      <div className="text-sm text-gray-600">{category?.name ?? "Category"}</div>
-                    </div>
-                    <div className="max-h-[75vh] overflow-auto">
-                      {books.map((b, idx) => {
-                        const active = b.id === bookId;
-                        const bCover = normalizeNextImageSrc(b.cover_url, FALLBACK_COVER);
-                        const bCoverUnoptimized = isAnimatedImageUrl(bCover);
-                        return (
-                          <button
-                            key={b.id}
-                            onClick={() => router.push(`/law_documents/${categoryId}/read/${b.id}`)}
-                            className={[
-                              "w-full text-left px-4 py-3 flex gap-3 hover:bg-gray-50 transition-colors",
-                              active ? "bg-[rgba(161,105,63,0.08)]" : "",
-                            ].join(" ")}
-                          >
-                            <div className="relative w-16 h-24 rounded-lg overflow-hidden shrink-0 bg-gray-100">
-                              <Image src={bCover} alt={b.title} fill className="object-cover" sizes="64px" unoptimized={bCoverUnoptimized} />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className={["text-sm font-semibold line-clamp-2", active ? "text-(--brown)" : "text-gray-900"].join(" ")}>
-                                {idx + 1}. {b.title}
-                              </div>
-                              <div className="text-xs text-gray-600 mt-1">
-                                {[b.author, String(b.year)].filter(Boolean).join(" • ")}
-                              </div>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </aside>
               </div>
             ) : (
-              <div className="grid lg:grid-cols-12 gap-6">
-                <div className="lg:col-span-8">
+              <div className="grid grid-cols-1 gap-6">
+                <div>
                   <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                     <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between gap-3">
                       <div className="text-sm font-semibold text-gray-900 truncate">Reader</div>
-                      <div className="text-xs text-gray-500">Protected view</div>
+                      <div className="flex items-center gap-3">
+                        <div className="text-xs text-gray-500">Protected view</div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          disabled={!viewToken}
+                          onClick={() => {
+                            if (!viewToken) return;
+                            const url = serveUrl ?? `/api/books/serve?token=${encodeURIComponent(viewToken)}`;
+                            const w = window.open(url, "_blank", "noopener");
+                            if (w) w.opener = null;
+                          }}
+                        >
+                          View full page
+                        </Button>
+                      </div>
                     </div>
 
                     <div className="bg-slate-50">
@@ -254,58 +237,6 @@ export default function ReadDocumentPage() {
                     </div>
                   </div>
                 </div>
-
-                <aside className="lg:col-span-4">
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                    <div className="px-5 py-4 border-b border-gray-200">
-                      <div className="font-semibold text-gray-900">Documents</div>
-                      <div className="text-sm text-gray-600">{category?.name ?? "Category"}</div>
-                    </div>
-                    <div className="max-h-[75vh] overflow-auto">
-                      {books.map((b, idx) => {
-                        const active = b.id === bookId;
-                        const bCover = normalizeNextImageSrc(b.cover_url, FALLBACK_COVER);
-                        const bCoverUnoptimized = isAnimatedImageUrl(bCover);
-                        return (
-                          <button
-                            key={b.id}
-                            onClick={() => router.push(`/law_documents/${categoryId}/read/${b.id}`)}
-                            className={[
-                              "w-full text-left px-4 py-3 flex gap-3 hover:bg-gray-50 transition-colors",
-                              active ? "bg-[rgba(161,105,63,0.08)]" : "",
-                            ].join(" ")}
-                          >
-                            <div className="relative w-16 h-24 rounded-lg overflow-hidden shrink-0 bg-gray-100">
-                              <Image src={bCover} alt={b.title} fill className="object-cover" sizes="64px" unoptimized={bCoverUnoptimized} />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className={["text-sm font-semibold line-clamp-2", active ? "text-(--brown)" : "text-gray-900"].join(" ")}>
-                                {idx + 1}. {b.title}
-                              </div>
-                              <div className="text-xs text-gray-600 mt-1">
-                                {[b.author, String(b.year)].filter(Boolean).join(" • ")}
-                              </div>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {current ? (
-                      <div className="px-4 py-4 border-t border-gray-200">
-                        <div className="flex items-start gap-3">
-                          <div className="relative w-14 h-20 rounded-lg overflow-hidden shrink-0 bg-gray-100">
-                            <Image src={cover} alt={current.title} fill className="object-cover" sizes="56px" unoptimized={coverUnoptimized} />
-                          </div>
-                          <div className="min-w-0">
-                            <div className="text-sm font-semibold text-gray-900 line-clamp-2">{current.title}</div>
-                            {current.description ? <div className="text-xs text-gray-600 line-clamp-2 mt-1">{current.description}</div> : null}
-                          </div>
-                        </div>
-                      </div>
-                    ) : null}
-                  </div>
-                </aside>
               </div>
             )}
           </div>

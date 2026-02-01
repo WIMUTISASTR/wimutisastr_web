@@ -155,11 +155,11 @@ export default function Home() {
         hasPaid={hasPaid}
       />
 
-      <StatisticsSection home={home} />
-      <TrustedBySection />
+      {/* <StatisticsSection home={home} /> */}
+      {/* <TrustedBySection /> */}
       <AccreditationSection />
       <TestimonialsSection />
-      <CallToActionSection />
+      {/* <CallToActionSection /> */}
       <Footer />
     </PageContainer>
   );

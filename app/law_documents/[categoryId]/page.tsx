@@ -8,6 +8,7 @@ import PageContainer from "@/compounents/PageContainer";
 import Button from "@/compounents/Button";
 import { fetchBooks, type BookCategory, type BookRow } from "@/lib/api/client";
 import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
+import LoadingState from "@/compounents/LoadingState";
 
 const FALLBACK_COVER = "/sample_book/cover/book1.png";
 const ALL_CATEGORY_ID = "__all__";
@@ -74,7 +75,9 @@ export default function DocumentCategoryPage() {
         <section className="py-12 px-2 sm:px-4 lg:px-6">
           <div className="max-w-7xl mx-auto">
             {isLoading ? (
-              <div className="text-center text-gray-600 py-16">Loading…</div>
+              <div className="py-16">
+                <LoadingState label="Loading documents..." />
+              </div>
             ) : error ? (
               <div className="text-center text-red-600 py-16">{error}</div>
             ) : books.length === 0 ? (

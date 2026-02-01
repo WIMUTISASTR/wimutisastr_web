@@ -35,10 +35,6 @@ export default function FeaturedCoursesSection({
             <div className="w-2 h-2 bg-(--primary) rounded-full animate-pulse" />
             <span className="text-sm font-bold text-(--primary) uppercase tracking-wide">Popular Courses</span>
           </div>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-(--ink) mb-6 leading-tight">
-            Featured{" "}
-            <span className="text-(--primary)">Courses</span>
-          </h2>
           <p className="text-xl text-(--gray-700) max-w-3xl mx-auto font-medium">
             Explore our most popular legal education courses
           </p>
@@ -46,7 +42,7 @@ export default function FeaturedCoursesSection({
 
         {/* Carousel Container */}
         <div className="relative mb-12">
-          <div className="relative overflow-hidden bg-white">
+          <div className="relative overflow-hidden">
             <div 
               className="flex transition-transform duration-700 ease-out"
               style={{ transform: `translateX(-${currentCourseIndex * 100}%)` }}
@@ -54,7 +50,7 @@ export default function FeaturedCoursesSection({
               {(home?.categories ?? []).map((cat) => (
                 <div key={cat.id} className="min-w-full">
                   <Link href={`/law_video/${cat.id}`} className="block">
-                    <div className="relative grid md:grid-cols-2 gap-10 lg:gap-12 p-8 lg:p-12 bg-white hover:bg-(--accent)/5 transition-all duration-500 group">
+                    <div className="relative grid md:grid-cols-2 gap-10 lg:gap-12 p-8 lg:p-12 duration-500 group">
                       {/* Left Side - Course Thumbnail */}
                       <div className="relative">
                         <div className="relative w-full aspect-video overflow-hidden">

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import PageContainer from "@/compounents/PageContainer";
 import Button from "@/compounents/Button";
+import LoadingState from "@/compounents/LoadingState";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -123,7 +124,9 @@ export default function PricingPage() {
       <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           {isPlansLoading ? (
-            <div className="text-center text-gray-600 py-16">Loading plans…</div>
+            <div className="py-16">
+              <LoadingState label="Loading plans..." />
+            </div>
           ) : plansError ? (
             <div className="text-center text-red-600 py-16">{plansError}</div>
           ) : plans.length === 0 ? (

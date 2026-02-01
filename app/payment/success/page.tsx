@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Suspense } from "react";
 import PageContainer from "@/compounents/PageContainer";
 import Button from "@/compounents/Button";
+import LoadingState from "@/compounents/LoadingState";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
@@ -157,10 +158,7 @@ export default function PaymentSuccessPage() {
     <Suspense fallback={
       <PageContainer>
         <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-(--brown) mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading...</p>
-          </div>
+          <LoadingState label="Loading..." />
         </div>
       </PageContainer>
     }>
