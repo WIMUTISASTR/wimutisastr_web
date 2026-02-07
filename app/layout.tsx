@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AuthProvider } from "@/lib/auth/context";
-import ToastProvider from "@/compounents/ToastProvider";
+import ToastProvider from "@/components/ToastProvider";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,10 +17,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <AuthProvider>
-          {children}
-          <ToastProvider />
-        </AuthProvider>
+        <ErrorBoundary>
+          <AuthProvider>
+            {children}
+            <ToastProvider />
+          </AuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import Button from "@/compounents/Button";
+import Button from "@/components/Button";
 import type { HomeResponse } from "@/lib/api/client";
 
 interface HeroSectionProps {
@@ -16,18 +16,18 @@ export default function HeroSection({ isVisible, mousePosition, home, homeLoadin
   const router = useRouter();
 
   return (
-    <section className="relative overflow-hidden bg-[var(--paper)] pt-20">
+    <section className="relative overflow-hidden bg-(--paper) pt-20">
       {/* Background */}
       <div className="absolute inset-0 -z-10">
         <div
-          className="absolute -top-32 -left-32 h-[28rem] w-[28rem] rounded-full bg-(--primary) opacity-[0.07] blur-3xl"
+          className="absolute -top-32 -left-32 h-112 w-md rounded-full bg-(--primary) opacity-[0.07] blur-3xl"
           style={{
             transform: `translate(${mousePosition.x * 0.25}px, ${mousePosition.y * 0.25}px)`,
             transition: "transform 0.4s ease-out",
           }}
         />
         <div
-          className="absolute -bottom-40 -right-40 h-[34rem] w-[34rem] rounded-full bg-(--accent) opacity-[0.10] blur-3xl"
+          className="absolute -bottom-40 -right-40 h-136 w-136 rounded-full bg-(--accent) opacity-[0.10] blur-3xl"
           style={{
             transform: `translate(${-mousePosition.x * 0.18}px, ${-mousePosition.y * 0.18}px)`,
             transition: "transform 0.4s ease-out",
@@ -47,13 +47,13 @@ export default function HeroSection({ isVisible, mousePosition, home, homeLoadin
             ].join(" ")}
           >
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--brown-rgb)/0.25)] bg-white/70 px-4 py-2 text-xs font-semibold tracking-wide text-[var(--ink)] shadow-sm backdrop-blur">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--brown-rgb)/0.25)] bg-white/70 px-4 py-2 text-xs font-semibold tracking-wide text-(--ink) shadow-sm backdrop-blur">
               <span className="inline-flex h-2 w-2 rounded-full bg-(--primary)" />
               Professional Legal Education
             </div>
             
             {/* Main Headline */}
-            <h1 className="text-[2.75rem] leading-[1.05] tracking-tight text-[var(--ink)] sm:text-6xl lg:text-7xl">
+            <h1 className="text-[2.75rem] leading-[1.05] tracking-tight text-(--ink) sm:text-6xl lg:text-7xl">
               <span className="font-extrabold">Learn</span>{" "}
               <span className="font-extrabold text-(--primary)">Cambodian</span>{" "}
               <span className="font-extrabold">Legal From Experts</span>
@@ -124,7 +124,7 @@ export default function HeroSection({ isVisible, mousePosition, home, homeLoadin
                   className="rounded-2xl border border-gray-200 bg-white/70 px-4 py-3 shadow-sm backdrop-blur"
                 >
                   <div className="flex items-baseline gap-2">
-                    <div className="text-2xl font-extrabold text-[var(--ink)]">
+                    <div className="text-2xl font-extrabold text-(--ink)">
                       {homeLoading ? <span className="inline-block w-10 animate-pulse rounded bg-gray-200">&nbsp;</span> : s.value}
                     </div>
                     <div className="text-xs font-semibold uppercase tracking-wide text-(--gray-700)">
@@ -146,11 +146,11 @@ export default function HeroSection({ isVisible, mousePosition, home, homeLoadin
           >
             <div className="relative mx-auto w-full max-w-xl">
               {/* Glow */}
-              <div className="absolute -inset-6 rounded-[2rem] bg-(--accent) opacity-[0.18] blur-3xl" />
+              <div className="absolute -inset-6 rounded-4xlbg-(--accent) opacity-[0.18] blur-3xl" />
 
               {/* Frame */}
               <div
-                className="relative overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-2xl"
+                className="relative overflow-hidden rounded-4xl border border-gray-200 bg-white shadow-2xl"
                 style={{
                   transform: `perspective(1200px) rotateY(${mousePosition.x * 0.012}deg) rotateX(${-mousePosition.y * 0.012}deg)`,
                   transition: "transform 0.25s ease-out",
@@ -158,7 +158,7 @@ export default function HeroSection({ isVisible, mousePosition, home, homeLoadin
               >
                 <div className="relative p-5 sm:p-7">
                   <div className="rounded-2xl border border-[rgb(var(--brown-rgb)/0.20)] bg-[rgb(var(--brown-rgb)/0.06)] p-4">
-                    <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-white shadow-md">
+                    <div className="relative aspect-4/3 overflow-hidden bg-white shadow-md">
                       <Image
                         src="/asset/hero.png"
                         alt="Cambodian legal education"
@@ -168,48 +168,7 @@ export default function HeroSection({ isVisible, mousePosition, home, homeLoadin
                         sizes="(max-width: 1024px) 90vw, 42vw"
                       />
                     </div>
-                  </div>
-
-                  {/* Floating pills */}
-                  <div className="pointer-events-none absolute left-6 top-6 sm:left-8 sm:top-8">
-                    <div className="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white/90 px-3 py-2 text-xs font-semibold text-[var(--ink)] shadow-md backdrop-blur">
-                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-[rgb(var(--brown-rgb)/0.12)] text-(--primary)">
-                        <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
-                          <path
-                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </span>
-                      <span>
-                        <span className="text-sm font-extrabold">{homeLoading ? "…" : `${home?.stats.booksCount ?? 0}+`}</span>
-                        <span className="ml-1 text-(--gray-700)">Resources</span>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="pointer-events-none absolute bottom-6 right-6 sm:bottom-8 sm:right-8">
-                    <div className="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white/90 px-3 py-2 text-xs font-semibold text-[var(--ink)] shadow-md backdrop-blur">
-                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-(--primary) text-white">
-                        <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
-                          <path
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </span>
-                      <span>
-                        <span className="text-sm font-extrabold">Trusted</span>
-                        <span className="ml-1 text-(--gray-700)">Learning</span>
-                      </span>
-                    </div>
-                  </div>
+                  </div>                                 
                 </div>
               </div>
             </div>

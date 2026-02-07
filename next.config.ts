@@ -114,7 +114,7 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self'",
+              "script-src 'self'", // Removed 'unsafe-eval' and 'unsafe-inline' for better security
               "style-src 'self' 'unsafe-inline'", // Tailwind needs unsafe-inline
               "img-src 'self' data: https:",
               "connect-src 'self' https://*.supabase.co",
@@ -168,7 +168,7 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+              "script-src 'self' 'unsafe-inline'", // Next.js requires unsafe-inline for inline scripts, but removed unsafe-eval
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https: blob:",
               "font-src 'self' data:",

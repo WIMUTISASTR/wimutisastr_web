@@ -91,12 +91,12 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const db = createServerClient();
+    const db = getSupabaseWithToken(token);
 
     const [{ data: profile }, { data: latestProof }, { data: latestVerified }] = await Promise.all([
       db
         .from("user_profiles")
-        .select("id,full_name,email,membership_status,membership_notes,membership_approved_at,membership_denied_at,created_at,updated_at")
+        .select("id,full_name,email,membership_status,membership_notes,membership_approved_at,membership_denied_at,membership_starts_at,membership_ends_at,admin_notified,created_at,updated_at")
         .eq("id", user.id)
         .maybeSingle(),
       db
@@ -108,7 +108,7 @@ export async function GET(req: NextRequest) {
         .maybeSingle(),
       db
         .from("payment_proofs")
-        .select("membership_ends_at")
+        .select("membership_starts_at,membership_ends_at")
         .eq("user_id", user.id)
         .eq("status", "verified")
         .order("membership_ends_at", { ascending: false })
@@ -116,7 +116,14 @@ export async function GET(req: NextRequest) {
         .maybeSingle(),
     ]);
 
-    const membershipEndsAt = (latestVerified?.membership_ends_at as string | null | undefined) ?? null;
+    const profileMembershipStartsAt = (profile as { membership_starts_at?: unknown } | null)?.membership_starts_at;
+    const profileMembershipEndsAt = (profile as { membership_ends_at?: unknown } | null)?.membership_ends_at;
+    const membershipStartsAt =
+      (profileMembershipStartsAt as string | null | undefined) ??
+      ((latestVerified?.membership_starts_at as string | null | undefined) ?? null);
+    const membershipEndsAt =
+      (profileMembershipEndsAt as string | null | undefined) ??
+      ((latestVerified?.membership_ends_at as string | null | undefined) ?? null);
 
     const membershipStatusRaw = (profile as { membership_status?: unknown } | null)?.membership_status;
     const membershipStatus: MembershipStatus =
@@ -142,6 +149,7 @@ export async function GET(req: NextRequest) {
         profile: profile ?? null,
         membership: {
           status: membershipStatus,
+          membershipStartsAt,
           membershipEndsAt,
           notes: (profile as { membership_notes?: unknown } | null)?.membership_notes ?? null,
         },

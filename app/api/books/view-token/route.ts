@@ -4,6 +4,8 @@ import { signContentToken, TOKEN_EXPIRY } from "@/lib/security/tokens/content";
 import { env } from "@/lib/utils/env";
 import { logger } from "@/lib/utils/logger";
 import { rateLimit, createRateLimitResponse, RateLimitPresets } from "@/lib/rate-limit/redis";
+import { COOKIE_NAMES, jsonResponseWithCookie } from "@/lib/security/secure-cookies";
+import { checkMembershipWithCache } from "@/lib/cache";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -17,18 +19,25 @@ function getSupabaseWithToken(token: string) {
 }
 
 async function requireApprovedMembership(supabase: ReturnType<typeof getSupabaseWithToken>, userId: string) {
-  const { data: profile, error } = await supabase
-    .from("user_profiles")
-    .select("membership_status")
-    .eq("id", userId)
-    .maybeSingle();
+  const result = await checkMembershipWithCache(userId, async () => {
+    const { data: profile, error } = await supabase
+      .from("user_profiles")
+      .select("membership_status, membership_ends_at")
+      .eq("id", userId)
+      .maybeSingle();
 
-  if (error) {
-    log.error("Membership check failed", error, { userId });
-    return { ok: false as const, status: 500, error: "Failed to verify membership" };
-  }
+    if (error) {
+      log.error("Membership check failed", error, { userId });
+      throw error;
+    }
 
-  if (profile?.membership_status !== "approved") {
+    return {
+      status: (profile?.membership_status as 'approved' | 'pending' | 'rejected' | 'expired' | 'none') ?? 'none',
+      membershipEndsAt: profile?.membership_ends_at ?? null,
+    };
+  });
+
+  if (result.status !== "approved") {
     return { ok: false as const, status: 403, error: "Membership required" };
   }
 
@@ -90,16 +99,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const gate = await requireApprovedMembership(supabase, user.id);
-    if (!gate.ok) return NextResponse.json({ error: gate.error }, { status: gate.status });
-
     const body = (await req.json().catch(() => ({}))) as { bookId?: string };
     const bookId = body.bookId ?? "";
     if (!bookId) return NextResponse.json({ error: "Missing bookId" }, { status: 400 });
 
     const { data: book, error: bookErr } = await supabase
       .from("books")
-      .select("id,file_url")
+      .select("id,file_url,access_level")
       .eq("id", bookId)
       .maybeSingle();
 
@@ -108,6 +114,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Failed to fetch document" }, { status: 500 });
     }
     if (!book?.file_url) return NextResponse.json({ error: "Document not found" }, { status: 404 });
+
+    if (book.access_level !== "free") {
+      const gate = await requireApprovedMembership(supabase, user.id);
+      if (!gate.ok) return NextResponse.json({ error: gate.error }, { status: gate.status });
+    }
 
     const loc = extractBookKey(book.file_url);
     if (!loc) return NextResponse.json({ error: "Unsupported document URL format" }, { status: 400 });
@@ -124,12 +135,21 @@ export async function POST(req: NextRequest) {
     );
 
     log.info("View token generated", { bookId, userId: user.id });
-    return NextResponse.json({ 
-      token: viewToken, 
-      expiresAt: Math.floor(Date.now() / 1000) + TOKEN_EXPIRY.SHORT_LIVED, 
-      filename: meta.filename, 
-      ext: meta.ext 
-    });
+    
+    // Set token in secure HTTP-only cookie and return metadata
+    return jsonResponseWithCookie(
+      { 
+        // Don't expose token in response body for security
+        // Client should use the cookie automatically
+        ready: true,
+        expiresAt: Math.floor(Date.now() / 1000) + TOKEN_EXPIRY.SHORT_LIVED, 
+        filename: meta.filename, 
+        ext: meta.ext 
+      },
+      COOKIE_NAMES.BOOK_TOKEN,
+      viewToken,
+      { maxAge: TOKEN_EXPIRY.SHORT_LIVED, path: "/api/books" }
+    );
   } catch (e) {
     log.error("POST /api/books/view-token unexpected error", e);
     return NextResponse.json({ error: "Unexpected error" }, { status: 500 });

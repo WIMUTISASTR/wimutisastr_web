@@ -1,6 +1,7 @@
 "use client";
 
 import { supabase } from "@/lib/supabase/instance";
+import logger from "@/lib/utils/logger";
 
 export type VideoCategory = {
   id: string;
@@ -18,6 +19,7 @@ export type VideoRow = {
   category_id?: string | null;
   uploaded_at?: string | null;
   presented_by?: string | null;
+  access_level?: "free" | "members" | null;
 };
 
 export type PublicVideosResponse = { categories: VideoCategory[]; videos: VideoRow[] };
@@ -66,6 +68,7 @@ export type BookRow = {
   uploaded_at?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
+  access_level?: "free" | "members" | null;
 };
 
 export type PublicBooksResponse = { categories: BookCategory[]; books: BookRow[] };
@@ -86,11 +89,15 @@ export type ProfileMeResponse = {
     membership_notes: string | null;
     membership_approved_at: string | null;
     membership_denied_at: string | null;
+    membership_starts_at: string | null;
+    membership_ends_at: string | null;
     created_at: string | null;
     updated_at: string | null;
+    admin_notified: boolean | null;
   } | null;
   membership: {
     status: "pending" | "approved" | "denied" | "none";
+    membershipStartsAt: string | null;
     membershipEndsAt: string | null;
     notes: string | null;
   };
@@ -132,7 +139,7 @@ export async function apiGet<T>(url: string): Promise<T> {
   
   // Add timeout to prevent hanging requests
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
   
   try {
     const res = await fetch(url, { 
@@ -218,8 +225,7 @@ export function fetchBooks(categoryId?: string) {
   const url = categoryId ? `/api/books-public?categoryId=${encodeURIComponent(categoryId)}` : "/api/books-public";
   return apiGet<PublicBooksResponse>(withOptionalDebugParam(url)).then((data: any) => {
     if (typeof window !== "undefined" && new URL(window.location.href).searchParams.get("debug") === "1" && data?.debug) {
-      // eslint-disable-next-line no-console
-      console.log("books-public debug:", data.debug);
+      logger.debug('books-public', data.debug);
     }
     return data as PublicBooksResponse;
   });

@@ -3,7 +3,7 @@ import { uploadToR2 } from '@/lib/storage/r2-client';
 import { createClient } from '@supabase/supabase-js';
 import { sendTelegramMessage } from '@/lib/utils/telegram';
 import { env } from '@/lib/utils/env';
-import { logger } from '@/lib/utils/logger';
+import logger from "@/lib/utils/logger";
 import { rateLimit, createRateLimitResponse, RateLimitPresets } from '@/lib/rate-limit/redis';
 import { validateFileBuffer, sanitizeFilename } from '@/lib/storage/file-validation';
 

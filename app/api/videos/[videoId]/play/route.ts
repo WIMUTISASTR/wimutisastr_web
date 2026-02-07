@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { signVideoToken, TOKEN_EXPIRY } from "@/lib/security/tokens/video";
 import { env } from "@/lib/utils/env";
-import { logger } from "@/lib/utils/logger";
+import logger from "@/lib/utils/logger";
 import { rateLimit, createRateLimitResponse, RateLimitPresets } from "@/lib/rate-limit/redis";
+import { COOKIE_NAMES, jsonResponseWithCookie } from "@/lib/security/secure-cookies";
+import { checkMembershipWithCache } from "@/lib/cache";
 
 export const dynamic = "force-dynamic";
 
@@ -15,19 +17,30 @@ function getSupabaseWithToken(token: string) {
   });
 }
 
+/**
+ * Check membership with caching support
+ * First tries the cache, then falls back to database query
+ */
 async function requireApprovedMembership(supabase: ReturnType<typeof getSupabaseWithToken>, userId: string) {
-  const { data: profile, error } = await supabase
-    .from("user_profiles")
-    .select("membership_status")
-    .eq("id", userId)
-    .maybeSingle();
+  const result = await checkMembershipWithCache(userId, async () => {
+    const { data: profile, error } = await supabase
+      .from("user_profiles")
+      .select("membership_status, membership_ends_at")
+      .eq("id", userId)
+      .maybeSingle();
 
-  if (error) {
-    log.error("Membership check failed", error, { userId });
-    return { ok: false as const, status: 500, error: "Failed to verify membership" };
-  }
+    if (error) {
+      log.error("Membership check failed", error, { userId });
+      throw error;
+    }
 
-  if (profile?.membership_status !== "approved") {
+    return {
+      status: (profile?.membership_status as 'approved' | 'pending' | 'rejected' | 'expired' | 'none') ?? 'none',
+      membershipEndsAt: profile?.membership_ends_at ?? null,
+    };
+  });
+
+  if (result.status !== "approved") {
     return { ok: false as const, status: 403, error: "Membership required" };
   }
 
@@ -82,17 +95,23 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ videoId: st
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const gate = await requireApprovedMembership(supabase, user.id);
-    if (!gate.ok) {
-      return NextResponse.json({ error: gate.error }, { status: gate.status });
-    }
-
-    const { data: video, error: vidErr } = await supabase.from("videos").select("id,file_url").eq("id", videoId).maybeSingle();
+    const { data: video, error: vidErr } = await supabase
+      .from("videos")
+      .select("id,file_url,access_level")
+      .eq("id", videoId)
+      .maybeSingle();
     if (vidErr) {
       log.error("GET /api/videos/[id]/play failed", vidErr, { videoId, userId: user.id });
       return NextResponse.json({ error: "Failed to fetch video" }, { status: 500 });
     }
     if (!video?.file_url) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    if (video.access_level !== "free") {
+      const gate = await requireApprovedMembership(supabase, user.id);
+      if (!gate.ok) {
+        return NextResponse.json({ error: gate.error }, { status: gate.status });
+      }
+    }
 
     const extracted = extractR2Key(String(video.file_url));
 
@@ -110,14 +129,22 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ videoId: st
       TOKEN_EXPIRY.VIDEO_PLAY
     );
 
-    const url = `/api/videos/serve?token=${encodeURIComponent(playToken)}`;
+    // URL for the serve endpoint (token will be in cookie)
+    const url = `/api/videos/serve`;
     
     log.info("Video play token generated", { videoId, userId: user.id });
-    return NextResponse.json({ 
-      kind: "r2_proxy", 
-      url, 
-      exp: Math.floor(Date.now() / 1000) + TOKEN_EXPIRY.VIDEO_PLAY 
-    }, { status: 200 });
+    
+    // Set token in secure HTTP-only cookie and return the serve URL
+    return jsonResponseWithCookie(
+      { 
+        kind: "r2_proxy", 
+        url, 
+        exp: Math.floor(Date.now() / 1000) + TOKEN_EXPIRY.VIDEO_PLAY 
+      },
+      COOKIE_NAMES.VIDEO_TOKEN,
+      playToken,
+      { maxAge: TOKEN_EXPIRY.VIDEO_PLAY, path: "/api/videos" }
+    );
   } catch (e) {
     log.error("GET /api/videos/[id]/play unexpected error", e);
     return NextResponse.json({ error: "Unexpected error" }, { status: 500 });

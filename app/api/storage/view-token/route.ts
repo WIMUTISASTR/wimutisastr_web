@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { signStorageToken, TOKEN_EXPIRY } from "@/lib/security/tokens/storage";
 import { env } from "@/lib/utils/env";
-import { logger } from "@/lib/utils/logger";
+import logger from "@/lib/utils/logger";
 import { rateLimit, createRateLimitResponse, RateLimitPresets } from "@/lib/rate-limit/redis";
 
 export const dynamic = "force-dynamic";

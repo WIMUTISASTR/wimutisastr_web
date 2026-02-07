@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Button from "@/compounents/Button";
+import Button from "@/components/Button";
 import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
 import type { HomeResponse } from "@/lib/api/client";
 
@@ -61,6 +61,7 @@ export default function FeaturedCoursesSection({
                             fill
                             className="object-cover group-hover:scale-105 transition-transform duration-700"
                             sizes="(max-width: 768px) 100vw, 50vw"
+                            loading="lazy"
                           />
                           
                           {/* Dark Overlay */}

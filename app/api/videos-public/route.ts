@@ -32,11 +32,16 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const categoryId = searchParams.get("categoryId");
 
+    const videosQuery = (() => {
+      const query = categoryId
+        ? supabase.from("videos").select("*").eq("category_id", categoryId).order("uploaded_at", { ascending: false })
+        : supabase.from("videos").select("*").order("uploaded_at", { ascending: false });
+      return query;
+    })();
+
     const [{ data: categories, error: catErr }, { data: videos, error: vidErr }] = await Promise.all([
       supabase.from("video_categories").select("*").order("created_at", { ascending: false }),
-      categoryId
-        ? supabase.from("videos").select("*").eq("category_id", categoryId).order("uploaded_at", { ascending: false })
-        : supabase.from("videos").select("*").order("uploaded_at", { ascending: false }),
+      videosQuery,
     ]);
 
     if (catErr || vidErr) {
@@ -53,6 +58,7 @@ export async function GET(req: NextRequest) {
       category_id: v.category_id,
       uploaded_at: v.uploaded_at,
       presented_by: v.presented_by,
+      access_level: v.access_level ?? null,
     }));
 
     return NextResponse.json({ categories: categories ?? [], videos: safeVideos });

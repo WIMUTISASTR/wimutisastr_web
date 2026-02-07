@@ -1,22 +1,40 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import PageContainer from "@/compounents/PageContainer";
-import Button from "@/compounents/Button";
-import ProtectedRoute from "@/compounents/ProtectedRoute";
-import LoadingState from "@/compounents/LoadingState";
+import PageContainer from "@/components/PageContainer";
+import Button from "@/components/Button";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import LoadingState from "@/components/LoadingState";
 import { apiPost, fetchBooks, type BookCategory, type BookRow } from "@/lib/api/client";
 import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
 import { useMembership } from "@/lib/hooks/useMembership";
+
+// Dynamic import for DocxViewer to avoid SSR issues with docx-preview
+const DocxViewer = dynamic(() => import("@/components/DocxViewer"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center h-[60vh]">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-3"></div>
+        <div className="text-sm text-gray-600">Loading viewer...</div>
+      </div>
+    </div>
+  ),
+});
 
 const FALLBACK_COVER = "/sample_book/cover/book1.png";
 const ALL_CATEGORY_ID = "__all__";
 
 function isAnimatedImageUrl(src: string) {
   return /\.gif(\?|#|$)/i.test(src);
+}
+
+function shouldDisableImageOptimization(src: string) {
+  return src.includes(".r2.dev/");
 }
 
 export default function ReadDocumentPage() {
@@ -61,24 +79,34 @@ export default function ReadDocumentPage() {
   const category = useMemo(() => categories.find((c) => c.id === categoryId) ?? null, [categories, categoryId]);
   const currentIndex = useMemo(() => books.findIndex((b) => b.id === bookId), [books, bookId]);
   const current = currentIndex >= 0 ? books[currentIndex] : null;
+  const isFree = current?.access_level === "free";
 
   const prev = currentIndex > 0 ? books[currentIndex - 1] : null;
   const next = currentIndex >= 0 && currentIndex < books.length - 1 ? books[currentIndex + 1] : null;
 
   const cover = normalizeNextImageSrc(current?.cover_url, FALLBACK_COVER);
-  const coverUnoptimized = isAnimatedImageUrl(cover);
+  const coverUnoptimized = isAnimatedImageUrl(cover) || shouldDisableImageOptimization(cover);
+  
+  // Track if we have a valid token cookie set (ready state from API)
+  const [isReady, setIsReady] = useState(false);
+  
   useEffect(() => {
     let cancelled = false;
     const run = async () => {
       try {
+        setIsReady(false);
         setViewToken(null);
         setViewExt(null);
         setViewFilename(null);
         if (!bookId) return;
-        if (membershipStatus !== "approved") return;
-        const res = await apiPost<{ token: string; ext?: string; filename?: string }>("/api/books/view-token", { bookId });
+        if (!current?.id) return;
+        if (!isFree && membershipStatus !== "approved") return;
+        // API now sets HTTP-only cookie and returns ready state
+        const res = await apiPost<{ ready?: boolean; token?: string; ext?: string; filename?: string }>("/api/books/view-token", { bookId });
         if (!cancelled) {
-          setViewToken(res.token);
+          // Support both new cookie-based flow and legacy token flow
+          setIsReady(res.ready ?? !!res.token);
+          setViewToken(res.token ?? "cookie"); // Use marker for cookie-based auth
           setViewExt(res.ext ? String(res.ext).toLowerCase() : null);
           setViewFilename(res.filename ?? null);
         }
@@ -91,18 +119,15 @@ export default function ReadDocumentPage() {
     return () => {
       cancelled = true;
     };
-  }, [bookId, membershipStatus]);
+  }, [bookId, current?.id, isFree, membershipStatus]);
 
+  // URL for serving content - cookie will be sent automatically
   const serveUrl = useMemo(() => {
-    if (!viewToken) return null;
+    if (!isReady && !viewToken) return null;
     if (typeof window === "undefined") return null;
-    return `${window.location.origin}/api/books/serve?token=${encodeURIComponent(viewToken)}`;
-  }, [viewToken]);
-
-  const officeEmbedUrl = useMemo(() => {
-    if (!serveUrl) return null;
-    return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(serveUrl)}`;
-  }, [serveUrl]);
+    // Simple URL - token is now in HTTP-only cookie
+    return `${window.location.origin}/api/books/serve`;
+  }, [isReady, viewToken]);
 
   return (
     <ProtectedRoute>
@@ -144,12 +169,12 @@ export default function ReadDocumentPage() {
               <div className="py-16">
                 <LoadingState label="Checking membership..." />
               </div>
-            ) : membershipStatus !== "approved" ? (
+            ) : !isFree && membershipStatus !== "approved" ? (
               <div className="grid lg:grid-cols-12 gap-6">
                 <div className="lg:col-span-8">
                   <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                     <div className="relative w-full aspect-4/3 bg-black">
-                      <Image src={cover} alt={current.title} fill className="object-cover opacity-65" sizes="100vw" unoptimized={coverUnoptimized} />
+                      <Image src={cover} alt={current.title} fill className="object-cover opacity-65" sizes="(max-width: 1024px) 100vw, 66vw" unoptimized={coverUnoptimized} />
                       <div className="absolute inset-0 bg-black/40" />
                       <div className="absolute inset-0 flex items-center justify-center p-6 text-center text-white">
                         <div>
@@ -176,10 +201,11 @@ export default function ReadDocumentPage() {
                           type="button"
                           variant="outline"
                           size="sm"
-                          disabled={!viewToken}
+                          disabled={!isReady}
                           onClick={() => {
-                            if (!viewToken) return;
-                            const url = serveUrl ?? `/api/books/serve?token=${encodeURIComponent(viewToken)}`;
+                            if (!isReady) return;
+                            // Token is in HTTP-only cookie, no need to include in URL
+                            const url = serveUrl ?? `/api/books/serve`;
                             const w = window.open(url, "_blank", "noopener");
                             if (w) w.opener = null;
                           }}
@@ -190,41 +216,34 @@ export default function ReadDocumentPage() {
                     </div>
 
                     <div className="bg-slate-50">
-                      {/* Use native viewers (PDF browser viewer / Office viewer) */}
-                      {viewToken ? (
+                      {/* Use native viewers (PDF browser viewer / client-side DOCX viewer) */}
+                      {isReady ? (
                         viewExt === "docx" || viewExt === "doc" ? (
-                          <div className="w-full h-[75vh] bg-white overflow-auto p-5">
-                            <div className="flex items-center justify-between gap-3 pb-4 border-b border-gray-200">
+                          <div className="w-full bg-white overflow-auto">
+                            <div className="flex items-center justify-between gap-3 p-4 border-b border-gray-200">
                               <div className="min-w-0">
                                 <div className="text-sm font-semibold text-gray-900 truncate">Document Viewer</div>
                                 {viewFilename ? <div className="text-xs text-gray-500 truncate">{viewFilename}</div> : null}
                               </div>
                               <a
                                 className="text-xs font-semibold text-(--brown) hover:underline shrink-0"
-                                href={serveUrl ?? `/api/books/serve?token=${encodeURIComponent(viewToken)}`}
+                                href={serveUrl ?? `/api/books/serve`}
                                 target="_blank"
                                 rel="noreferrer"
                               >
                                 Open / Download
                               </a>
                             </div>
-                            {officeEmbedUrl ? (
-                              <iframe
-                                title={current.title}
-                                src={officeEmbedUrl}
-                                className="w-full h-[65vh] bg-white mt-4 rounded-lg border border-gray-200"
-                              />
-                            ) : (
-                              <div className="py-10 text-center text-gray-700">
-                                <div className="font-semibold mb-2">Preparing viewer…</div>
-                                <div className="text-sm text-gray-600">Please wait a moment.</div>
-                              </div>
-                            )}
+                            {/* Client-side DOCX viewer - renders document directly in browser */}
+                            <DocxViewer
+                              url={serveUrl ?? `/api/books/serve`}
+                              className="min-h-[65vh]"
+                            />
                           </div>
                         ) : (
                           <iframe
                             title={current.title}
-                            src={`/api/books/serve?token=${encodeURIComponent(viewToken)}`}
+                            src={`/api/books/serve`}
                             className="w-full h-[75vh] bg-white"
                           />
                         )

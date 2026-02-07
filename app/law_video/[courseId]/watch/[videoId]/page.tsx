@@ -4,14 +4,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import PageContainer from "@/compounents/PageContainer";
-import ProtectedRoute from "@/compounents/ProtectedRoute";
-import Button from "@/compounents/Button";
+import PageContainer from "@/components/PageContainer";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import Button from "@/components/Button";
 import { fetchVideoPlaybackUrl, fetchVideos, type VideoCategory, type VideoPlaybackResponse, type VideoRow } from "@/lib/api/client";
 import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
 import { useMembership } from "@/lib/hooks/useMembership";
 
 const FALLBACK_THUMB = "/asset/document_background.png";
+
+function shouldDisableImageOptimization(src: string) {
+  return src.includes(".r2.dev/");
+}
 
 type TabKey = "overview" | "notes" | "qa" | "reviews";
 
@@ -127,6 +131,7 @@ export default function WatchVideoPage() {
   const course = useMemo(() => categories.find((c) => c.id === courseId) ?? null, [categories, courseId]);
   const currentIndex = useMemo(() => videos.findIndex((v) => v.id === videoId), [videos, videoId]);
   const current = currentIndex >= 0 ? videos[currentIndex] : null;
+  const isFree = current?.access_level === "free";
 
   const persistLastVideo = useCallback(
     (vId: string) => {
@@ -153,7 +158,7 @@ export default function WatchVideoPage() {
 
       if (!current?.id) return;
       if (membershipLoading) return;
-      if (membershipStatus !== "approved") return;
+      if (!isFree && membershipStatus !== "approved") return;
 
       try {
         setPlaybackLoading(true);
@@ -172,10 +177,11 @@ export default function WatchVideoPage() {
     return () => {
       cancelled = true;
     };
-  }, [current?.id, membershipLoading, membershipStatus, persistLastVideo]);
+  }, [current?.id, isFree, membershipLoading, membershipStatus, persistLastVideo]);
 
   const src = playback?.kind === "r2_proxy" ? playback.url : "";
   const thumb = normalizeNextImageSrc(current?.thumbnail_url, FALLBACK_THUMB);
+  const thumbUnoptimized = shouldDisableImageOptimization(thumb);
 
   const prev = currentIndex > 0 ? videos[currentIndex - 1] : null;
   const next = currentIndex >= 0 && currentIndex < videos.length - 1 ? videos[currentIndex + 1] : null;
@@ -198,7 +204,7 @@ export default function WatchVideoPage() {
               <div className="flex items-center justify-between mb-4">
                 <Link
                   href={`/law_video/${courseId}`}
-                  className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-[var(--brown)] transition-colors group"
+                  className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-(--brown) transition-colors group"
                 >
                   <ChevronLeftIcon className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                   <span>Back to Course</span>
@@ -242,27 +248,7 @@ export default function WatchVideoPage() {
                       </>
                     )}
                   </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Button
-                    onClick={() => prev && handleGo(prev.id)}
-                    variant="outline"
-                    disabled={!prev}
-                    className="flex items-center gap-2"
-                  >
-                    <ChevronLeftIcon className="w-4 h-4" />
-                    Previous
-                  </Button>
-                  <Button
-                    onClick={() => next && handleGo(next.id)}
-                    variant="primary"
-                    disabled={!next}
-                    className="flex items-center gap-2"
-                  >
-                    Next
-                    <ChevronRightIcon className="w-4 h-4" />
-                  </Button>
-                </div>
+                </div>               
               </div>
             </div>
 
@@ -291,7 +277,7 @@ export default function WatchVideoPage() {
                 {/* Main Content Area */}
                 <div className="space-y-6">
                   {/* Enhanced Video Player */}
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden animate-scale-in">
+                  <div className="rounded-none border border-gray-200 shadow-lg overflow-hidden animate-scale-in">
                     <div className="relative w-full aspect-video bg-black">
                       {playbackLoading ? (
                         <div className="absolute inset-0 flex flex-col items-center justify-center text-white/90">
@@ -308,14 +294,15 @@ export default function WatchVideoPage() {
                             </Button>
                           </div>
                         </div>
-                      ) : membershipStatus !== "approved" ? (
+                      ) : !isFree && membershipStatus !== "approved" ? (
                         <div className="absolute inset-0">
                           <Image
                             src={thumb}
                             alt={current.title ?? "Video"}
                             fill
                             className="object-cover opacity-60"
-                            sizes="100vw"
+                            sizes="(max-width: 1024px) 100vw, 70vw"
+                            unoptimized={thumbUnoptimized}
                           />
                           <div className="absolute inset-0 bg-black/55" />
                           <div className="absolute inset-0 flex items-center justify-center p-8 text-center text-white">
@@ -368,17 +355,8 @@ export default function WatchVideoPage() {
                     </div>
 
                     {/* Video Info Bar */}
-                    <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                    <div className="px-6 py-4 border-gray-200 rounded-none">
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                        <div className="flex items-center gap-4 text-sm">
-                          <div className="flex items-center gap-2 text-gray-700">
-                            <div className="w-2 h-2 rounded-full bg-(--brown)"></div>
-                            <span className="font-medium">Lesson {currentIndex >= 0 ? currentIndex + 1 : "—"}</span>
-                          </div>
-                          <div className="text-gray-500">
-                            {videos.length} {videos.length === 1 ? "video" : "videos"} in course
-                          </div>
-                        </div>
                         <div className="flex items-center gap-4">
                           {courseProgress > 0 && (
                             <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600">
@@ -414,7 +392,7 @@ export default function WatchVideoPage() {
                               onClick={() => setActiveTab(t.key)}
                               className={`pb-4 px-1 text-sm font-semibold whitespace-nowrap border-b-2 transition-all duration-200 flex items-center gap-2 ${
                                 activeTab === t.key
-                                  ? "border-(--brown) text-[var(--brown)]"
+                                  ? "border-(--brown) text-(--brown)"
                                   : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
                               }`}
                             >
@@ -441,17 +419,17 @@ export default function WatchVideoPage() {
 
                             <div className="rounded-xl border border-gray-200 bg-gray-50 p-6 shadow-sm">
                               <div className="flex items-start gap-4">
-                                <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-(--brown)/10 flex items-center justify-center">
-                                  <PlayIcon className="w-6 h-6 text-[var(--brown)]" />
+                                <div className="shrink-0 w-12 h-12 rounded-lg bg-(--brown)/10 flex items-center justify-center">
+                                  <PlayIcon className="w-6 h-6 text-(--brown)" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <div className="text-sm font-semibold text-gray-900 mb-1">Current Lesson</div>
                                   <div className="text-lg font-bold text-gray-900 mb-2">{current.title ?? "Untitled"}</div>
                                   {current.presented_by && (
                                     <div className="flex items-center gap-2 text-sm text-gray-700 mb-3">
-                                      <UserIcon className="w-4 h-4 text-[var(--brown)]" />
+                                      <UserIcon className="w-4 h-4 text-(--brown)" />
                                       <span className="font-medium">Presented by:</span>
-                                      <span className="text-[var(--brown)] font-semibold">{current.presented_by}</span>
+                                      <span className="text-(--brown) font-semibold">{current.presented_by}</span>
                                     </div>
                                   )}
                                   {current.description ? (
@@ -490,7 +468,7 @@ export default function WatchVideoPage() {
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-lg font-bold text-gray-900">Course Content</h3>
                         {courseProgress > 0 && (
-                          <span className="text-xs font-semibold text-[var(--brown)] bg-(--brown)/10 px-3 py-1 rounded-full">
+                          <span className="text-xs font-semibold text-(--brown) bg-(--brown)/10 px-3 py-1 rounded-full">
                             {courseProgress}% Complete
                           </span>
                         )}
@@ -516,7 +494,7 @@ export default function WatchVideoPage() {
                               }`}
                             >
                               <div className="flex items-start gap-3">
-                                <div className="flex-shrink-0 mt-0.5">
+                                <div className="shrink-0 mt-0.5">
                                   {isWatched ? (
                                     <div className="w-6 h-6 rounded-full bg-(--brown) flex items-center justify-center">
                                       <CheckIcon className="w-4 h-4 text-white" />
@@ -536,7 +514,7 @@ export default function WatchVideoPage() {
                                 <div className="flex-1 min-w-0">
                                   <div
                                     className={`text-sm font-semibold mb-1 line-clamp-2 ${
-                                      isActive ? "text-[var(--brown)]" : "text-gray-900"
+                                      isActive ? "text-(--brown)" : "text-gray-900"
                                     }`}
                                   >
                                     {video.title ?? `Lesson ${idx + 1}`}
@@ -553,7 +531,7 @@ export default function WatchVideoPage() {
                                   )}
                                 </div>
                                 {isActive && (
-                                  <PlayIcon className="w-5 h-5 text-[var(--brown)] flex-shrink-0 mt-0.5" />
+                                  <PlayIcon className="w-5 h-5 text-(--brown) shrink-0 mt-0.5" />
                                 )}
                               </div>
                             </button>

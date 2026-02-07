@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import PageContainer from "@/compounents/PageContainer";
-import Button from "@/compounents/Button";
-import LoadingState from "@/compounents/LoadingState";
+import PageContainer from "@/components/PageContainer";
+import Button from "@/components/Button";
+import LoadingState from "@/components/LoadingState";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -101,7 +101,7 @@ export default function PricingPage() {
             className="object-cover"
             priority
             sizes="100vw"
-            style={{ objectFit: 'cover' }}
+            fetchPriority="high"
           />
         </div>
         {/* Dark Overlay */}

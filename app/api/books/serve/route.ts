@@ -4,9 +4,25 @@ import { Readable } from "stream";
 import { r2Client } from "@/lib/storage/r2-client";
 import { verifyContentToken } from "@/lib/security/tokens/content";
 import { env } from "@/lib/utils/env";
+import { rateLimit, createRateLimitResponse } from "@/lib/rate-limit/redis";
+import { COOKIE_NAMES, getTokenFromRequest } from "@/lib/security/secure-cookies";
+import { getR2MetadataWithCache } from "@/lib/cache";
+
+// Books/documents should NOT be cached in browser - they are sensitive legal documents
+// Using no-store to prevent any caching
+const BOOK_CACHE_CONTROL = "private, no-store, no-cache, must-revalidate";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+/**
+ * Rate limit preset for document serving
+ * More restrictive than videos since documents are typically downloaded once
+ */
+const BOOK_SERVE_RATE_LIMIT = {
+  windowSeconds: 60,
+  maxRequests: 60, // Allow reasonable browsing but prevent abuse
+};
 
 function inferContentTypeFromKey(key: string): { contentType: string; isInline: boolean; filename: string } {
   const rawFilename = key.split("/").pop() || "document";
@@ -82,8 +98,14 @@ function parseRange(rangeHeader: string | null, size: number): { start: number; 
 }
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const token = searchParams.get("token") ?? "";
+  // Apply rate limiting first
+  const rateLimitResult = await rateLimit(req, BOOK_SERVE_RATE_LIMIT);
+  if (!rateLimitResult.success) {
+    return createRateLimitResponse(rateLimitResult, "Too many document requests. Please wait before continuing.");
+  }
+
+  // Get token from secure cookie first, fall back to query param for backwards compatibility
+  const token = getTokenFromRequest(req, COOKIE_NAMES.BOOK_TOKEN, "token");
   const payload = token ? verifyContentToken(token) : null;
 
   if (!payload) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -94,15 +116,32 @@ export async function GET(req: NextRequest) {
   const bucketName = env.r2.bookBucket();
 
   try {
-    const head = await r2Client.send(
-      new HeadObjectCommand({
-        Bucket: bucketName,
-        Key: payload.key,
-      })
+    // Get R2 metadata with caching to reduce API calls
+    const { metadata } = await getR2MetadataWithCache(
+      bucketName,
+      payload.key,
+      async () => {
+        const head = await r2Client.send(
+          new HeadObjectCommand({
+            Bucket: bucketName,
+            Key: payload.key,
+          })
+        );
+        if (!head.ContentLength) return null;
+        return {
+          size: head.ContentLength,
+          contentType: head.ContentType,
+          etag: head.ETag,
+          lastModified: head.LastModified?.toISOString(),
+        };
+      }
     );
 
-    const size = head.ContentLength ?? 0;
-    if (!size) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (!metadata || !metadata.size) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    const size = metadata.size;
 
     const range = parseRange(req.headers.get("range"), size);
 
@@ -119,18 +158,27 @@ export async function GET(req: NextRequest) {
     const body = toWebStream(obj.Body);
 
     const inferred = inferContentTypeFromKey(payload.key);
-    const contentType = head.ContentType || inferred.contentType;
+    const contentType = metadata.contentType || inferred.contentType;
     const isInline = inferred.isInline && contentType === "application/pdf";
 
     const headers: Record<string, string> = {
       "Content-Type": contentType,
       "Content-Disposition": `${isInline ? "inline" : "attachment"}; filename="${inferred.filename}"`,
       "X-Content-Type-Options": "nosniff",
-      "Cache-Control": "no-store, no-cache, must-revalidate, private",
+      "Cache-Control": BOOK_CACHE_CONTROL,
       Pragma: "no-cache",
       Expires: "0",
       "Accept-Ranges": "bytes",
+      // Rate limit headers
+      "X-RateLimit-Limit": rateLimitResult.limit.toString(),
+      "X-RateLimit-Remaining": rateLimitResult.remaining.toString(),
+      "X-RateLimit-Reset": rateLimitResult.reset.toString(),
     };
+
+    // Add ETag for conditional requests
+    if (metadata.etag) {
+      headers["ETag"] = metadata.etag;
+    }
 
     if (range) {
       const contentLength = range.end - range.start + 1;

@@ -2,15 +2,20 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import PageContainer from "@/compounents/PageContainer";
-import Button from "@/compounents/Button";
-import ProtectedRoute from "@/compounents/ProtectedRoute";
+import PageContainer from "@/components/PageContainer";
+import Button from "@/components/Button";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { fetchVideos, type VideoCategory, type VideoRow } from "@/lib/api/client";
 import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
+import { useMembership } from "@/lib/hooks/useMembership";
 
 const FALLBACK_THUMB = "/asset/document_background.png";
+
+function shouldDisableImageOptimization(src: string) {
+  return src.includes(".r2.dev/");
+}
 
 function formatDate(d: string | null | undefined) {
   if (!d) return null;
@@ -59,6 +64,8 @@ export default function VideoCategoryPage() {
   const [videos, setVideos] = useState<VideoRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { status: membershipStatus } = useMembership();
+  const isApproved = membershipStatus === "approved";
 
   useEffect(() => {
     let cancelled = false;
@@ -99,6 +106,7 @@ export default function VideoCategoryPage() {
               className="object-cover"
               priority
               sizes="100vw"
+              fetchPriority="high"
             />
           </div>
           <div className="absolute inset-0 bg-slate-900/65 z-10" />
@@ -119,7 +127,7 @@ export default function VideoCategoryPage() {
 
         {/* Course Content Section */}
         <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
-          <div className="max-w-6xl mx-auto">
+          <div className="w-[80vw] max-w-[80vw] mx-auto">
             {isLoading ? (
               <div className="space-y-6">
                 {Array.from({ length: 3 }).map((_, i) => (
@@ -159,18 +167,15 @@ export default function VideoCategoryPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="mb-8">
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Course Lessons</h2>
-                  <p className="text-gray-600">Click on any lesson to start watching</p>
-                </div>
-
                 {videos.map((video, index) => {
                   const thumb = normalizeNextImageSrc(video.thumbnail_url, FALLBACK_THUMB);
+                  const unoptimized = shouldDisableImageOptimization(thumb);
+                  const isLocked = !isApproved && video.access_level !== "free";
                   
                   return (
                     <div
                       key={video.id}
-                      className="group bg-white rounded-2xl border-2 border-gray-200 shadow-lg hover:shadow-xl overflow-hidden transition-all duration-300 animate-scale-in"
+                      className="group bg-white rounded-none overflow-hidden border-b border-black transition-all duration-300 animate-scale-in"
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
                       <div className="p-6 sm:p-8">
@@ -178,7 +183,12 @@ export default function VideoCategoryPage() {
                           {/* Video Thumbnail */}
                           <Link
                             href={`/law_video/${categoryId}/watch/${video.id}`}
-                            className="relative w-full lg:w-80 xl:w-96 aspect-video rounded-xl overflow-hidden block bg-gray-100 shrink-0 group/thumb"
+                            className="relative w-full lg:w-80 xl:w-96 aspect-video overflow-hidden block shrink-0 group/thumb"
+                            onClick={(e) => {
+                              if (!isLocked) return;
+                              e.preventDefault();
+                              router.push("/pricing_page");
+                            }}
                           >
                             <Image
                               src={thumb}
@@ -186,19 +196,22 @@ export default function VideoCategoryPage() {
                               fill
                               className="object-cover transition-transform duration-500 group-hover/thumb:scale-110"
                               sizes="(max-width: 1024px) 100vw, 400px"
+                              unoptimized={unoptimized}
                             />
                             <div className="absolute inset-0 bg-black/30 opacity-0 group-hover/thumb:opacity-100 transition-opacity duration-300" />
+                            {isLocked && (
+                              <div className="absolute inset-0 bg-black/45 flex items-center justify-center">
+                                <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-gray-900">
+                                  Members only
+                                </span>
+                              </div>
+                            )}
                             
                             {/* Play Button */}
                             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/thumb:opacity-100 transition-opacity duration-300">
                             <div className="w-20 h-20 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-2xl transform group-hover/thumb:scale-110 transition-transform">
                                 <PlayIcon className="w-10 h-10 text-(--brown) ml-1" />
                               </div>
-                            </div>
-
-                            {/* Lesson Number Badge */}
-                            <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-bold text-(--brown) shadow-lg">
-                              Lesson {index + 1}
                             </div>
                           </Link>
 
@@ -208,6 +221,11 @@ export default function VideoCategoryPage() {
                               <Link
                                 href={`/law_video/${categoryId}/watch/${video.id}`}
                                 className="group/title"
+                                onClick={(e) => {
+                                  if (!isLocked) return;
+                                  e.preventDefault();
+                                  router.push("/pricing_page");
+                                }}
                               >
                                 <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 group-hover/title:text-(--brown) transition-colors">
                                   {index + 1}. {video.title ?? "Untitled Lesson"}
@@ -244,12 +262,12 @@ export default function VideoCategoryPage() {
                             {/* Action Button */}
                             <div className="pt-4 border-t border-gray-100">
                               <Button
-                                onClick={() => router.push(`/law_video/${categoryId}/watch/${video.id}`)}
+                                onClick={() => router.push(isLocked ? "/pricing_page" : `/law_video/${categoryId}/watch/${video.id}`)}
                                 variant="primary"
                                 className="w-full sm:w-auto"
                               >
                                 <PlayIcon className="w-5 h-5" />
-                                Watch Lesson
+                                {isLocked ? "Upgrade to Access" : "Watch Now"}
                               </Button>
                             </div>
                           </div>

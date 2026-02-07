@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
+import logger from "@/lib/utils/logger";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -32,6 +33,7 @@ type VideoCategoryRow = {
 type VideoRow = {
   id: string;
   category_id: string | null;
+  access_level: "free" | "members" | null;
 };
 
 type BookRow = {
@@ -42,6 +44,7 @@ type BookRow = {
   year: number;
   cover_url: string | null;
   uploaded_at: string | null;
+  access_level: "free" | "members" | null;
 };
 
 export async function GET() {
@@ -59,10 +62,10 @@ export async function GET() {
         .from("video_categories")
         .select("id,name,description,cover_url,created_at")
         .order("created_at", { ascending: false }),
-      supabase.from("videos").select("id,category_id", { count: "exact" }),
+      supabase.from("videos").select("id,category_id,access_level", { count: "exact" }),
       supabase
         .from("books")
-        .select("id,title,description,author,year,cover_url,uploaded_at", { count: "exact" })
+        .select("id,title,description,author,year,cover_url,uploaded_at,access_level", { count: "exact" })
         .order("uploaded_at", { ascending: false })
         .limit(6),
     ]);
@@ -72,7 +75,7 @@ export async function GET() {
     const typedBooks = books as BookRow[] | null;
 
     if (vcErr || vErr || bErr) {
-      console.error("GET /api/home failed:", { vcErr, vErr, bErr });
+      logger.error("GET /api/home failed:", { vcErr, vErr, bErr });
       return NextResponse.json({ error: "Failed to fetch home data" }, { status: 500 });
     }
 
@@ -113,8 +116,7 @@ export async function GET() {
       { status: 200 }
     );
   } catch (e) {
-    console.error("GET /api/home unexpected error:", e);
+    logger.error("GET /api/home unexpected error:", e);
     return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
   }
 }
-

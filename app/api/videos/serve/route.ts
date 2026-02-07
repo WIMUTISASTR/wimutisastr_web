@@ -3,9 +3,29 @@ import { GetObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
 import { Readable } from "stream";
 import { r2Client } from "@/lib/storage/r2-client";
 import { verifyVideoToken } from "@/lib/security/tokens/video";
+import { rateLimit, createRateLimitResponse, addRateLimitHeaders } from "@/lib/rate-limit/redis";
+import { COOKIE_NAMES, getTokenFromRequest } from "@/lib/security/secure-cookies";
+import { getR2MetadataWithCache, type CachedR2Metadata } from "@/lib/cache";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+/**
+ * Cache-Control header for video content
+ * - private: Only cache in browser, not CDN (token-protected content)
+ * - max-age: 1 hour for video segments (helps with seeking)
+ * - must-revalidate: Check with server when stale
+ */
+const VIDEO_CACHE_CONTROL = "private, max-age=3600, must-revalidate";
+
+/**
+ * Rate limit preset for video streaming
+ * More relaxed for range requests (video seeking) but still protective
+ */
+const VIDEO_SERVE_RATE_LIMIT = {
+  windowSeconds: 60,
+  maxRequests: 120, // Allow frequent range requests for video seeking
+};
 
 function isSafeKey(key: string): boolean {
   if (!key) return false;
@@ -75,8 +95,14 @@ function parseRange(rangeHeader: string | null, size: number): { start: number; 
 }
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const token = searchParams.get("token") ?? "";
+  // Apply rate limiting first
+  const rateLimitResult = await rateLimit(req, VIDEO_SERVE_RATE_LIMIT);
+  if (!rateLimitResult.success) {
+    return createRateLimitResponse(rateLimitResult, "Too many video requests. Please wait before continuing.");
+  }
+
+  // Get token from secure cookie first, fall back to query param for backwards compatibility
+  const token = getTokenFromRequest(req, COOKIE_NAMES.VIDEO_TOKEN, "token");
   const payload = token ? verifyVideoToken(token) : null;
 
   if (!payload) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -86,16 +112,32 @@ export async function GET(req: NextRequest) {
   if (!bucketName) return NextResponse.json({ error: "Storage not configured" }, { status: 500 });
 
   try {
-    const head = await r2Client.send(
-      new HeadObjectCommand({
-        Bucket: bucketName,
-        Key: payload.key,
-      })
+    // Get R2 metadata with caching to reduce API calls
+    const { metadata } = await getR2MetadataWithCache(
+      bucketName,
+      payload.key,
+      async () => {
+        const head = await r2Client.send(
+          new HeadObjectCommand({
+            Bucket: bucketName,
+            Key: payload.key,
+          })
+        );
+        if (!head.ContentLength) return null;
+        return {
+          size: head.ContentLength,
+          contentType: head.ContentType,
+          etag: head.ETag,
+          lastModified: head.LastModified?.toISOString(),
+        };
+      }
     );
 
-    const size = head.ContentLength ?? 0;
-    if (!size) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (!metadata || !metadata.size) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
 
+    const size = metadata.size;
     const range = parseRange(req.headers.get("range"), size);
 
     const obj = await r2Client.send(
@@ -109,15 +151,20 @@ export async function GET(req: NextRequest) {
     if (!obj.Body) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     const body = toWebStream(obj.Body);
-    const contentType = head.ContentType || obj.ContentType || inferContentTypeFromKey(payload.key);
+    const contentType = metadata.contentType || obj.ContentType || inferContentTypeFromKey(payload.key);
 
     const headers: Record<string, string> = {
       "Content-Type": contentType,
       "X-Content-Type-Options": "nosniff",
-      "Cache-Control": "no-store, no-cache, must-revalidate, private",
-      Pragma: "no-cache",
-      Expires: "0",
+      // Allow browser caching for video segments (helps with seeking performance)
+      "Cache-Control": VIDEO_CACHE_CONTROL,
       "Accept-Ranges": "bytes",
+      // ETag for cache validation
+      ...(metadata.etag && { "ETag": metadata.etag }),
+      // Rate limit headers
+      "X-RateLimit-Limit": rateLimitResult.limit.toString(),
+      "X-RateLimit-Remaining": rateLimitResult.remaining.toString(),
+      "X-RateLimit-Reset": rateLimitResult.reset.toString(),
     };
 
     if (range) {

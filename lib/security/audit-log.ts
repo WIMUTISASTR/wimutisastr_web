@@ -4,7 +4,7 @@
  */
 
 import { createAdminClient } from '@/lib/supabase/server';
-import { logger } from '@/lib/utils/logger';
+import logger from "@/lib/utils/logger";
 
 const log = logger.child({ module: 'audit' });
 

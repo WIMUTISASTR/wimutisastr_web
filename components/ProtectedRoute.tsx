@@ -3,7 +3,7 @@
 import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/context";
-import LoadingState from "@/compounents/LoadingState";
+import LoadingState from "@/components/LoadingState";
 
 export default function ProtectedRoute({ children }: { children: ReactNode }) {
   const router = useRouter();

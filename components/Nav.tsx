@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/context";
-import Button from "@/compounents/Button";
+import Button from "@/components/Button";
 
 export default function Nav() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

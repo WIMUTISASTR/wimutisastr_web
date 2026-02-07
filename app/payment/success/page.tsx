@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import { Suspense } from "react";
-import PageContainer from "@/compounents/PageContainer";
-import Button from "@/compounents/Button";
-import LoadingState from "@/compounents/LoadingState";
+import PageContainer from "@/components/PageContainer";
+import Button from "@/components/Button";
+import LoadingState from "@/components/LoadingState";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
@@ -76,7 +76,7 @@ function PaymentSuccessContent() {
             className="object-cover"
             priority
             sizes="100vw"
-            style={{ objectFit: 'cover' }}
+            fetchPriority="high"
           />
         </div>
         <div className="absolute inset-0 bg-slate-900/65 z-10"></div>

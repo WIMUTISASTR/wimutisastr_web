@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useAuth } from "@/lib/auth/context";
 import { supabase } from "@/lib/supabase/instance";
-import PageContainer from "@/compounents/PageContainer";
-import Button from "@/compounents/Button";
-import LoadingState from "@/compounents/LoadingState";
+import PageContainer from "@/components/PageContainer";
+import Button from "@/components/Button";
+import LoadingState from "@/components/LoadingState";
 import { useEffect, useMemo, useState } from "react";
 import { fetchProfileMe, type ProfileMeResponse } from "@/lib/api/client";
 
@@ -155,7 +155,7 @@ export default function ProfilePage() {
     <PageContainer>
       <section className="relative bg-slate-900 text-white py-16 sm:py-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <Image src="/asset/aboutUs.png" alt="Profile background" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/asset/aboutUs.png" alt="Profile background" fill className="object-cover" priority sizes="100vw" fetchPriority="high" />
         </div>
         <div className="absolute inset-0 bg-slate-900/65 z-10" />
         <div className="absolute inset-0 bg-(--brown-soft) opacity-20 z-10" />
@@ -194,6 +194,24 @@ export default function ProfilePage() {
                       <span className="font-semibold text-gray-900">{joinDate}</span>
                     </div>
                     <div className="flex items-center justify-between">
+                      <span>Profile created</span>
+                      <span className="font-semibold text-gray-900">
+                        {profile?.profile?.created_at ? formatDateTime(profile.profile.created_at) : "—"}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Profile updated</span>
+                      <span className="font-semibold text-gray-900">
+                        {profile?.profile?.updated_at ? formatDateTime(profile.profile.updated_at) : "—"}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Membership starts</span>
+                      <span className="font-semibold text-gray-900">
+                        {profile?.membership.membershipStartsAt ? formatDateTime(profile.membership.membershipStartsAt) : "—"}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
                       <span>Membership ends</span>
                       <span className="font-semibold text-gray-900">
                         {profile?.membership.membershipEndsAt ? formatDateTime(profile.membership.membershipEndsAt) : "—"}
@@ -220,9 +238,30 @@ export default function ProfilePage() {
                   <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
                     <p className="text-sm text-gray-600">Membership status</p>
                     <p className="mt-1 text-lg font-semibold text-gray-900">{statusBadge.label}</p>
+                    {profile?.profile?.membership_approved_at ? (
+                      <p className="mt-2 text-sm text-gray-700">
+                        Approved at: {formatDateTime(profile.profile.membership_approved_at)}
+                      </p>
+                    ) : null}
+                    {profile?.profile?.membership_denied_at ? (
+                      <p className="mt-2 text-sm text-gray-700">
+                        Denied at: {formatDateTime(profile.profile.membership_denied_at)}
+                      </p>
+                    ) : null}
+                    {profile?.profile?.admin_notified !== null && profile?.profile?.admin_notified !== undefined ? (
+                      <p className="mt-2 text-sm text-gray-700">
+                        Admin notified: {profile.profile.admin_notified ? "Yes" : "No"}
+                      </p>
+                    ) : null}
                     {profile?.membership.notes ? (
                       <p className="mt-2 text-sm text-gray-700">Note: {String(profile.membership.notes)}</p>
                     ) : null}
+                  </div>
+                  <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
+                    <p className="text-sm text-gray-600">Membership starts</p>
+                    <p className="mt-1 text-lg font-semibold text-gray-900">
+                      {profile?.membership.membershipStartsAt ? formatDateTime(profile.membership.membershipStartsAt) : "—"}
+                    </p>
                   </div>
                   <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
                     <p className="text-sm text-gray-600">Membership ends</p>

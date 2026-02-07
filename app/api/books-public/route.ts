@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createAdminClient, createServerClient } from "@/lib/supabase/server";
+import logger from "@/lib/utils/logger";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +19,7 @@ type PublicBookRow = {
   cover_url: string | null;
   category_id: string | null;
   uploaded_at: string | null;
+  access_level: "free" | "members" | null;
 };
 
 type PublicCategoryRow = {
@@ -48,7 +50,7 @@ type BooksPublicResponse = {
 
 export async function GET(req: NextRequest) {
   try {
-    console.log('[books-public] Starting request');
+    logger.debug('books-public', 'Starting request');
     // Public endpoint:
     // - Anyone can browse categories + covers (no auth required)
     // - Never expose book file URLs here
@@ -56,7 +58,7 @@ export async function GET(req: NextRequest) {
     // Use service role (bypass RLS) for public browsing, but only return safe fields (no file_url).
     const supabase = hasServiceRole ? createAdminClient() : createServerClient();
     const serverKeyMode = hasServiceRole ? "service_role" : "anon";
-    console.log('[books-public] Server key mode:', serverKeyMode);
+    logger.debug('books-public', 'Server key mode:', serverKeyMode);
 
     const authHeader = req.headers.get("authorization") ?? "";
     let membershipGate: MembershipGate = "anonymous";
@@ -91,37 +93,40 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const categoryId = searchParams.get("categoryId");
     const debug = searchParams.get("debug") === "1";
-    console.log('[books-public] Category ID:', categoryId, 'Debug:', debug);
+    logger.debug('books-public', 'Category ID:', categoryId, 'Debug:', debug);
 
-    console.log('[books-public] Building books query...');
+    logger.debug('books-public', 'Building books query...');
     const booksQuery = (() => {
       // Special virtual categories
       if (!categoryId || categoryId === ALL_CATEGORY_ID) {
-        return supabase
+        const query = supabase
           .from("books")
-          .select("id,title,author,year,description,cover_url,category_id,uploaded_at")
+          .select("id,title,author,year,description,cover_url,category_id,uploaded_at,access_level")
           .order("uploaded_at", { ascending: false });
+        return query;
       }
       if (categoryId === UNCATEGORIZED_ID) {
-        return supabase
+        const query = supabase
           .from("books")
-          .select("id,title,author,year,description,cover_url,category_id,uploaded_at")
+          .select("id,title,author,year,description,cover_url,category_id,uploaded_at,access_level")
           .is("category_id", null)
           .order("uploaded_at", { ascending: false });
+        return query;
       }
-      return supabase
+      const query = supabase
         .from("books")
-        .select("id,title,author,year,description,cover_url,category_id,uploaded_at")
+        .select("id,title,author,year,description,cover_url,category_id,uploaded_at,access_level")
         .eq("category_id", categoryId)
         .order("uploaded_at", { ascending: false });
+      return query;
     })();
 
-    console.log('[books-public] Executing books query...');
+    logger.debug('books-public', 'Executing books query...');
     const { data: books, error: bookErr } = (await booksQuery) as { data: PublicBookRow[] | null; error: unknown };
-    console.log('[books-public] Books query completed. Count:', books?.length ?? 0);
+    logger.debug('books-public', 'Books query completed. Count:', books?.length ?? 0);
     
     if (bookErr) {
-      console.error("[books-public] Books query error:", bookErr);
+      logger.error("[books-public] Books query error:", bookErr);
       return NextResponse.json({ error: "Failed to fetch books" }, { status: 500 });
     }
 
@@ -129,18 +134,18 @@ export async function GET(req: NextRequest) {
     // When browsing a specific category, fetch all categories (so user can navigate)
     // This ensures categories are always shown even if books don't reference them
     
-    console.log('[books-public] Building categories query...');
+    logger.debug('books-public', 'Building categories query...');
     const categoriesQuery = supabase
       .from("categories")
       .select("*")
       .order("created_at", { ascending: false });
 
-    console.log('[books-public] Executing categories query...');
+    logger.debug('books-public', 'Executing categories query...');
     const { data: categories, error: catErr } = (await categoriesQuery) as { data: PublicCategoryRow[] | null; error: unknown };
-    console.log('[books-public] Categories query completed. Count:', categories?.length ?? 0);
+    logger.debug('books-public', 'Categories query completed. Count:', categories?.length ?? 0);
 
     if (catErr) {
-      console.error("[books-public] Categories query error:", catErr);
+      logger.error("[books-public] Categories query error:", catErr);
       return NextResponse.json({ error: "Failed to fetch categories" }, { status: 500 });
     }
 
@@ -171,7 +176,7 @@ export async function GET(req: NextRequest) {
         : []),
     ];
 
-    console.log('[books-public] Preparing response...');
+    logger.debug('books-public', 'Preparing response...');
     const payload: BooksPublicResponse = {
       categories: [...virtualCategories, ...((categories ?? []) as PublicCategoryRow[])],
       books: safeBooks,
@@ -188,10 +193,10 @@ export async function GET(req: NextRequest) {
         hasUncategorized,
       };
     }
-    console.log('[books-public] Sending response with', payload.categories.length, 'categories and', payload.books.length, 'books');
+    logger.debug('books-public', 'Sending response with', payload.categories.length, 'categories and', payload.books.length, 'books');
     return NextResponse.json(payload);
   } catch (e) {
-    console.error("[books-public] Unexpected error:", e);
+    logger.error("[books-public] Unexpected error:", e);
     return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
   }
 }

@@ -1,18 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { supabase } from "@/lib/supabase/instance";
-import PageContainer from "@/compounents/PageContainer";
-import FormSection from "@/compounents/FormSection";
-import FormCard from "@/compounents/FormCard";
-import FormHeader from "@/compounents/FormHeader";
-import Input from "@/compounents/Input";
-import Checkbox from "@/compounents/Checkbox";
-import Button from "@/compounents/Button";
-import Divider from "@/compounents/Divider";
-import FormLink from "@/compounents/FormLink";
+import PageContainer from "@/components/PageContainer";
+import FormSection from "@/components/FormSection";
+import FormCard from "@/components/FormCard";
+import FormHeader from "@/components/FormHeader";
+import Input from "@/components/Input";
+import Checkbox from "@/components/Checkbox";
+import Button from "@/components/Button";
+import Divider from "@/components/Divider";
+import FormLink from "@/components/FormLink";
+import Turnstile from "@/components/Turnstile";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -31,9 +32,21 @@ export default function RegisterPage() {
     general?: string;
   }>({});
   const [loading, setLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+
+  const handleTurnstileVerify = useCallback((token: string) => {
+    setTurnstileToken(token);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check Turnstile verification
+    if (!turnstileToken) {
+      toast.error("Please complete the security check");
+      return;
+    }
+    
     const newErrors: typeof errors = {};
 
     if (formData.password !== formData.confirmPassword) {
@@ -56,6 +69,21 @@ export default function RegisterPage() {
       setErrors({});
 
       try {
+        // Verify Turnstile token on server
+        const turnstileResponse = await fetch('/api/turnstile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: turnstileToken }),
+        });
+        
+        const turnstileResult = await turnstileResponse.json();
+        
+        if (!turnstileResult.success) {
+          toast.error("Security verification failed. Please try again.");
+          setLoading(false);
+          return;
+        }
+
         const { data, error: signUpError } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
@@ -178,7 +206,12 @@ export default function RegisterPage() {
               <p className="text-xs text-red-600">{errors.agreeToTerms}</p>
             )}
 
-            <Button type="submit" fullWidth disabled={loading}>
+            {/* Cloudflare Turnstile Bot Protection */}
+            <div className="flex justify-center">
+              <Turnstile onVerify={handleTurnstileVerify} />
+            </div>
+
+            <Button type="submit" fullWidth disabled={loading || !turnstileToken}>
               {loading ? "Creating account..." : "Create Account"}
             </Button>
           </form>

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import Button from "@/compounents/Button";
+import Button from "@/components/Button";
 import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
 import type { HomeResponse } from "@/lib/api/client";
 
@@ -70,7 +70,8 @@ export default function FeaturedDocumentsSection({
                             fill
                             className="object-cover group-hover:scale-105 transition-transform duration-700"
                             sizes="(max-width: 768px) 100vw, 384px"
-                          />
+                            loading="lazy"
+                          /> 
                           <div className="absolute inset-0 bg-black/30" />
                           
                           {/* Lock Overlay for Non-Paid Users */}

@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import PageContainer from "@/compounents/PageContainer";
+import PageContainer from "@/components/PageContainer";
 import { useEffect } from "react";
+import ContactContent from "@/components/contact/ContactContent";
 
 export default function AboutUsPage() {
   type TeamMember = {
@@ -111,7 +112,8 @@ export default function AboutUsPage() {
             fill
             className="object-cover"
             sizes="100vw"
-            style={{ objectFit: 'cover' }}
+            priority
+            fetchPriority="high"
           />
         </div>
         {/* Light overlay for readability */}
@@ -235,13 +237,13 @@ export default function AboutUsPage() {
                 <div
                   key={member.name}
                   className={[
-                    "bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-200",
-                    "hover:shadow-2xl hover:-translate-y-1 transition-all duration-300",
+                    "bg-white rounded-xl overflow-hidden border border-gray-200",
+                    "hover:shadow-md transition-all duration-300",
                     "opacity-0 translate-y-8",
                     delayClass,
                   ].join(" ")}
                 >
-                  <div className="relative w-full aspect-[4/5] bg-gray-100">
+                  <div className="relative w-full aspect-4/5 bg-gray-100">
                     <img
                       src={member.imageUrl}
                       alt={member.name}
@@ -249,12 +251,12 @@ export default function AboutUsPage() {
                       loading="lazy"
                       referrerPolicy="no-referrer"
                     />
-                    <div className="absolute inset-0 bg-black/30"></div>
-                    <div className="absolute bottom-3 left-3 right-3 flex gap-2">
+                    <div className="absolute inset-0 bg-linear-to-t from-black/45 via-black/10 to-transparent"></div>
+                    <div className="absolute top-3 right-3 flex gap-2">
                       {member.phone ? (
                         <a
                           href={`tel:${member.phone}`}
-                          className="inline-flex items-center justify-center rounded-lg bg-white/90 text-gray-900 w-10 h-10 hover:bg-white transition-colors"
+                          className="inline-flex items-center justify-center rounded-md bg-white/90 text-gray-900 w-9 h-9 hover:bg-white transition-colors"
                           aria-label={`Call ${member.name}`}
                           title="Call"
                         >
@@ -275,7 +277,7 @@ export default function AboutUsPage() {
                       {member.email ? (
                         <a
                           href={`mailto:${member.email}`}
-                          className="inline-flex items-center justify-center rounded-lg bg-white/90 text-gray-900 w-10 h-10 hover:bg-white transition-colors"
+                          className="inline-flex items-center justify-center rounded-md bg-white/90 text-gray-900 w-9 h-9 hover:bg-white transition-colors"
                           aria-label={`Email ${member.name}`}
                           title="Email"
                         >
@@ -299,7 +301,7 @@ export default function AboutUsPage() {
                           href={member.facebook}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center justify-center rounded-lg bg-white/90 text-gray-900 w-10 h-10 hover:bg-white transition-colors"
+                          className="inline-flex items-center justify-center rounded-md bg-white/90 text-gray-900 w-9 h-9 hover:bg-white transition-colors"
                           aria-label={`Facebook profile of ${member.name}`}
                           title="Facebook"
                         >
@@ -317,12 +319,31 @@ export default function AboutUsPage() {
                   </div>
 
                   <div className="p-5">
-                    <h3 className="text-lg font-bold text-gray-900 leading-snug">
+                    <h3 className="text-lg font-semibold text-gray-900 leading-snug">
                       {member.name}
                     </h3>
-                    <p className="mt-1 text-sm text-[var(--brown-strong)] font-semibold">
+                    <p className="mt-1 text-sm text-(--brown-strong) font-semibold uppercase tracking-wide">
                       {member.role}
                     </p>
+                    <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-gray-600">
+                      {member.phone ? (
+                        <span className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-1">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 3 5.18 2 2 0 0 1 5.11 3h3a2 2 0 0 1 2 1.72c.12.86.3 1.7.54 2.5a2 2 0 0 1-.45 2.11L9.09 10.91a16 16 0 0 0 4 4l1.58-1.58a2 2 0 0 1 2.11-.45c.8.24 1.64.42 2.5.54A2 2 0 0 1 22 16.92z" />
+                          </svg>
+                          <span>{member.phone}</span>
+                        </span>
+                      ) : null}
+                      {member.email ? (
+                        <span className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-1">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 4h16v16H4z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m22 6-10 7L2 6" />
+                          </svg>
+                          <span className="truncate">{member.email}</span>
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
               );
@@ -532,6 +553,8 @@ export default function AboutUsPage() {
           </div>
         </div>
       </section>
+
+      <ContactContent />
     </PageContainer>
   );
 }

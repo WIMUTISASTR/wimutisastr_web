@@ -1,135 +1,99 @@
 /**
- * Production-safe logging utility
- * Replaces console.log/error with structured logging that's safe for production
+ * Environment-aware logger utility
+ * Only logs in development mode, silent in production
  */
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+const isDevelopment = process.env.NODE_ENV === 'development';
 
-interface LogContext {
-  [key: string]: unknown;
+type LogContext = Record<string, unknown>;
+
+function formatContext(context?: LogContext): string {
+  if (!context) return '';
+  if (typeof context.module === 'string' && context.module.trim() !== '') {
+    return `[${context.module}]`;
+  }
+  return '';
 }
 
-class Logger {
-  private isProduction: boolean;
-
-  constructor() {
-    this.isProduction = process.env.NODE_ENV === 'production';
-  }
-
+export const logger = {
   /**
-   * Formats log message with timestamp and context
+   * Log informational messages (development only)
    */
-  private formatMessage(level: LogLevel, message: string, context?: LogContext): string {
-    const timestamp = new Date().toISOString();
-    const contextStr = context ? ` ${JSON.stringify(context)}` : '';
-    return `[${timestamp}] [${level.toUpperCase()}] ${message}${contextStr}`;
-  }
-
-  /**
-   * Sanitizes sensitive data from logs
-   */
-  private sanitize(context?: LogContext): LogContext | undefined {
-    if (!context) return undefined;
-
-    const sanitized = { ...context };
-    const sensitiveKeys = [
-      'password',
-      'token',
-      'secret',
-      'apiKey',
-      'api_key',
-      'authorization',
-      'cookie',
-      'session',
-    ];
-
-    for (const key of Object.keys(sanitized)) {
-      const lowerKey = key.toLowerCase();
-      if (sensitiveKeys.some(sk => lowerKey.includes(sk))) {
-        sanitized[key] = '[REDACTED]';
-      }
+  log: (...args: any[]) => {
+    if (isDevelopment) {
+      console.log(...args);
     }
-
-    return sanitized;
-  }
+  },
 
   /**
-   * Debug logs - only in development
+   * Log warning messages (development only)
    */
-  debug(message: string, context?: LogContext): void {
-    if (!this.isProduction) {
-      console.debug(this.formatMessage('debug', message, this.sanitize(context)));
+  warn: (...args: any[]) => {
+    if (isDevelopment) {
+      console.warn(...args);
     }
-  }
+  },
 
   /**
-   * Info logs - important non-error information
+   * Log error messages (always logged, even in production)
    */
-  info(message: string, context?: LogContext): void {
-    console.info(this.formatMessage('info', message, this.sanitize(context)));
-  }
+  error: (...args: any[]) => {
+    console.error(...args);
+  },
 
   /**
-   * Warning logs - potential issues that don't stop execution
+   * Log debug messages with a prefix (development only)
    */
-  warn(message: string, context?: LogContext): void {
-    console.warn(this.formatMessage('warn', message, this.sanitize(context)));
-  }
+  debug: (context: string, ...args: any[]) => {
+    if (isDevelopment) {
+      console.log(`[DEBUG:${context}]`, ...args);
+    }
+  },
 
   /**
-   * Error logs - actual errors that need attention
+   * Log informational messages with a prefix (development only)
    */
-  error(message: string, error?: Error | unknown, context?: LogContext): void {
-    const errorContext: LogContext = {
-      ...this.sanitize(context),
+  info: (context: string, ...args: any[]) => {
+    if (isDevelopment) {
+      console.info(`[INFO:${context}]`, ...args);
+    }
+  },
+
+  /**
+   * Create a child logger with static context
+   */
+  child: (context?: LogContext) => {
+    const prefix = formatContext(context);
+    return {
+      log: (...args: any[]) => {
+        if (isDevelopment) {
+          console.log(prefix, ...args);
+        }
+      },
+      warn: (...args: any[]) => {
+        if (isDevelopment) {
+          console.warn(prefix, ...args);
+        }
+      },
+      error: (...args: any[]) => {
+        console.error(prefix, ...args);
+      },
+      debug: (ctx: string, ...args: any[]) => {
+        if (isDevelopment) {
+          console.log(`[DEBUG:${ctx}]`, prefix, ...args);
+        }
+      },
+      info: (ctx: string, ...args: any[]) => {
+        if (isDevelopment) {
+          console.info(`[INFO:${ctx}]`, prefix, ...args);
+        }
+      },
+      child: (next?: LogContext) => {
+        const merged = { ...(context ?? {}), ...(next ?? {}) };
+        return logger.child(merged);
+      },
     };
+  },
+};
 
-    if (error instanceof Error) {
-      errorContext.error = {
-        message: error.message,
-        name: error.name,
-        stack: this.isProduction ? undefined : error.stack,
-      };
-    } else if (error) {
-      errorContext.error = error;
-    }
-
-    console.error(this.formatMessage('error', message, errorContext));
-  }
-
-  /**
-   * Creates a child logger with default context
-   */
-  child(defaultContext: LogContext): Logger {
-    const childLogger = new Logger();
-    const originalMethods = {
-      debug: childLogger.debug.bind(childLogger),
-      info: childLogger.info.bind(childLogger),
-      warn: childLogger.warn.bind(childLogger),
-      error: childLogger.error.bind(childLogger),
-    };
-
-    childLogger.debug = (message: string, context?: LogContext) =>
-      originalMethods.debug(message, { ...defaultContext, ...context });
-    
-    childLogger.info = (message: string, context?: LogContext) =>
-      originalMethods.info(message, { ...defaultContext, ...context });
-    
-    childLogger.warn = (message: string, context?: LogContext) =>
-      originalMethods.warn(message, { ...defaultContext, ...context });
-    
-    childLogger.error = (message: string, error?: Error | unknown, context?: LogContext) =>
-      originalMethods.error(message, error, { ...defaultContext, ...context });
-
-    return childLogger;
-  }
-}
-
-export const logger = new Logger();
-
-/**
- * Create a logger for a specific module/route
- */
-export function createLogger(module: string): Logger {
-  return logger.child({ module });
-}
+export default logger;

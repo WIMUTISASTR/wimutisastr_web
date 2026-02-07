@@ -3,7 +3,7 @@
  * Logs security-related events for analysis and alerting
  */
 
-import { logger } from '@/lib/utils/logger';
+import logger from "@/lib/utils/logger";
 
 const secLog = logger.child({ module: 'security' });
 
