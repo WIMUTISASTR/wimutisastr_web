@@ -57,25 +57,13 @@
   --foreground: var(--ink);
 }
 
-/* Note: Tailwind v4 supports @theme, but some editors flag it as unknown.
-   We keep our tokens as plain CSS variables instead. */
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #1a2630;
-    --ink: #e9ecef;
-    --ink-rgb: 233 236 239;
-    --border: rgba(155, 181, 198, 0.15);
-    --surface: rgba(28, 35, 40, 0.7);
-    --surface-strong: rgba(28, 35, 40, 0.9);
-    --background: var(--paper);
-    --foreground: var(--ink);
-  }
-}
+/* Force light mode - ignore browser dark mode preference */
+/* Dark mode disabled to maintain consistent branding */
 
 html,
 body {
   height: 100%;
+  color-scheme: light;
 }
 
 body {
@@ -424,6 +412,19 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Dark mode glass adjustments */
+@media (prefers-color-scheme: dark) {
+  .glass {
+    background: rgba(26, 38, 48, 0.75);
+    border: 1px solid rgba(155, 181, 198, 0.15);
+  }
+  
+  .glass-strong {
+    background: rgba(26, 38, 48, 0.9);
+    border: 1px solid rgba(155, 181, 198, 0.2);
+  }
+}
+
 /* Enhanced 3D Card Effect */
 .card-3d {
   transform-style: preserve-3d;
@@ -544,4 +545,125 @@ html {
 
 .Toastify__toast-body {
   font-family: var(--font-body), system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
+
+/* ========================================
+   DARK MODE UTILITY OVERRIDES
+   ======================================== */
+
+/* Text colors - adapt to dark mode */
+@media (prefers-color-scheme: dark) {
+  /* Gray text variants */
+  .text-gray-500 {
+    color: var(--gray-700) !important;
+  }
+  .text-gray-600 {
+    color: #9ca3af !important;
+  }
+  .text-gray-700 {
+    color: #d1d5db !important;
+  }
+  .text-gray-800 {
+    color: #e5e7eb !important;
+  }
+  .text-gray-900 {
+    color: var(--ink) !important;
+  }
+  
+  /* Slate text variants */
+  .text-slate-400 {
+    color: #94a3b8 !important;
+  }
+  .text-slate-500 {
+    color: #94a3b8 !important;
+  }
+  .text-slate-600 {
+    color: #cbd5e1 !important;
+  }
+  
+  /* Background colors */
+  .bg-white {
+    background-color: var(--gray-50) !important;
+  }
+  .bg-gray-50 {
+    background-color: var(--paper) !important;
+  }
+  .bg-gray-100 {
+    background-color: var(--gray-100) !important;
+  }
+  .bg-gray-200 {
+    background-color: var(--gray-200) !important;
+  }
+  
+  /* Border colors */
+  .border-gray-100 {
+    border-color: var(--gray-200) !important;
+  }
+  .border-gray-200 {
+    border-color: var(--gray-300) !important;
+  }
+  .border-gray-300 {
+    border-color: rgba(155, 181, 198, 0.3) !important;
+  }
+  
+  /* White/opacity variants for dark mode */
+  .bg-white\/90,
+  .bg-white\/80 {
+    background-color: rgba(26, 38, 48, 0.9) !important;
+  }
+  .bg-white\/50 {
+    background-color: rgba(26, 38, 48, 0.5) !important;
+  }
+  .hover\:bg-white:hover {
+    background-color: var(--gray-100) !important;
+  }
+  
+  /* Ring colors */
+  .ring-gray-200 {
+    --tw-ring-color: var(--gray-300) !important;
+  }
+  .ring-gray-300 {
+    --tw-ring-color: rgba(155, 181, 198, 0.4) !important;
+  }
+  
+  /* Divide colors */
+  .divide-gray-100 > :not([hidden]) ~ :not([hidden]) {
+    border-color: var(--gray-200) !important;
+  }
+  .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+    border-color: var(--gray-300) !important;
+  }
+  
+  /* Shadow adjustments */
+  .shadow-sm,
+  .shadow-md,
+  .shadow-lg {
+    --tw-shadow-color: rgba(0, 0, 0, 0.3) !important;
+  }
+  
+  /* Placeholder text */
+  .placeholder\:text-slate-400::placeholder {
+    color: #64748b !important;
+  }
+  .placeholder\:text-gray-400::placeholder {
+    color: #6b7280 !important;
+  }
+}
+
+/* DOCX Viewer dark mode */
+@media (prefers-color-scheme: dark) {
+  .docx-container {
+    background-color: var(--gray-50) !important;
+    color: var(--ink) !important;
+  }
+  
+  /* Microsoft DOCX rendered content */
+  .docx-wrapper {
+    background-color: var(--gray-100) !important;
+  }
+  
+  .docx-wrapper section {
+    background-color: var(--gray-50) !important;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3) !important;
+  }
 }
