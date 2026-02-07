@@ -33,16 +33,21 @@ export default function RegisterPage() {
   }>({});
   const [loading, setLoading] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileRequired, setTurnstileRequired] = useState(true);
 
   const handleTurnstileVerify = useCallback((token: string) => {
     setTurnstileToken(token);
   }, []);
 
+  const handleTurnstileUnconfigured = useCallback(() => {
+    setTurnstileRequired(false);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Check Turnstile verification
-    if (!turnstileToken) {
+    // Check Turnstile verification only if required
+    if (turnstileRequired && !turnstileToken) {
       toast.error("Please complete the security check");
       return;
     }
@@ -69,19 +74,21 @@ export default function RegisterPage() {
       setErrors({});
 
       try {
-        // Verify Turnstile token on server
-        const turnstileResponse = await fetch('/api/turnstile', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token: turnstileToken }),
-        });
-        
-        const turnstileResult = await turnstileResponse.json();
-        
-        if (!turnstileResult.success) {
-          toast.error("Security verification failed. Please try again.");
-          setLoading(false);
-          return;
+        // Verify Turnstile token on server (only if we have a token)
+        if (turnstileToken) {
+          const turnstileResponse = await fetch('/api/turnstile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: turnstileToken }),
+          });
+          
+          const turnstileResult = await turnstileResponse.json();
+          
+          if (!turnstileResult.success) {
+            toast.error("Security verification failed. Please try again.");
+            setLoading(false);
+            return;
+          }
         }
 
         const { data, error: signUpError } = await supabase.auth.signUp({
@@ -208,10 +215,13 @@ export default function RegisterPage() {
 
             {/* Cloudflare Turnstile Bot Protection */}
             <div className="flex justify-center">
-              <Turnstile onVerify={handleTurnstileVerify} />
+              <Turnstile 
+                onVerify={handleTurnstileVerify}
+                onUnconfigured={handleTurnstileUnconfigured}
+              />
             </div>
 
-            <Button type="submit" fullWidth disabled={loading || !turnstileToken}>
+            <Button type="submit" fullWidth disabled={loading || (turnstileRequired && !turnstileToken)}>
               {loading ? "Creating account..." : "Create Account"}
             </Button>
           </form>

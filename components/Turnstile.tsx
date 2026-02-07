@@ -6,6 +6,8 @@ interface TurnstileProps {
   onVerify: (token: string) => void;
   onError?: () => void;
   onExpire?: () => void;
+  onLoad?: () => void;
+  onUnconfigured?: () => void;
 }
 
 declare global {
@@ -19,7 +21,7 @@ declare global {
   }
 }
 
-export default function Turnstile({ onVerify, onError, onExpire }: TurnstileProps) {
+export default function Turnstile({ onVerify, onError, onExpire, onLoad, onUnconfigured }: TurnstileProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
 
@@ -27,7 +29,9 @@ export default function Turnstile({ onVerify, onError, onExpire }: TurnstileProp
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
     
     if (!siteKey) {
-      console.error('Turnstile site key not configured');
+      console.warn('Turnstile site key not configured - skipping verification');
+      // Notify parent that Turnstile is not configured
+      onUnconfigured?.();
       return;
     }
 
@@ -38,8 +42,9 @@ export default function Turnstile({ onVerify, onError, onExpire }: TurnstileProp
           callback: onVerify,
           'error-callback': onError,
           'expired-callback': onExpire,
-          theme: 'light', // or 'dark' or 'auto'
+          theme: 'light',
         });
+        onLoad?.();
       }
     };
 
@@ -55,6 +60,12 @@ export default function Turnstile({ onVerify, onError, onExpire }: TurnstileProp
       
       window.onTurnstileLoad = renderWidget;
       
+      // Handle script load error
+      script.onerror = () => {
+        console.warn('Turnstile script blocked or failed to load - proceeding without bot protection');
+        onUnconfigured?.();
+      };
+      
       document.head.appendChild(script);
     }
 
@@ -64,7 +75,12 @@ export default function Turnstile({ onVerify, onError, onExpire }: TurnstileProp
         widgetIdRef.current = null;
       }
     };
-  }, [onVerify, onError, onExpire]);
+  }, [onVerify, onError, onExpire, onLoad, onUnconfigured]);
+
+  // Don't render if not configured
+  if (!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) {
+    return null;
+  }
 
   return <div ref={containerRef} className="cf-turnstile" />;
 }
