@@ -54,7 +54,8 @@ function getRequiredEnv(key: keyof EnvConfig): string {
     );
   }
   
-  return value;
+  // Always trim to remove accidental whitespace
+  return value.trim();
 }
 
 /**
@@ -62,7 +63,7 @@ function getRequiredEnv(key: keyof EnvConfig): string {
  */
 function getOptionalEnv(key: keyof EnvConfig): string | undefined {
   const value = process.env[key];
-  return value && value.trim() !== '' ? value : undefined;
+  return value && value.trim() !== '' ? value.trim() : undefined;
 }
 
 /**
