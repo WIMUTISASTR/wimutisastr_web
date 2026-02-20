@@ -65,7 +65,7 @@ export default function FeaturedDocumentsSection({
                         {/* Book Cover */}
                         <div className="relative aspect-3/4 overflow-hidden shadow-2xl group-hover:shadow-3xl transition-all duration-500 card-lift">
                           <Image
-                            src={normalizeNextImageSrc(book.cover_url, FALLBACK_COVER)}
+                            src={normalizeNextImageSrc(book.cover_url, FALLBACK_COVER, { bucket: "book" })}
                             alt={book.title}
                             fill
                             className="object-cover group-hover:scale-105 transition-transform duration-700"

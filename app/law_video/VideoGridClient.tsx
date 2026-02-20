@@ -13,7 +13,7 @@ const STORAGE = {
 } as const;
 
 function shouldDisableImageOptimization(src: string) {
-  return src.includes(".r2.dev/");
+  return src.includes(".r2.dev/") || /^https?:\/\//i.test(src);
 }
 
 function formatDate(d: string | null | undefined) {
@@ -205,7 +205,7 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredCategories.map((cat, index) => {
-                const thumb = normalizeNextImageSrc(cat.cover_url, FALLBACK_THUMB);
+                const thumb = normalizeNextImageSrc(cat.cover_url, FALLBACK_THUMB, { bucket: "video" });
                 const unoptimized = shouldDisableImageOptimization(thumb);
                 const stats = videoStatsByCategory.get(cat.id);
                 const total = stats?.count ?? 0;

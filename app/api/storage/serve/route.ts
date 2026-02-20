@@ -136,6 +136,30 @@ function imageFallbackResponse(status: number, reason: string) {
   });
 }
 
+function isTlsHandshakeError(err: unknown): boolean {
+  if (typeof err !== "object" || err === null) return false;
+  const code = "code" in err ? String((err as { code?: unknown }).code ?? "") : "";
+  const message = "message" in err ? String((err as { message?: unknown }).message ?? "") : "";
+  return code === "EPROTO" || /handshake failure|sslv3 alert handshake failure/i.test(message);
+}
+
+function publicBaseUrlForBucket(bucketParam: string | null): string | null {
+  if (bucketParam === "video") return (process.env.R2_VIDEO_PUBLIC_URL ?? "").trim() || null;
+  if (bucketParam === "book") return (process.env.R2_PUBLIC_URL ?? "").trim() || null;
+  if (bucketParam === "proof-payment") return (process.env.R2_PROOF_OF_PAYMENT_URL ?? "").trim() || null;
+  return null;
+}
+
+function buildPublicObjectUrl(baseUrl: string, key: string): string {
+  const base = baseUrl.replace(/\/+$/, "");
+  const encodedKey = key
+    .split("/")
+    .filter(Boolean)
+    .map((part) => encodeURIComponent(part))
+    .join("/");
+  return `${base}/${encodedKey}`;
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const token = searchParams.get("token") ?? "";
@@ -188,6 +212,9 @@ export async function GET(req: NextRequest) {
       const name = awsName(err);
       if (status === 404 || name === "NoSuchKey") {
         return NextResponse.json({ error: "Not found" }, { status: 404 });
+      }
+      if (isTlsHandshakeError(err) && isImageKey(payload.key)) {
+        return imageFallbackResponse(200, "tls-fallback");
       }
       console.error("GET /api/storage/serve (token) failed:", err);
       return NextResponse.json({ error: "Failed to fetch object" }, { status: 500 });
@@ -258,6 +285,20 @@ export async function GET(req: NextRequest) {
       }
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
+
+    // Fallback for environments that cannot TLS-handshake with R2 S3 API endpoint.
+    // If a public bucket URL is configured, redirect to the object on that public domain.
+    if (isTlsHandshakeError(err)) {
+      if (isImageKey(key)) {
+        return imageFallbackResponse(200, "tls-fallback");
+      }
+      const publicBaseUrl = publicBaseUrlForBucket(bucketParam);
+      if (publicBaseUrl) {
+        const fallbackUrl = buildPublicObjectUrl(publicBaseUrl, key);
+        return NextResponse.redirect(fallbackUrl, { status: 307 });
+      }
+    }
+
     console.error("GET /api/storage/serve failed:", err);
     return NextResponse.json({ error: "Failed to fetch object" }, { status: 500 });
   }

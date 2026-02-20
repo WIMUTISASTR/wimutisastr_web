@@ -129,11 +129,22 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ videoId: st
       TOKEN_EXPIRY.VIDEO_PLAY
     );
 
-    // URL for the serve endpoint (token will be in cookie)
+    // Always use same-origin serve endpoint (token is in secure HttpOnly cookie).
+    // Do not return direct/signed storage URLs to reduce link sharing/reuse.
     const url = `/api/videos/serve`;
     
     log.info("Video play token generated", { videoId, userId: user.id });
     
+    const secureCookie = process.env.NODE_ENV === "production" || process.env.HTTPS === "true";
+    const cookiePath = secureCookie ? "/" : "/api/videos";
+    log.info("Setting video token cookie", {
+      videoId,
+      userId: user.id,
+      cookie: COOKIE_NAMES.VIDEO_TOKEN,
+      secure: secureCookie,
+      path: cookiePath,
+    });
+
     // Set token in secure HTTP-only cookie and return the serve URL
     return jsonResponseWithCookie(
       { 

@@ -136,6 +136,16 @@ export async function POST(req: NextRequest) {
 
     log.info("View token generated", { bookId, userId: user.id });
     
+    const secureCookie = process.env.NODE_ENV === "production" || process.env.HTTPS === "true";
+    const cookiePath = secureCookie ? "/" : "/api/books";
+    log.info("Setting book token cookie", {
+      bookId,
+      userId: user.id,
+      cookie: COOKIE_NAMES.BOOK_TOKEN,
+      secure: secureCookie,
+      path: cookiePath,
+    });
+
     // Set token in secure HTTP-only cookie and return metadata
     return jsonResponseWithCookie(
       { 
@@ -143,6 +153,7 @@ export async function POST(req: NextRequest) {
         // Client should use the cookie automatically
         ready: true,
         expiresAt: Math.floor(Date.now() / 1000) + TOKEN_EXPIRY.SHORT_LIVED, 
+        url: "/api/books/serve",
         filename: meta.filename, 
         ext: meta.ext 
       },

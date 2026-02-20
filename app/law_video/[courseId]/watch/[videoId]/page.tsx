@@ -14,7 +14,7 @@ import { useMembership } from "@/lib/hooks/useMembership";
 const FALLBACK_THUMB = "/asset/document_background.png";
 
 function shouldDisableImageOptimization(src: string) {
-  return src.includes(".r2.dev/");
+  return src.includes(".r2.dev/") || /^https?:\/\//i.test(src);
 }
 
 type TabKey = "overview" | "notes" | "qa" | "reviews";
@@ -180,7 +180,7 @@ export default function WatchVideoPage() {
   }, [current?.id, isFree, membershipLoading, membershipStatus, persistLastVideo]);
 
   const src = playback?.kind === "r2_proxy" ? playback.url : "";
-  const thumb = normalizeNextImageSrc(current?.thumbnail_url, FALLBACK_THUMB);
+  const thumb = normalizeNextImageSrc(current?.thumbnail_url, FALLBACK_THUMB, { bucket: "video" });
   const thumbUnoptimized = shouldDisableImageOptimization(thumb);
 
   const prev = currentIndex > 0 ? videos[currentIndex - 1] : null;

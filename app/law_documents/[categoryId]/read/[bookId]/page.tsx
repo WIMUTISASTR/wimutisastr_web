@@ -34,7 +34,7 @@ function isAnimatedImageUrl(src: string) {
 }
 
 function shouldDisableImageOptimization(src: string) {
-  return src.includes(".r2.dev/");
+  return src.includes(".r2.dev/") || /^https?:\/\//i.test(src);
 }
 
 export default function ReadDocumentPage() {
@@ -50,6 +50,7 @@ export default function ReadDocumentPage() {
   const [viewToken, setViewToken] = useState<string | null>(null);
   const [viewExt, setViewExt] = useState<string | null>(null);
   const [viewFilename, setViewFilename] = useState<string | null>(null);
+  const [viewUrl, setViewUrl] = useState<string | null>(null);
   const { status: membershipStatus, isLoading: membershipLoading } = useMembership();
 
   useEffect(() => {
@@ -84,7 +85,7 @@ export default function ReadDocumentPage() {
   const prev = currentIndex > 0 ? books[currentIndex - 1] : null;
   const next = currentIndex >= 0 && currentIndex < books.length - 1 ? books[currentIndex + 1] : null;
 
-  const cover = normalizeNextImageSrc(current?.cover_url, FALLBACK_COVER);
+  const cover = normalizeNextImageSrc(current?.cover_url, FALLBACK_COVER, { bucket: "book" });
   const coverUnoptimized = isAnimatedImageUrl(cover) || shouldDisableImageOptimization(cover);
   
   // Track if we have a valid token cookie set (ready state from API)
@@ -98,17 +99,19 @@ export default function ReadDocumentPage() {
         setViewToken(null);
         setViewExt(null);
         setViewFilename(null);
+        setViewUrl(null);
         if (!bookId) return;
         if (!current?.id) return;
         if (!isFree && membershipStatus !== "approved") return;
         // API now sets HTTP-only cookie and returns ready state
-        const res = await apiPost<{ ready?: boolean; token?: string; ext?: string; filename?: string }>("/api/books/view-token", { bookId });
+        const res = await apiPost<{ ready?: boolean; token?: string; ext?: string; filename?: string; url?: string }>("/api/books/view-token", { bookId });
         if (!cancelled) {
           // Support both new cookie-based flow and legacy token flow
           setIsReady(res.ready ?? !!res.token);
           setViewToken(res.token ?? "cookie"); // Use marker for cookie-based auth
           setViewExt(res.ext ? String(res.ext).toLowerCase() : null);
           setViewFilename(res.filename ?? null);
+          setViewUrl(res.url ?? null);
         }
       } catch (e) {
         console.error(e);
@@ -124,10 +127,9 @@ export default function ReadDocumentPage() {
   // URL for serving content - cookie will be sent automatically
   const serveUrl = useMemo(() => {
     if (!isReady && !viewToken) return null;
-    if (typeof window === "undefined") return null;
-    // Simple URL - token is now in HTTP-only cookie
-    return `${window.location.origin}/api/books/serve`;
-  }, [isReady, viewToken]);
+    if (viewUrl) return viewUrl;
+    return `/api/books/serve`;
+  }, [isReady, viewToken, viewUrl]);
 
   return (
     <ProtectedRoute>
@@ -243,7 +245,7 @@ export default function ReadDocumentPage() {
                         ) : (
                           <iframe
                             title={current.title}
-                            src={`/api/books/serve`}
+                            src={serveUrl ?? `/api/books/serve`}
                             className="w-full h-[75vh] bg-white"
                           />
                         )

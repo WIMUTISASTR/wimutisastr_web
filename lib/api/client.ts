@@ -167,6 +167,36 @@ export async function apiGet<T>(url: string): Promise<T> {
   }
 }
 
+export async function apiGetPublic<T>(url: string): Promise<T> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+  try {
+    const res = await fetch(url, {
+      cache: "no-store",
+      credentials: "omit",
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+
+    const json: unknown = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const message =
+        typeof (json as { error?: unknown })?.error === "string"
+          ? ((json as { error?: unknown }).error as string)
+          : `HTTP ${res.status}`;
+      throw Object.assign(new Error(message), { status: res.status, payload: json });
+    }
+    return json as T;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new Error("Request timeout - please try again");
+    }
+    throw error;
+  }
+}
+
 function withOptionalDebugParam(url: string): string {
   // Allow debugging API responses from within the app:
   // visit /law_documents?debug=1 then fetchBooks will call /api/books-public?debug=1
@@ -218,7 +248,7 @@ export function fetchVideoPlaybackUrl(videoId: string) {
 }
 
 export function fetchHome() {
-  return apiGet<HomeResponse>("/api/home");
+  return apiGetPublic<HomeResponse>("/api/home");
 }
 
 export function fetchBooks(categoryId?: string) {

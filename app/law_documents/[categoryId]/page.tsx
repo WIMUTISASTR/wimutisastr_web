@@ -18,7 +18,7 @@ function isAnimatedImageUrl(src: string) {
 }
 
 function shouldDisableImageOptimization(src: string) {
-  return src.includes(".r2.dev/");
+  return src.includes(".r2.dev/") || /^https?:\/\//i.test(src);
 }
 
 export default function DocumentCategoryPage() {
@@ -91,7 +91,7 @@ export default function DocumentCategoryPage() {
             ) : (
               <div className="space-y-6">
                 {books.map((doc, index) => {
-                  const cover = normalizeNextImageSrc(doc.cover_url, FALLBACK_COVER);
+                  const cover = normalizeNextImageSrc(doc.cover_url, FALLBACK_COVER, { bucket: "book" });
                   const unoptimized = isAnimatedImageUrl(cover) || shouldDisableImageOptimization(cover);
                   const isLocked = !isApproved && doc.access_level !== "free";
                   return (

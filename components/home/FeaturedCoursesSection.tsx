@@ -56,7 +56,7 @@ export default function FeaturedCoursesSection({
                         <div className="relative w-full aspect-video overflow-hidden">
                           {/* Image */}
                           <Image
-                            src={normalizeNextImageSrc(cat.cover_url, "/asset/document_background.png")}
+                            src={normalizeNextImageSrc(cat.cover_url, "/asset/document_background.png", { bucket: "video" })}
                             alt={cat.name ?? "Category"}
                             fill
                             className="object-cover group-hover:scale-105 transition-transform duration-700"

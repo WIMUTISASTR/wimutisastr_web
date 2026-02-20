@@ -36,6 +36,12 @@ function isAuthRoute(pathname: string): boolean {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Fast-path for public pages: avoid Supabase session processing and cookie churn.
+  // This prevents large auth cookie headers from growing on routes that don't need auth checks.
+  if (!isProtectedRoute(pathname) && !isAuthRoute(pathname)) {
+    return NextResponse.next();
+  }
+
   // Apply CSRF protection to API routes (except public ones)
   if (pathname.startsWith('/api/')) {
     const publicApiRoutes = [

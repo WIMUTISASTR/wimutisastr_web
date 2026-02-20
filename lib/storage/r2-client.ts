@@ -1,4 +1,5 @@
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { env } from '@/lib/utils/env';
 
 // R2 is S3-compatible, so we use the AWS S3 SDK
@@ -31,6 +32,26 @@ export async function uploadToR2(
   // Return the public URL
   const publicUrl = process.env.R2_PROOF_OF_PAYMENT_URL || '';
   return `${publicUrl}/${key}`;
+}
+
+type SignedUrlOverrides = {
+  responseContentType?: string;
+  responseContentDisposition?: string;
+};
+
+export async function getSignedR2ObjectUrl(
+  bucketName: string,
+  key: string,
+  expiresInSeconds: number,
+  overrides: SignedUrlOverrides = {}
+): Promise<string> {
+  const command = new GetObjectCommand({
+    Bucket: bucketName,
+    Key: key,
+    ResponseContentType: overrides.responseContentType,
+    ResponseContentDisposition: overrides.responseContentDisposition,
+  });
+  return getSignedUrl(r2Client, command, { expiresIn: expiresInSeconds });
 }
 
 export { r2Client };

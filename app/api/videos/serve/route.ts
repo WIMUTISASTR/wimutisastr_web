@@ -4,7 +4,7 @@ import { Readable } from "stream";
 import { r2Client } from "@/lib/storage/r2-client";
 import { verifyVideoToken } from "@/lib/security/tokens/video";
 import { rateLimit, createRateLimitResponse, addRateLimitHeaders } from "@/lib/rate-limit/redis";
-import { COOKIE_NAMES, getTokenFromRequest } from "@/lib/security/secure-cookies";
+import { COOKIE_NAMES, getSecureCookie } from "@/lib/security/secure-cookies";
 import { getR2MetadataWithCache, type CachedR2Metadata } from "@/lib/cache";
 
 export const runtime = "nodejs";
@@ -101,8 +101,8 @@ export async function GET(req: NextRequest) {
     return createRateLimitResponse(rateLimitResult, "Too many video requests. Please wait before continuing.");
   }
 
-  // Get token from secure cookie first, fall back to query param for backwards compatibility
-  const token = getTokenFromRequest(req, COOKIE_NAMES.VIDEO_TOKEN, "token");
+  // Only accept token from secure HttpOnly cookie; never from URL query params.
+  const token = getSecureCookie(req, COOKIE_NAMES.VIDEO_TOKEN);
   const payload = token ? verifyVideoToken(token) : null;
 
   if (!payload) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

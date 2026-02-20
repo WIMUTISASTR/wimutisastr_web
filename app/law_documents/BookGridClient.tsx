@@ -17,7 +17,7 @@ function isAnimatedImageUrl(src: string) {
 }
 
 function shouldDisableImageOptimization(src: string) {
-  return src.includes(".r2.dev/");
+  return src.includes(".r2.dev/") || /^https?:\/\//i.test(src);
 }
 
 interface BookGridClientProps {
@@ -138,7 +138,7 @@ export default function BookGridClient({ categories, books }: BookGridClientProp
             <div className="space-y-6">
               {displayCategories.map((cat) => {
                 const list = cat.id === ALL_CATEGORY_ID ? books : byCategory.get(cat.id) ?? [];
-                const thumb = normalizeNextImageSrc(list[0]?.cover_url ?? null, FALLBACK_COVER);
+                const thumb = normalizeNextImageSrc(list[0]?.cover_url ?? null, FALLBACK_COVER, { bucket: "book" });
                 const unoptimized = isAnimatedImageUrl(thumb) || shouldDisableImageOptimization(thumb);
                 const hasFree = list.some((b) => b.access_level === "free");
                 const isLocked = !isApproved && !hasFree;

@@ -5,7 +5,7 @@ import { r2Client } from "@/lib/storage/r2-client";
 import { verifyContentToken } from "@/lib/security/tokens/content";
 import { env } from "@/lib/utils/env";
 import { rateLimit, createRateLimitResponse } from "@/lib/rate-limit/redis";
-import { COOKIE_NAMES, getTokenFromRequest } from "@/lib/security/secure-cookies";
+import { COOKIE_NAMES, getSecureCookie } from "@/lib/security/secure-cookies";
 import { getR2MetadataWithCache } from "@/lib/cache";
 
 // Books/documents should NOT be cached in browser - they are sensitive legal documents
@@ -104,8 +104,8 @@ export async function GET(req: NextRequest) {
     return createRateLimitResponse(rateLimitResult, "Too many document requests. Please wait before continuing.");
   }
 
-  // Get token from secure cookie first, fall back to query param for backwards compatibility
-  const token = getTokenFromRequest(req, COOKIE_NAMES.BOOK_TOKEN, "token");
+  // Only accept token from secure HttpOnly cookie; never from URL query params.
+  const token = getSecureCookie(req, COOKIE_NAMES.BOOK_TOKEN);
   const payload = token ? verifyContentToken(token) : null;
 
   if (!payload) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -198,6 +198,7 @@ export async function GET(req: NextRequest) {
     if (status === 404 || name === "NoSuchKey") {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
+
     console.error("GET /api/books/serve failed:", err);
     return NextResponse.json({ error: "Failed to fetch document" }, { status: 500 });
   }

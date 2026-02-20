@@ -27,10 +27,22 @@ export default function DocxViewer({ url, className = "" }: DocxViewerProps) {
         setLoading(true);
         setError(null);
 
+        const isAbsolute = /^https?:\/\//i.test(url);
+        const isCrossOrigin =
+          typeof window !== "undefined" &&
+          isAbsolute &&
+          (() => {
+            try {
+              return new URL(url).origin !== window.location.origin;
+            } catch {
+              return false;
+            }
+          })();
+
         // Fetch the document with credentials (cookies will be sent automatically)
         const response = await fetch(url, {
           method: "GET",
-          credentials: "include", // Important: send HTTP-only cookies
+          credentials: isCrossOrigin ? "omit" : "include",
         });
 
         if (!response.ok) {

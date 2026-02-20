@@ -1,4 +1,14 @@
-export function normalizeNextImageSrc(src: string | null | undefined, fallback?: string): string {
+type StorageBucket = "book" | "video" | "proof-payment";
+
+type NormalizeImageOptions = {
+  bucket?: StorageBucket;
+};
+
+export function normalizeNextImageSrc(
+  src: string | null | undefined,
+  fallback?: string,
+  options: NormalizeImageOptions = {}
+): string {
   const value = (src ?? "").trim();
   if (!value) return fallback ?? "";
 
@@ -7,6 +17,18 @@ export function normalizeNextImageSrc(src: string | null | undefined, fallback?:
 
   // These are valid for <img>/<Image> and should be kept as-is
   if (value.startsWith("data:") || value.startsWith("blob:")) return value;
+
+  // DB values like "video-thumbnails/foo.jpg" may be raw storage keys.
+  // If a bucket is provided, route via storage serve endpoint.
+  if (!value.includes("://") && !value.startsWith("//")) {
+    const normalized = value.replace(/^\.\/+/, "").replace(/^\/+/, "");
+    if (!normalized) return fallback ?? "";
+    if (options.bucket) {
+      return `/api/storage/serve?bucket=${encodeURIComponent(options.bucket)}&key=${encodeURIComponent(normalized)}`;
+    }
+    // Fallback for local relative assets.
+    return `/${normalized}`;
+  }
 
   try {
     const u = new URL(value);

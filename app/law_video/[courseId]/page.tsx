@@ -14,7 +14,7 @@ import { useMembership } from "@/lib/hooks/useMembership";
 const FALLBACK_THUMB = "/asset/document_background.png";
 
 function shouldDisableImageOptimization(src: string) {
-  return src.includes(".r2.dev/");
+  return src.includes(".r2.dev/") || /^https?:\/\//i.test(src);
 }
 
 function formatDate(d: string | null | undefined) {
@@ -168,7 +168,7 @@ export default function VideoCategoryPage() {
             ) : (
               <div className="space-y-4">
                 {videos.map((video, index) => {
-                  const thumb = normalizeNextImageSrc(video.thumbnail_url, FALLBACK_THUMB);
+                  const thumb = normalizeNextImageSrc(video.thumbnail_url, FALLBACK_THUMB, { bucket: "video" });
                   const unoptimized = shouldDisableImageOptimization(thumb);
                   const isLocked = !isApproved && video.access_level !== "free";
                   

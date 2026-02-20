@@ -60,11 +60,12 @@ export function setSecureCookie(
   const { maxAge = 3600, path = "/" } = options;
   const secure = isSecureContext();
   const effectiveName = getEffectiveCookieName(name);
+  const cookiePath = secure && effectiveName.startsWith("__Host-") ? "/" : path;
 
   // Build cookie string with security attributes
   const cookieParts = [
     `${effectiveName}=${encodeURIComponent(value)}`,
-    `Path=${path}`,
+    `Path=${cookiePath}`,
     `Max-Age=${maxAge}`,
     "HttpOnly", // Not accessible via JavaScript
     "SameSite=Strict", // Only sent to same origin
