@@ -23,14 +23,14 @@ export async function getCsrfToken(force = false): Promise<string> {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch CSRF token');
+      throw new Error('បរាជ័យក្នុងការទាញយក CSRF token');
     }
 
     const data = await response.json();
     const token = data.csrfToken;
     
     if (!token) {
-      throw new Error('CSRF token not received from server');
+      throw new Error('មិនទទួលបាន CSRF token ពីម៉ាស៊ីនមេ');
     }
     
     cachedCsrfToken = token;

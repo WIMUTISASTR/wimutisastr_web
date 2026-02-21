@@ -35,13 +35,13 @@ export default function PricingPage() {
         const res = await fetch("/api/pricing-plans", { cache: "no-store" });
         const json = (await res.json().catch(() => ({}))) as { plans?: PricingPlan[]; error?: string };
         if (!res.ok) {
-          if (!cancelled) setPlansError(json.error || "Failed to load plans.");
+          if (!cancelled) setPlansError(json.error || "ផ្ទុកគម្រោងមិនជោគជ័យ។");
           return;
         }
         if (!cancelled) setRemotePlans(Array.isArray(json.plans) ? json.plans : []);
       } catch (e) {
         console.error(e);
-        if (!cancelled) setPlansError("Failed to load plans.");
+        if (!cancelled) setPlansError("ផ្ទុកគម្រោងមិនជោគជ័យ។");
       } finally {
         if (!cancelled) setIsPlansLoading(false);
       }
@@ -111,10 +111,10 @@ export default function PricingPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
           <div className="text-center">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 opacity-0 translate-y-8 delay-100">
-              Choose Your Plan
+              ជ្រើសរើសគម្រោងរបស់អ្នក
             </h1>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto opacity-0 translate-y-8 delay-300">
-              Select the perfect plan to access comprehensive legal education
+              ជ្រើសរើសគម្រោងសមស្របបំផុតសម្រាប់ចូលប្រើការអប់រំច្បាប់យ៉ាងគ្រប់ជ្រុងជ្រោយ
             </p>
           </div>
         </div>
@@ -125,18 +125,18 @@ export default function PricingPage() {
         <div className="max-w-6xl mx-auto">
           {isPlansLoading ? (
             <div className="py-16">
-              <LoadingState label="Loading plans..." />
+              <LoadingState label="កំពុងផ្ទុកគម្រោង..." />
             </div>
           ) : plansError ? (
             <div className="text-center text-red-600 py-16">{plansError}</div>
           ) : plans.length === 0 ? (
-            <div className="text-center text-gray-600 py-16">No subscription plans available.</div>
+            <div className="text-center text-gray-600 py-16">មិនមានគម្រោងជាវនៅពេលនេះទេ។</div>
           ) : (
             <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
               {plans.map((plan, index) => (
                 <div
                   key={plan.id}
-                  className={`relative rounded-2xl border border-(--border) bg-(--surface-strong) backdrop-blur-xl shadow-[var(--shadow-elev-1)] overflow-hidden transition-all duration-300 hover:shadow-[var(--shadow-elev-2)] hover:-translate-y-1 opacity-0 translate-y-8 ${
+                  className={`relative rounded-2xl border border-(--border) bg-(--surface-strong) backdrop-blur-xl shadow-(--shadow-elev-1) overflow-hidden transition-all duration-300 hover:shadow-(--shadow-elev-2) hover:-translate-y-1 opacity-0 translate-y-8 ${
                     plan.popular
                       ? "ring-2 ring-[rgb(var(--brown-rgb)/0.35)] md:scale-[1.03]"
                       : ""
@@ -146,8 +146,8 @@ export default function PricingPage() {
                   <div className="p-8">
                     {plan.popular && (
                       <div className="absolute top-5 right-5">
-                        <span className="inline-flex items-center rounded-full bg-[rgb(var(--brown-rgb)/0.16)] text-[var(--brown-strong)] ring-1 ring-[rgb(var(--brown-rgb)/0.25)] px-3 py-1 text-xs font-semibold">
-                          Most popular
+                        <span className="inline-flex items-center rounded-full bg-[rgb(var(--brown-rgb)/0.16)] text-(--brown-strong) ring-1 ring-[rgb(var(--brown-rgb)/0.25)] px-3 py-1 text-xs font-semibold">
+                          ពេញនិយមបំផុត
                         </span>
                       </div>
                     )}
@@ -169,7 +169,7 @@ export default function PricingPage() {
                         )}
                       </div>
                       {plan.discount && (
-                        <span className="inline-flex mt-3 items-center px-3 py-1 bg-(--brown-soft) text-[var(--brown-strong)] rounded-full text-sm font-semibold">
+                        <span className="inline-flex mt-3 items-center px-3 py-1 bg-(--brown-soft) text-(--brown-strong) rounded-full text-sm font-semibold">
                           {plan.discount}
                         </span>
                       )}
@@ -183,7 +183,7 @@ export default function PricingPage() {
                           style={{ animationDelay: `${(index + 1) * 100 + (featureIndex + 1) * 50}ms` }}
                         >
                           <svg
-                            className="w-5 h-5 text-[var(--brown-strong)] mr-3 shrink-0 mt-0.5"
+                            className="w-5 h-5 text-(--brown-strong) mr-3 shrink-0 mt-0.5"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -206,7 +206,7 @@ export default function PricingPage() {
                       fullWidth
                       className="px-6 py-3"
                     >
-                      Get Started
+                      ចាប់ផ្តើម
                     </Button>
                   </div>
                 </div>
@@ -217,10 +217,10 @@ export default function PricingPage() {
           {/* Additional Info */}
           <div className="mt-16 text-center opacity-0 translate-y-8 delay-500">
             <p className="text-slate-700 mb-4">
-              All plans include full access to our legal education platform
+              គ្រប់គម្រោងរួមបញ្ចូលការចូលប្រើពេញលេញទៅវេទិកាអប់រំច្បាប់របស់យើង
             </p>
             <p className="text-sm text-slate-500">
-              Secure payment • Cancel anytime • 30-day money-back guarantee
+              ការទូទាត់មានសុវត្ថិភាព • អាចបោះបង់បានគ្រប់ពេល • ធានាសងប្រាក់វិញក្នុង 30 ថ្ងៃ
             </p>
           </div>
         </div>

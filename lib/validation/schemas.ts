@@ -14,7 +14,7 @@ import { z } from 'zod';
  * Validates that the value is a valid UUID v4
  */
 export const uuidSchema = z.string().uuid({
-  message: 'Invalid ID format. Expected a valid UUID.',
+  message: 'ទម្រង់ ID មិនត្រឹមត្រូវ។ ត្រូវការតម្លៃ UUID ត្រឹមត្រូវ។',
 });
 
 /**
@@ -22,14 +22,14 @@ export const uuidSchema = z.string().uuid({
  * Accepts UUID or special category "__all__"
  */
 export const bookIdSchema = z.string().uuid({
-  message: 'Invalid book ID format.',
+  message: 'ទម្រង់ Book ID មិនត្រឹមត្រូវ។',
 });
 
 /**
  * Video ID validator
  */
 export const videoIdSchema = z.string().uuid({
-  message: 'Invalid video ID format.',
+  message: 'ទម្រង់ Video ID មិនត្រឹមត្រូវ។',
 });
 
 /**
@@ -40,14 +40,14 @@ export const categoryIdSchema = z.union([
   z.string().uuid(),
   z.literal('__all__'),
 ]).refine(() => true, {
-  message: 'Invalid category ID format.',
+  message: 'ទម្រង់ Category ID មិនត្រឹមត្រូវ។',
 });
 
 /**
  * User ID validator
  */
 export const userIdSchema = z.string().uuid({
-  message: 'Invalid user ID format.',
+  message: 'ទម្រង់ User ID មិនត្រឹមត្រូវ។',
 });
 
 // ============================================================================
@@ -59,17 +59,17 @@ export const userIdSchema = z.string().uuid({
  * Accepts UUID or legacy plan names
  */
 export const planIdSchema = z.string().min(1, {
-  message: 'Plan ID is required.',
+  message: 'ត្រូវការបញ្ចូល Plan ID។',
 }).max(100, {
-  message: 'Plan ID is too long.',
+  message: 'Plan ID វែងពេក។',
 });
 
 /**
  * Payment reference validator
  */
 export const paymentReferenceSchema = z.string()
-  .min(1, { message: 'Payment reference is required.' })
-  .max(200, { message: 'Payment reference is too long (max 200 characters).' })
+  .min(1, { message: 'ត្រូវការបញ្ចូលលេខយោងការទូទាត់។' })
+  .max(200, { message: 'លេខយោងការទូទាត់វែងពេក (អតិបរមា 200 តួអក្សរ)។' })
   .trim();
 
 /**
@@ -77,9 +77,9 @@ export const paymentReferenceSchema = z.string()
  * Accepts positive numbers with up to 2 decimal places
  */
 export const amountSchema = z.number()
-  .positive({ message: 'Amount must be positive.' })
-  .finite({ message: 'Amount must be a valid number.' })
-  .multipleOf(0.01, { message: 'Amount can have at most 2 decimal places.' });
+  .positive({ message: 'ចំនួនទឹកប្រាក់ត្រូវតែធំជាងសូន្យ។' })
+  .finite({ message: 'ចំនួនទឹកប្រាក់ត្រូវតែជាលេខត្រឹមត្រូវ។' })
+  .multipleOf(0.01, { message: 'ចំនួនទឹកប្រាក់អាចមានទសភាគអតិបរមា 2 ខ្ទង់។' });
 
 // ============================================================================
 // Token Validators
@@ -90,8 +90,8 @@ export const amountSchema = z.number()
  * For JWT tokens, API tokens, etc.
  */
 export const tokenSchema = z.string()
-  .min(10, { message: 'Invalid token format.' })
-  .max(2000, { message: 'Token is too long.' });
+  .min(10, { message: 'ទម្រង់ token មិនត្រឹមត្រូវ។' })
+  .max(2000, { message: 'Token វែងពេក។' });
 
 /**
  * Content access token validator
@@ -116,7 +116,7 @@ export const storageTokenSchema = tokenSchema;
  * Email validator
  */
 export const emailSchema = z.string()
-  .email({ message: 'Invalid email address.' })
+  .email({ message: 'អាសយដ្ឋានអ៊ីមែលមិនត្រឹមត្រូវ។' })
   .toLowerCase()
   .trim();
 
@@ -125,16 +125,16 @@ export const emailSchema = z.string()
  * Minimum 8 characters, at least one letter and one number
  */
 export const passwordSchema = z.string()
-  .min(8, { message: 'Password must be at least 8 characters.' })
-  .max(100, { message: 'Password is too long.' })
-  .regex(/[a-zA-Z]/, { message: 'Password must contain at least one letter.' })
-  .regex(/[0-9]/, { message: 'Password must contain at least one number.' });
+  .min(8, { message: 'ពាក្យសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ 8 តួអក្សរ។' })
+  .max(100, { message: 'ពាក្យសម្ងាត់វែងពេក។' })
+  .regex(/[a-zA-Z]/, { message: 'ពាក្យសម្ងាត់ត្រូវមានអក្សរយ៉ាងហោចណាស់មួយ។' })
+  .regex(/[0-9]/, { message: 'ពាក្យសម្ងាត់ត្រូវមានលេខយ៉ាងហោចណាស់មួយ។' });
 
 /**
  * Search query validator
  */
 export const searchQuerySchema = z.string()
-  .max(200, { message: 'Search query is too long.' })
+  .max(200, { message: 'ពាក្យស្វែងរកវែងពេក។' })
   .trim()
   .optional();
 
@@ -146,9 +146,9 @@ export const searchQuerySchema = z.string()
  * File size validator (in bytes)
  */
 export const fileSizeSchema = z.number()
-  .int({ message: 'File size must be an integer.' })
-  .positive({ message: 'File size must be positive.' })
-  .max(10 * 1024 * 1024, { message: 'File size must not exceed 10MB.' });
+  .int({ message: 'ទំហំឯកសារត្រូវជាចំនួនគត់។' })
+  .positive({ message: 'ទំហំឯកសារត្រូវតែធំជាងសូន្យ។' })
+  .max(10 * 1024 * 1024, { message: 'ទំហំឯកសារមិនត្រូវលើស 10MB។' });
 
 /**
  * MIME type validator for images
@@ -160,7 +160,7 @@ export const imageMimeTypeSchema = z.enum([
   'image/webp',
   'image/gif',
 ], {
-  message: 'Invalid file type. Only images are allowed.',
+  message: 'ប្រភេទឯកសារមិនត្រឹមត្រូវ។ អនុញ្ញាតតែរូបភាពប៉ុណ្ណោះ។',
 });
 
 /**
@@ -171,7 +171,7 @@ export const documentMimeTypeSchema = z.enum([
   'application/msword',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ], {
-  message: 'Invalid file type. Only PDF and Word documents are allowed.',
+  message: 'ប្រភេទឯកសារមិនត្រឹមត្រូវ។ អនុញ្ញាតតែឯកសារ PDF និង Word ប៉ុណ្ណោះ។',
 });
 
 // ============================================================================
@@ -182,17 +182,17 @@ export const documentMimeTypeSchema = z.enum([
  * Page number validator
  */
 export const pageSchema = z.number()
-  .int({ message: 'Page must be an integer.' })
-  .positive({ message: 'Page must be positive.' })
+  .int({ message: 'ទំព័រត្រូវជាចំនួនគត់។' })
+  .positive({ message: 'ទំព័រត្រូវតែធំជាងសូន្យ។' })
   .default(1);
 
 /**
  * Page size validator
  */
 export const pageSizeSchema = z.number()
-  .int({ message: 'Page size must be an integer.' })
-  .positive({ message: 'Page size must be positive.' })
-  .max(100, { message: 'Page size must not exceed 100.' })
+  .int({ message: 'ទំហំទំព័រត្រូវជាចំនួនគត់។' })
+  .positive({ message: 'ទំហំទំព័រត្រូវតែធំជាងសូន្យ។' })
+  .max(100, { message: 'ទំហំទំព័រមិនត្រូវលើស 100។' })
   .default(10);
 
 // ============================================================================
@@ -220,7 +220,7 @@ export function validateInput<T>(
       const firstError = error.issues[0];
       return { success: false, error: firstError.message };
     }
-    return { success: false, error: 'Validation failed' };
+    return { success: false, error: 'ការផ្ទៀងផ្ទាត់បរាជ័យ' };
   }
 }
 
@@ -269,7 +269,7 @@ export const paymentProofUploadSchema = z.object({
  */
 export const loginSchema = z.object({
   email: emailSchema,
-  password: z.string().min(1, { message: 'Password is required.' }),
+  password: z.string().min(1, { message: 'ត្រូវការបញ្ចូលពាក្យសម្ងាត់។' }),
 });
 
 /**
@@ -280,7 +280,7 @@ export const registerSchema = z.object({
   password: passwordSchema,
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
+  message: "ពាក្យសម្ងាត់មិនត្រូវគ្នា",
   path: ['confirmPassword'],
 });
 

@@ -45,7 +45,7 @@ function LoginPageContent() {
     
     // Check Turnstile verification only if it's required and configured
     if (turnstileRequired && !turnstileToken) {
-      toast.error("Please complete the security check");
+      toast.error("សូមបំពេញការផ្ទៀងផ្ទាត់សុវត្ថិភាព");
       return;
     }
     
@@ -63,7 +63,7 @@ function LoginPageContent() {
         const turnstileResult = await turnstileResponse.json();
         
         if (!turnstileResult.success) {
-          toast.error("Security verification failed. Please try again.");
+          toast.error("ការផ្ទៀងផ្ទាត់សុវត្ថិភាពបរាជ័យ។ សូមព្យាយាមម្តងទៀត។");
           setLoading(false);
           return;
         }
@@ -75,13 +75,13 @@ function LoginPageContent() {
       });
 
       if (signInError) {
-        toast.error(signInError.message || "Failed to sign in. Please check your credentials.");
+        toast.error(signInError.message || "ចូលគណនីមិនជោគជ័យ។ សូមពិនិត្យព័ត៌មានសម្ងាត់របស់អ្នក។");
         setLoading(false);
         return;
       }
 
       if (data.user) {
-        toast.success("Welcome back! Sign in successful.");
+        toast.success("សូមស្វាគមន៍ត្រឡប់មកវិញ! ចូលគណនីបានជោគជ័យ។");
         // Redirect to home page or profile page
         setTimeout(() => {
           router.push(redirectTo);
@@ -89,7 +89,7 @@ function LoginPageContent() {
         }, 1000);
       }
     } catch {
-      toast.error("An unexpected error occurred. Please try again.");
+      toast.error("មានកំហុសមិនបានរំពឹងទុក។ សូមព្យាយាមម្តងទៀត។");
       setLoading(false);
     }
   };
@@ -106,15 +106,15 @@ function LoginPageContent() {
       <FormSection>
         <FormCard>
           <FormHeader
-            title="Welcome Back"
-            subtitle="Sign in to access your legal education resources"
+            title="សូមស្វាគមន៍ត្រឡប់មកវិញ"
+            subtitle="ចូលគណនីដើម្បីចូលប្រើធនធានអប់រំច្បាប់របស់អ្នក"
           />
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <Input
               type="email"
               name="email"
-              label="Email Address"
+              label="អាសយដ្ឋានអ៊ីមែល"
               value={formData.email}
               onChange={handleChange}
               required
@@ -125,18 +125,18 @@ function LoginPageContent() {
             <Input
               type="password"
               name="password"
-              label="Password"
+              label="ពាក្យសម្ងាត់"
               value={formData.password}
               onChange={handleChange}
               required
-              placeholder="Enter your password"
+              placeholder="បញ្ចូលពាក្យសម្ងាត់របស់អ្នក"
               disabled={loading}
               rightElement={
                 <Link
                   href="#"
                   className="text-sm text-(--brown-strong) hover:text-(--brown) font-medium"
                 >
-                  Forgot password?
+                  ភ្លេចពាក្យសម្ងាត់?
                 </Link>
               }
             />
@@ -144,7 +144,7 @@ function LoginPageContent() {
             <Checkbox
               id="remember"
               name="remember"
-              label="Remember me"
+              label="ចងចាំខ្ញុំ"
               disabled={loading}
             />
 
@@ -157,7 +157,7 @@ function LoginPageContent() {
             </div>
 
             <Button type="submit" fullWidth disabled={loading || (turnstileRequired && !turnstileToken)}>
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? "កំពុងចូលគណនី..." : "ចូលគណនី"}
             </Button>
           </form>
 
@@ -165,17 +165,17 @@ function LoginPageContent() {
 
           <div className="text-center">
             <p className="text-gray-600">
-              Don&apos;t have an account?{" "}
-              <FormLink href="/auth/register">Sign up</FormLink>
+              មិនទាន់មានគណនីមែនទេ?{" "}
+              <FormLink href="/auth/register">ចុះឈ្មោះ</FormLink>
             </p>
           </div>
         </FormCard>
 
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-500">
-            By signing in, you agree to our{" "}
-            <FormLink href="#">Terms of Service</FormLink> and{" "}
-            <FormLink href="#">Privacy Policy</FormLink>
+            តាមរយៈការចូលគណនី អ្នកយល់ព្រមតាម{" "}
+            <FormLink href="#">លក្ខខណ្ឌសេវាកម្ម</FormLink> និង{" "}
+            <FormLink href="#">គោលការណ៍ឯកជនភាព</FormLink>
           </p>
         </div>
       </FormSection>
@@ -189,7 +189,7 @@ export default function LoginPage() {
       fallback={
         <PageContainer>
           <div className="min-h-screen flex items-center justify-center">
-            <LoadingState label="Loading..." />
+            <LoadingState label="កំពុងផ្ទុក..." />
           </div>
         </PageContainer>
       }

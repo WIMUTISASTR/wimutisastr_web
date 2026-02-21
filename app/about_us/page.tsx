@@ -39,7 +39,7 @@ export default function AboutUsPage() {
     },
     {
       name: "Kheang Su iy",
-      role: "Legal Advisor",
+      role: "ទីប្រឹក្សាច្បាប់",
       imageUrl:
         "https://www.wimutisastrlawyer.com/assets/uploads/images/original/1709001614-1709001614-2660.jpg",
       phone: "087596866",
@@ -121,7 +121,7 @@ export default function AboutUsPage() {
         <div className="relative max-w-6xl mx-auto z-20">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 opacity-0 translate-y-8 delay-100">
-              Why We Created This Platform
+              ហេតុអ្វីបានជាយើងបង្កើតវេទិកានេះ
             </h2>
             <div className="w-24 h-1 bg-(--brown) mx-auto mb-8 opacity-0 translate-y-8 delay-200"></div>
           </div>
@@ -131,23 +131,23 @@ export default function AboutUsPage() {
             <div className="space-y-6">
               <div className="bg-(--brown-soft) rounded-2xl p-8 border-l-4 border-(--brown) opacity-0 -translate-x-8 delay-200 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  Our Mission
+                  បេសកកម្មរបស់យើង
                 </h3>
                 <p className="text-lg text-gray-700 leading-relaxed">
-                  We believe that legal knowledge should be accessible to everyone. Our platform was created 
-                  to democratize legal education in Cambodia, making complex legal concepts understandable 
-                  and available to all citizens, regardless of their background or location.
+                  យើងជឿជាក់ថាចំណេះដឹងផ្នែកច្បាប់គួរតែអាចចូលប្រើបានសម្រាប់មនុស្សគ្រប់រូប។ វេទិការបស់យើងត្រូវបានបង្កើតឡើង
+                  ដើម្បីផ្សព្វផ្សាយការអប់រំច្បាប់នៅកម្ពុជា ឱ្យកាន់តែងាយយល់ និងអាចចូលដល់សាធារណជនគ្រប់រូប
+                  ដោយមិនគិតពីប្រវត្តិរូប ឬទីតាំងរស់នៅ។
                 </p>
               </div>
 
               <div className="bg-slate-50 rounded-2xl p-8 opacity-0 -translate-x-8 delay-400 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  What We Offer
+                  អ្វីដែលយើងផ្តល់ជូន
                 </h3>
                 <p className="text-lg text-gray-700 leading-relaxed">
-                  Through comprehensive video tutorials and detailed legal documents, we provide 
-                  expert knowledge on Cambodian law, helping individuals and businesses navigate 
-                  the legal landscape with confidence and understanding.
+                  តាមរយៈវីដេអូបង្រៀនយ៉ាងគ្រប់ជ្រុងជ្រោយ និងឯកសារច្បាប់លម្អិត យើងផ្តល់
+                  ចំណេះដឹងពីអ្នកជំនាញអំពីច្បាប់កម្ពុជា ដើម្បីជួយបុគ្គល និងអាជីវកម្ម
+                  ឱ្យអាចដោះស្រាយបញ្ហាច្បាប់បានដោយទំនុកចិត្ត និងការយល់ដឹង។
                 </p>
               </div>
             </div>
@@ -155,57 +155,57 @@ export default function AboutUsPage() {
             {/* Right Side - Benefits */}
             <div className="space-y-6">
               <div className="flex items-start space-x-4 opacity-0 translate-x-8 delay-300 hover:transform hover:scale-105 transition-all duration-300">
-                <div className="shrink-0 w-12 h-12 bg-(--brown) rounded-lg flex items-center justify-center group-hover:bg-[var(--brown-strong)] transition-colors">
+                <div className="shrink-0 w-12 h-12 bg-(--brown) rounded-lg flex items-center justify-center group-hover:bg-(--brown-strong) transition-colors">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-xl font-bold text-gray-900 mb-2">Expert Knowledge</h4>
+                  <h4 className="text-xl font-bold text-gray-900 mb-2">ចំណេះដឹងពីអ្នកជំនាញ</h4>
                   <p className="text-gray-600">
-                    Learn from experienced legal professionals who understand Cambodian law inside and out
+                    សិក្សាពីអ្នកជំនាញច្បាប់ដែលមានបទពិសោធន៍ និងយល់ដឹងជ្រាលជ្រៅអំពីច្បាប់កម្ពុជា
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start space-x-4 opacity-0 translate-x-8 delay-400 hover:transform hover:scale-105 transition-all duration-300">
-                <div className="shrink-0 w-12 h-12 bg-(--brown) rounded-lg flex items-center justify-center group-hover:bg-[var(--brown-strong)] transition-colors">
+                <div className="shrink-0 w-12 h-12 bg-(--brown) rounded-lg flex items-center justify-center group-hover:bg-(--brown-strong) transition-colors">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-xl font-bold text-gray-900 mb-2">Accessible Learning</h4>
+                  <h4 className="text-xl font-bold text-gray-900 mb-2">ការរៀនដែលអាចចូលប្រើបាន</h4>
                   <p className="text-gray-600">
-                    Access legal education anytime, anywhere. No barriers, no prerequisites—just knowledge
+                    ចូលប្រើការអប់រំច្បាប់បានគ្រប់ពេល គ្រប់ទីកន្លែង។ មិនមានឧបសគ្គ គ្មានលក្ខខណ្ឌ—មានតែចំណេះដឹង
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start space-x-4 opacity-0 translate-x-8 delay-500 hover:transform hover:scale-105 transition-all duration-300">
-                <div className="shrink-0 w-12 h-12 bg-(--brown) rounded-lg flex items-center justify-center group-hover:bg-[var(--brown-strong)] transition-colors">
+                <div className="shrink-0 w-12 h-12 bg-(--brown) rounded-lg flex items-center justify-center group-hover:bg-(--brown-strong) transition-colors">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-xl font-bold text-gray-900 mb-2">Trusted Resources</h4>
+                  <h4 className="text-xl font-bold text-gray-900 mb-2">ធនធានដែលទុកចិត្តបាន</h4>
                   <p className="text-gray-600">
-                    All content is carefully prepared and verified by qualified legal experts
+                    មាតិកាទាំងអស់ត្រូវបានរៀបចំ និងផ្ទៀងផ្ទាត់យ៉ាងប្រុងប្រយ័ត្នដោយអ្នកជំនាញច្បាប់ដែលមានសមត្ថភាព
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start space-x-4 opacity-0 translate-x-8 delay-700 hover:transform hover:scale-105 transition-all duration-300">
-                <div className="shrink-0 w-12 h-12 bg-(--brown) rounded-lg flex items-center justify-center group-hover:bg-[var(--brown-strong)] transition-colors">
+                <div className="shrink-0 w-12 h-12 bg-(--brown) rounded-lg flex items-center justify-center group-hover:bg-(--brown-strong) transition-colors">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-xl font-bold text-gray-900 mb-2">Empowering Communities</h4>
+                  <h4 className="text-xl font-bold text-gray-900 mb-2">ពង្រឹងសហគមន៍</h4>
                   <p className="text-gray-600">
-                    Building a more legally aware society, one learner at a time
+                    កសាងសង្គមដែលមានការយល់ដឹងអំពីច្បាប់កាន់តែប្រសើរ ម្នាក់ម្តងៗ
                   </p>
                 </div>
               </div>
@@ -219,10 +219,10 @@ export default function AboutUsPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 opacity-0 translate-y-8 delay-100">
-              Our Team
+              ក្រុមការងាររបស់យើង
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto opacity-0 translate-y-8 delay-200">
-              Meet the professionals supporting our mission to make legal knowledge accessible.
+              សូមស្គាល់អ្នកជំនាញដែលគាំទ្របេសកកម្មរបស់យើងក្នុងការធ្វើឱ្យចំណេះដឹងច្បាប់អាចចូលប្រើបាន។
             </p>
             <div className="w-24 h-1 bg-(--brown) mx-auto mt-6 opacity-0 translate-y-8 delay-300"></div>
           </div>
@@ -257,8 +257,8 @@ export default function AboutUsPage() {
                         <a
                           href={`tel:${member.phone}`}
                           className="inline-flex items-center justify-center rounded-md bg-white/90 text-gray-900 w-9 h-9 hover:bg-white transition-colors"
-                          aria-label={`Call ${member.name}`}
-                          title="Call"
+                          aria-label={`ហៅទៅកាន់ ${member.name}`}
+                          title="ហៅទូរស័ព្ទ"
                         >
                           <svg
                             viewBox="0 0 24 24"
@@ -278,8 +278,8 @@ export default function AboutUsPage() {
                         <a
                           href={`mailto:${member.email}`}
                           className="inline-flex items-center justify-center rounded-md bg-white/90 text-gray-900 w-9 h-9 hover:bg-white transition-colors"
-                          aria-label={`Email ${member.name}`}
-                          title="Email"
+                          aria-label={`ផ្ញើអ៊ីមែលទៅ ${member.name}`}
+                          title="អ៊ីមែល"
                         >
                           <svg
                             viewBox="0 0 24 24"
@@ -302,7 +302,7 @@ export default function AboutUsPage() {
                           target="_blank"
                           rel="noreferrer"
                           className="inline-flex items-center justify-center rounded-md bg-white/90 text-gray-900 w-9 h-9 hover:bg-white transition-colors"
-                          aria-label={`Facebook profile of ${member.name}`}
+                          aria-label={`ប្រវត្តិរូប Facebook របស់ ${member.name}`}
                           title="Facebook"
                         >
                           <svg
@@ -357,10 +357,10 @@ export default function AboutUsPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 opacity-0 translate-y-8 delay-100">
-              Meet Our Expert
+              ស្គាល់អ្នកជំនាញរបស់យើង
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto opacity-0 translate-y-8 delay-200">
-              All documents and videos are carefully prepared by our experienced legal professional
+              ឯកសារ និងវីដេអូទាំងអស់ត្រូវបានរៀបចំយ៉ាងម៉ត់ចត់ដោយអ្នកជំនាញច្បាប់ដែលមានបទពិសោធន៍របស់យើង
             </p>
             <div className="w-24 h-1 bg-(--brown) mx-auto mt-6 opacity-0 translate-y-8 delay-300"></div>
           </div>
@@ -391,41 +391,41 @@ export default function AboutUsPage() {
                 <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
                   Men Vuth
                 </h2>
-                <p className="text-xl text-[var(--brown-strong)] font-semibold mb-4">
-                  Legal Expert
+                <p className="text-xl text-(--brown-strong) font-semibold mb-4">
+                  អ្នកជំនាញច្បាប់
                 </p>
                 <p className="text-gray-600">
-                  All documents and videos on this platform are prepared by our expert legal professional
+                  ឯកសារ និងវីដេអូទាំងអស់លើវេទិកានេះត្រូវបានរៀបចំដោយអ្នកជំនាញច្បាប់របស់យើង
                 </p>
               </div>
 
               {/* Specializations */}
               <div className="bg-(--brown-soft) rounded-xl p-6 border border-[rgb(var(--brown-rgb)/0.25)] opacity-0 translate-x-8 delay-400 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Specializations</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">ជំនាញឯកទេស</h3>
                 <ul className="space-y-2 text-gray-700">
                   <li className="flex items-start opacity-0 translate-y-4 delay-500 hover:translate-x-2 transition-all duration-300">
-                    <span className="text-[var(--brown-strong)] mr-2">•</span>
-                    <span>Land Law</span>
+                    <span className="text-(--brown-strong) mr-2">•</span>
+                    <span>ច្បាប់ដីធ្លី</span>
                   </li>
                   <li className="flex items-start opacity-0 translate-y-4 delay-600 hover:translate-x-2 transition-all duration-300">
-                    <span className="text-[var(--brown-strong)] mr-2">•</span>
-                    <span>Labor Law</span>
+                    <span className="text-(--brown-strong) mr-2">•</span>
+                    <span>ច្បាប់ការងារ</span>
                   </li>
                   <li className="flex items-start opacity-0 translate-y-4 delay-700 hover:translate-x-2 transition-all duration-300">
-                    <span className="text-[var(--brown-strong)] mr-2">•</span>
-                    <span>Corporate Law</span>
+                    <span className="text-(--brown-strong) mr-2">•</span>
+                    <span>ច្បាប់សាជីវកម្ម</span>
                   </li>
                   <li className="flex items-start opacity-0 translate-y-4 delay-800 hover:translate-x-2 transition-all duration-300">
-                    <span className="text-[var(--brown-strong)] mr-2">•</span>
-                    <span>Investment Protection Law</span>
+                    <span className="text-(--brown-strong) mr-2">•</span>
+                    <span>ច្បាប់ការពារវិនិយោគ</span>
                   </li>
                   <li className="flex items-start opacity-0 translate-y-4 delay-900 hover:translate-x-2 transition-all duration-300">
-                    <span className="text-[var(--brown-strong)] mr-2">•</span>
-                    <span>Court and Out-of-Court Litigation</span>
+                    <span className="text-(--brown-strong) mr-2">•</span>
+                    <span>ដោះស្រាយវិវាទក្នុង និងក្រៅតុលាការ</span>
                   </li>
                   <li className="flex items-start opacity-0 translate-y-4 delay-1000 hover:translate-x-2 transition-all duration-300">
-                    <span className="text-[var(--brown-strong)] mr-2">•</span>
-                    <span>Contract Preparation</span>
+                    <span className="text-(--brown-strong) mr-2">•</span>
+                    <span>ការរៀបចំកិច្ចសន្យា</span>
                   </li>
                 </ul>
               </div>
@@ -436,42 +436,42 @@ export default function AboutUsPage() {
           <div className="mt-16 grid md:grid-cols-2 gap-8">
             {/* Personal Details */}
             <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200 opacity-0 translate-y-8 delay-100 hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Personal Information</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">ព័ត៌មានផ្ទាល់ខ្លួន</h3>
               <div className="space-y-4 text-gray-700">
                 <div className="opacity-0 translate-y-4 delay-200">
-                  <span className="font-semibold text-gray-900">Full Name:</span>{" "}
+                  <span className="font-semibold text-gray-900">ឈ្មោះពេញ:</span>{" "}
                   <span>Men Vuth</span>
                 </div>
                 <div className="opacity-0 translate-y-4 delay-300">
-                  <span className="font-semibold text-gray-900">Gender:</span> Male
+                  <span className="font-semibold text-gray-900">ភេទ:</span> ប្រុស
                 </div>
                 <div className="opacity-0 translate-y-4 delay-400">
-                  <span className="font-semibold text-gray-900">Nationality:</span> Cambodian
+                  <span className="font-semibold text-gray-900">សញ្ជាតិ:</span> ខ្មែរ
                 </div>
                 <div className="opacity-0 translate-y-4 delay-500">
-                  <span className="font-semibold text-gray-900">Date of Birth:</span> May 5, 1984
+                  <span className="font-semibold text-gray-900">ថ្ងៃខែឆ្នាំកំណើត:</span> 5 ឧសភា 1984
                 </div>
                 <div className="opacity-0 translate-y-4 delay-700">
-                  <span className="font-semibold text-gray-900">Place of Birth:</span>{" "}
-                  <span>Dak Van Village, Oudom Soriya Commune, Tram Kak District, Takeo Province</span>
+                  <span className="font-semibold text-gray-900">ទីកន្លែងកំណើត:</span>{" "}
+                  <span>ភូមិតាកវ៉ាន់ ឃុំឧត្តមសុរិយា ស្រុកត្រាំកក់ ខេត្តតាកែវ</span>
                 </div>
               </div>
             </div>
 
             {/* Education */}
             <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200 opacity-0 translate-y-8 delay-200 hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Education</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">ការអប់រំ</h3>
               <div className="space-y-4 text-gray-700">
                 <div className="opacity-0 translate-y-4 delay-300">
                   <p className="font-semibold text-gray-900 mb-1">2006-2010</p>
                   <p className="text-sm text-gray-600">
-                    Bachelor of Law (French Specialization), Royal University of Law and Economics
+                    បរិញ្ញាបត្រនីតិសាស្ត្រ (ឯកទេសភាសាបារាំង), សាកលវិទ្យាល័យភូមិន្ទនីតិសាស្ត្រ និងវិទ្យាសាស្ត្រសេដ្ឋកិច្ច
                   </p>
                 </div>
                 <div className="opacity-0 translate-y-4 delay-500">
                   <p className="font-semibold text-gray-900 mb-1">2010-2013</p>
                   <p className="text-sm text-gray-600">
-                    Master&apos;s Degree in International and Comparative Law, Lyon II University & Royal University of Law and Economics
+                    បរិញ្ញាបត្រជាន់ខ្ពស់ផ្នែកច្បាប់អន្តរជាតិ និងប្រៀបធៀប, សាកលវិទ្យាល័យ Lyon II និង សាកលវិទ្យាល័យភូមិន្ទនីតិសាស្ត្រ និងវិទ្យាសាស្ត្រសេដ្ឋកិច្ច
                   </p>
                 </div>
               </div>
@@ -480,27 +480,27 @@ export default function AboutUsPage() {
 
           {/* Professional Experience */}
           <div className="mt-8 bg-white rounded-xl shadow-lg p-8 border border-gray-200 opacity-0 translate-y-8 delay-100 hover:shadow-2xl transition-all duration-300">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">Professional Experience</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-6">បទពិសោធន៍វិជ្ជាជីវៈ</h3>
             <div className="space-y-6">
-              <div className="border-l-4 border-(--brown) pl-6 opacity-0 translate-x-8 delay-200 hover:border-[var(--brown-strong)] hover:translate-x-2 transition-all duration-300">
+              <div className="border-l-4 border-(--brown) pl-6 opacity-0 translate-x-8 delay-200 hover:border-(--brown-strong) hover:translate-x-2 transition-all duration-300">
                 <p className="font-semibold text-gray-900">2022-2023</p>
-                <p className="text-gray-600">Practicing Lawyer at CPH LAW GROUP, Kingdom of Cambodia</p>
+                <p className="text-gray-600">មេធាវីអនុវត្តនៅ CPH LAW GROUP, ព្រះរាជាណាចក្រកម្ពុជា</p>
               </div>
-              <div className="border-l-4 border-(--brown) pl-6 opacity-0 translate-x-8 delay-300 hover:border-[var(--brown-strong)] hover:translate-x-2 transition-all duration-300">
+              <div className="border-l-4 border-(--brown) pl-6 opacity-0 translate-x-8 delay-300 hover:border-(--brown-strong) hover:translate-x-2 transition-all duration-300">
                 <p className="font-semibold text-gray-900">2012-2021</p>
-                <p className="text-gray-600">Legal Team at His Excellency Hun Manet&apos;s Office, Kampong Speu Province</p>
+                <p className="text-gray-600">ក្រុមការងារផ្នែកច្បាប់នៅខុទ្ទកាល័យឯកឧត្តម ហ៊ុន ម៉ាណែត ខេត្តកំពង់ស្ពឺ</p>
               </div>
-              <div className="border-l-4 border-(--brown) pl-6 opacity-0 translate-x-8 delay-400 hover:border-[var(--brown-strong)] hover:translate-x-2 transition-all duration-300">
+              <div className="border-l-4 border-(--brown) pl-6 opacity-0 translate-x-8 delay-400 hover:border-(--brown-strong) hover:translate-x-2 transition-all duration-300">
                 <p className="font-semibold text-gray-900">2010 - Present</p>
-                <p className="text-gray-600">Part-time Lecturer at Royal University of Law and Economics</p>
+                <p className="text-gray-600">គ្រូបង្រៀនក្រៅម៉ោងនៅសាកលវិទ្យាល័យភូមិន្ទនីតិសាស្ត្រ និងវិទ្យាសាស្ត្រសេដ្ឋកិច្ច</p>
               </div>
-              <div className="border-l-4 border-(--brown) pl-6 opacity-0 translate-x-8 delay-500 hover:border-[var(--brown-strong)] hover:translate-x-2 transition-all duration-300">
+              <div className="border-l-4 border-(--brown) pl-6 opacity-0 translate-x-8 delay-500 hover:border-(--brown-strong) hover:translate-x-2 transition-all duration-300">
                 <p className="font-semibold text-gray-900">2012-2015</p>
-                <p className="text-gray-600">Head of Legal Affairs at CAMLIFE Insurance Company</p>
+                <p className="text-gray-600">ប្រធានផ្នែកកិច្ចការច្បាប់នៅក្រុមហ៊ុនធានារ៉ាប់រង CAMLIFE</p>
               </div>
-              <div className="border-l-4 border-(--brown) pl-6 opacity-0 translate-x-8 delay-700 hover:border-[var(--brown-strong)] hover:translate-x-2 transition-all duration-300">
+              <div className="border-l-4 border-(--brown) pl-6 opacity-0 translate-x-8 delay-700 hover:border-(--brown-strong) hover:translate-x-2 transition-all duration-300">
                 <p className="font-semibold text-gray-900">2010-2012</p>
-                <p className="text-gray-600">Legal Assistant at the Prosecutor&apos;s Office of the Phnom Penh Municipal Court</p>
+                <p className="text-gray-600">ជំនួយការផ្នែកច្បាប់នៅអយ្យការអមសាលាដំបូងរាជធានីភ្នំពេញ</p>
               </div>
             </div>
           </div>
@@ -509,43 +509,43 @@ export default function AboutUsPage() {
           <div className="mt-8 grid md:grid-cols-2 gap-8">
             {/* Languages */}
             <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200 opacity-0 translate-y-8 delay-100 hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Languages</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">ភាសា</h3>
               <div className="space-y-3">
                 <div className="flex items-center opacity-0 translate-x-8 delay-200 hover:translate-x-2 transition-all duration-300">
                   <div className="w-3 h-3 bg-(--brown) rounded-full mr-3"></div>
-                  <span className="text-gray-700">Khmer - Native</span>
+                  <span className="text-gray-700">ខ្មែរ - ភាសាកំណើត</span>
                 </div>
                 <div className="flex items-center opacity-0 translate-x-8 delay-300 hover:translate-x-2 transition-all duration-300">
                   <div className="w-3 h-3 bg-(--brown) rounded-full mr-3"></div>
-                  <span className="text-gray-700">English</span>
+                  <span className="text-gray-700">អង់គ្លេស</span>
                 </div>
                 <div className="flex items-center opacity-0 translate-x-8 delay-400 hover:translate-x-2 transition-all duration-300">
                   <div className="w-3 h-3 bg-(--brown) rounded-full mr-3"></div>
-                  <span className="text-gray-700">French</span>
+                  <span className="text-gray-700">បារាំង</span>
                 </div>
               </div>
             </div>
 
             {/* Contact Information */}
             <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200 opacity-0 translate-y-8 delay-200 hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Contact Information</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">ព័ត៌មានទំនាក់ទំនង</h3>
               <div className="space-y-4 text-gray-700">
                 <div className="opacity-0 translate-y-4 delay-300">
-                  <span className="font-semibold text-gray-900">Phone:</span>{" "}
-                  <a href="tel:012227202" className="text-[var(--brown-strong)] hover:text-[var(--brown)] transition-colors">
+                  <span className="font-semibold text-gray-900">ទូរស័ព្ទ:</span>{" "}
+                  <a href="tel:012227202" className="text-(--brown-strong) hover:text-(--brown) transition-colors">
                     012 227 202
                   </a>
                 </div>
                 <div className="opacity-0 translate-y-4 delay-400">
-                  <span className="font-semibold text-gray-900">Email:</span>{" "}
-                  <a href="mailto:vuthmen5@gmail.com" className="text-[var(--brown-strong)] hover:text-[var(--brown)] transition-colors">
+                  <span className="font-semibold text-gray-900">អ៊ីមែល:</span>{" "}
+                  <a href="mailto:vuthmen5@gmail.com" className="text-(--brown-strong) hover:text-(--brown) transition-colors">
                     vuthmen5@gmail.com
                   </a>
                 </div>
                 <div className="opacity-0 translate-y-4 delay-500">
-                  <span className="font-semibold text-gray-900">Address:</span>
+                  <span className="font-semibold text-gray-900">អាសយដ្ឋាន:</span>
                   <p className="mt-1 text-gray-600">
-                    House No. 24Q, Street 36, Phnom Penh Thmei Village, Prek Anchanh Commune, Mukh Kampul District, Kandal Province
+                    ផ្ទះលេខ 24Q ផ្លូវលេខ 36 ភូមិភ្នំពេញថ្មី ឃុំព្រែកអញ្ចាញ ស្រុកមុខកំពូល ខេត្តកណ្ដាល
                   </p>
                 </div>
               </div>

@@ -52,7 +52,7 @@ export class ApiClient {
         };
       } catch (error) {
         console.error('Failed to get CSRF token:', error);
-        throw new ApiError('CSRF token fetch failed', 0, 'CSRF_FETCH_ERROR');
+        throw new ApiError('បរាជ័យក្នុងការទាញយក CSRF token', 0, 'CSRF_FETCH_ERROR');
       }
     }
 
@@ -68,7 +68,7 @@ export class ApiClient {
         if (data.code === 'CSRF_VALIDATION_FAILED') {
           clearCsrfToken();
           throw new ApiError(
-            data.error || 'CSRF validation failed',
+            data.error || 'ការផ្ទៀងផ្ទាត់ CSRF បរាជ័យ',
             403,
             'CSRF_VALIDATION_FAILED',
             data
@@ -81,7 +81,7 @@ export class ApiClient {
         const data = await response.json().catch(() => ({}));
         const retryAfter = response.headers.get('Retry-After');
         throw new ApiError(
-          data.error || 'Rate limit exceeded',
+          data.error || 'លើសកម្រិតសំណើដែលអនុញ្ញាត',
           429,
           'RATE_LIMIT_EXCEEDED',
           { retryAfter, ...data }
@@ -92,7 +92,7 @@ export class ApiClient {
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
         throw new ApiError(
-          data.error || `Request failed with status ${response.status}`,
+          data.error || `សំណើបរាជ័យ ជាមួយស្ថានភាព ${response.status}`,
           response.status,
           data.code,
           data
@@ -111,7 +111,7 @@ export class ApiClient {
         throw error;
       }
       throw new ApiError(
-        'Network error',
+        'កំហុសបណ្តាញ',
         0,
         'NETWORK_ERROR',
         error

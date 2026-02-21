@@ -2,19 +2,19 @@
 
 export default function TrustedBySection() {
   const partners = [
-    { name: "Law School", abbrev: "LAW" },
-    { name: "Bar Association", abbrev: "BAR" },
-    { name: "Judicial Institute", abbrev: "JUD" },
-    { name: "Ministry", abbrev: "MIN" },
-    { name: "Legal Firm", abbrev: "LEG" },
-    { name: "Education", abbrev: "EDU" },
+    { name: "សាលាច្បាប់", abbrev: "LAW" },
+    { name: "គណៈមេធាវី", abbrev: "BAR" },
+    { name: "វិទ្យាស្ថានតុលាការ", abbrev: "JUD" },
+    { name: "ក្រសួង", abbrev: "MIN" },
+    { name: "ក្រុមហ៊ុនច្បាប់", abbrev: "LEG" },
+    { name: "អប់រំ", abbrev: "EDU" },
   ];
 
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white border-t border-gray-200">
       <div className="max-w-7xl mx-auto">
         <p className="text-center text-gray-600 mb-12 text-lg font-medium scroll-animate opacity-0 translate-y-4">
-          Trusted by legal professionals and institutions
+          ទទួលការជឿទុកចិត្តពីអ្នកជំនាញច្បាប់ និងស្ថាប័ននានា
         </p>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center">
           {partners.map((partner, index) => (

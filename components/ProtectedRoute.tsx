@@ -16,7 +16,7 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
   if (authLoading) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center p-8">
-        <LoadingState label="Loading..." />
+        <LoadingState label="កំពុងផ្ទុក..." />
       </div>
     );
   }

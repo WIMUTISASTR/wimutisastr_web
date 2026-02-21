@@ -47,10 +47,10 @@ export default function Nav() {
               />
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-lg sm:text-xl font-bold text-[var(--ink)] tracking-tight group-hover:text-(--primary) transition-colors">
+              <h1 className="text-lg sm:text-xl font-bold text-(--ink) tracking-tight group-hover:text-(--primary) transition-colors">
                 WIMUTISASTR
               </h1>
-              <p className="text-xs text-(--gray-700) font-medium">Law Office</p>
+              <p className="text-xs text-(--gray-700) font-medium">ការិយាល័យច្បាប់</p>
             </div>
           </Link>
 
@@ -64,7 +64,7 @@ export default function Nav() {
                   : "text-(--gray-700) hover:text-(--primary) hover:bg-(--accent)/20"
               }`}
             >
-              Home
+              ទំព័រដើម
             </Link>
             <Link
               href="/law_video"
@@ -74,7 +74,7 @@ export default function Nav() {
                   : "text-(--gray-700) hover:text-(--primary) hover:bg-(--accent)/20"
               }`}
             >
-              Videos
+              វីដេអូ
             </Link>
             <Link
               href="/law_documents"
@@ -84,7 +84,7 @@ export default function Nav() {
                   : "text-(--gray-700) hover:text-(--primary) hover:bg-(--accent)/20"
               }`}
             >
-              Documents
+              ឯកសារ
             </Link>
             <Link
               href="/about_us"
@@ -94,7 +94,7 @@ export default function Nav() {
                   : "text-(--gray-700) hover:text-(--primary) hover:bg-(--accent)/20"
               }`}
             >
-              About Us
+              អំពីយើង
             </Link>
           </div>
 
@@ -111,7 +111,7 @@ export default function Nav() {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
-                    Profile
+                    ប្រវត្តិរូប
                   </Button>
                 ) : (
                   <>
@@ -120,14 +120,14 @@ export default function Nav() {
                       variant="ghost"
                       size="sm"
                     >
-                      Login
+                      ចូលគណនី
                     </Button>
                     <Button
                       onClick={() => router.push("/auth/register")}
                       variant="primary"
                       size="sm"
                     >
-                      Get Started
+                      ចាប់ផ្តើម
                     </Button>
                   </>
                 )}
@@ -140,10 +140,10 @@ export default function Nav() {
             type="button"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="md:hidden p-2 rounded-lg hover:bg-white/50 transition-all duration-300 active:scale-95"
-            aria-label="Toggle menu"
+            aria-label="បើក/បិទម៉ឺនុយ"
           >
             <svg
-              className="w-6 h-6 text-[var(--ink)] transition-transform duration-300"
+              className="w-6 h-6 text-(--ink) transition-transform duration-300"
               style={{ transform: isMenuOpen ? 'rotate(90deg)' : 'rotate(0deg)' }}
               fill="none"
               stroke="currentColor"
@@ -184,7 +184,7 @@ export default function Nav() {
                   : "text-(--gray-700) hover:bg-(--accent)/20 hover:text-(--primary)"
               }`}
             >
-              Home
+              ទំព័រដើម
             </Link>
             <Link
               href="/law_video"
@@ -195,7 +195,7 @@ export default function Nav() {
                   : "text-(--gray-700) hover:bg-(--accent)/20 hover:text-(--primary)"
               }`}
             >
-              Videos
+              វីដេអូ
             </Link>
             <Link
               href="/law_documents"
@@ -206,7 +206,7 @@ export default function Nav() {
                   : "text-(--gray-700) hover:bg-(--accent)/20 hover:text-(--primary)"
               }`}
             >
-              Documents
+              ឯកសារ
             </Link>
             <Link
               href="/about_us"
@@ -217,7 +217,7 @@ export default function Nav() {
                   : "text-(--gray-700) hover:bg-(--accent)/20 hover:text-(--primary)"
               }`}
             >
-              About Us
+              អំពីយើង
             </Link>
             <div className="pt-3 border-t border-white/20 mt-2 space-y-2">
               {!loading && (
@@ -235,7 +235,7 @@ export default function Nav() {
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
-                      Profile
+                      ប្រវត្តិរូប
                     </Button>
                   ) : (
                     <>
@@ -248,7 +248,7 @@ export default function Nav() {
                         fullWidth
                         size="md"
                       >
-                        Login
+                        ចូលគណនី
                       </Button>
                       <Button
                         onClick={() => {
@@ -259,7 +259,7 @@ export default function Nav() {
                         fullWidth
                         size="md"
                       >
-                        Get Started
+                        ចាប់ផ្តើម
                       </Button>
                     </>
                   )}

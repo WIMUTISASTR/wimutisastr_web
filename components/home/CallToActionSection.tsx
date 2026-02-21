@@ -34,20 +34,20 @@ export default function CallToActionSection() {
         <div className="inline-block mb-8 animate-bounce-in">
           <div className="flex items-center gap-2 px-5 py-2.5 bg-white/10 backdrop-blur-sm rounded-full border-2 border-(--accent) shadow-xl">
             <div className="w-2 h-2 bg-(--accent) rounded-full animate-pulse" />
-            <span className="text-sm font-bold text-white uppercase tracking-wide">Start Your Journey</span>
+            <span className="text-sm font-bold text-white uppercase tracking-wide">ចាប់ផ្តើមដំណើររបស់អ្នក</span>
           </div>
         </div>
 
         {/* Main Heading */}
         <h2 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-8 leading-tight">
-          Ready to Elevate Your{" "}
-          <span className="text-(--accent)">Legal Expertise?</span>
+          ត្រៀមខ្លួនរួចរាល់ដើម្បីបង្កើន{" "}
+          <span className="text-(--accent)">ជំនាញច្បាប់របស់អ្នកហើយឬនៅ?</span>
         </h2>
 
         {/* Subheading */}
         <p className="text-xl lg:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
-          Join thousands of legal professionals who have transformed their careers with our comprehensive 
-          educational platform. Start your journey to legal excellence today.
+          ចូលរួមជាមួយអ្នកជំនាញច្បាប់រាប់ពាន់នាក់ដែលបានអភិវឌ្ឍអាជីពរបស់ពួកគេតាមរយៈវេទិកាអប់រំដ៏គ្រប់ជ្រុងជ្រោយរបស់យើង។
+          ចាប់ផ្តើមដំណើរទៅកាន់ឧត្តមភាពផ្នែកច្បាប់របស់អ្នកថ្ងៃនេះ។
         </p>
 
         {/* Benefits List */}
@@ -59,8 +59,8 @@ export default function CallToActionSection() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               ),
-              title: "Expert-Led Courses",
-              desc: "Learn from experienced legal professionals"
+              title: "វគ្គដឹកនាំដោយអ្នកជំនាញ",
+              desc: "សិក្សាពីអ្នកជំនាញច្បាប់មានបទពិសោធន៍"
             },
             {
               icon: (
@@ -68,8 +68,8 @@ export default function CallToActionSection() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
               ),
-              title: "Comprehensive Library",
-              desc: "Access extensive legal documents"
+              title: "បណ្ណាល័យគ្រប់ជ្រុងជ្រោយ",
+              desc: "ចូលប្រើឯកសារច្បាប់ជាច្រើន"
             },
             {
               icon: (
@@ -77,8 +77,8 @@ export default function CallToActionSection() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               ),
-              title: "Lifetime Access",
-              desc: "Learn at your own pace, anytime"
+              title: "ចូលប្រើរយៈពេលវែង",
+              desc: "រៀនតាមល្បឿនរបស់អ្នក គ្រប់ពេល"
             }
           ].map((benefit, index) => (
             <div key={index} className="flex flex-col items-center text-center gap-4 p-6 rounded-2xl bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 group border border-white/10">
@@ -102,7 +102,7 @@ export default function CallToActionSection() {
             className="group/btn shadow-2xl"
           >
             <span className="flex items-center gap-2">
-              Start Learning Now
+              ចាប់ផ្តើមសិក្សាឥឡូវនេះ
               <svg className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
@@ -115,7 +115,7 @@ export default function CallToActionSection() {
             size="lg"
             className="bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20"
           >
-            View Pricing Plans
+            មើលគម្រោងតម្លៃ
           </Button>
         </div>
 
@@ -129,7 +129,7 @@ export default function CallToActionSection() {
                     <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                 ),
-                text: "No credit card required"
+                text: "មិនចាំបាច់ប្រើកាតឥណទាន"
               },
               {
                 icon: (
@@ -137,7 +137,7 @@ export default function CallToActionSection() {
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                   </svg>
                 ),
-                text: "7-day money-back guarantee"
+                text: "ធានាសងប្រាក់វិញក្នុង 7 ថ្ងៃ"
               },
               {
                 icon: (
@@ -146,7 +146,7 @@ export default function CallToActionSection() {
                     <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
                   </svg>
                 ),
-                text: "24/7 support available"
+                text: "មានក្រុមគាំទ្រ 24/7"
               }
             ].map((indicator, index) => (
               <div key={index} className="flex items-center gap-2 font-medium">

@@ -53,7 +53,7 @@ export default function ProfilePage() {
         });
       } catch (e) {
         console.error("Failed to load profile:", e);
-        toast.error("Failed to load profile data");
+        toast.error("ផ្ទុកទិន្នន័យប្រវត្តិរូបមិនជោគជ័យ");
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -72,10 +72,10 @@ export default function ProfilePage() {
         data: { full_name: edit.fullName, phone: edit.phone },
       });
       if (updateError) {
-        toast.error(updateError.message || "Failed to update profile");
+        toast.error(updateError.message || "ធ្វើបច្ចុប្បន្នភាពប្រវត្តិរូបមិនជោគជ័យ");
         return;
       }
-      toast.success("Profile updated successfully!");
+      toast.success("បានធ្វើបច្ចុប្បន្នភាពប្រវត្តិរូបដោយជោគជ័យ!");
       setIsEditing(false);
       try {
         const data = await fetchProfileMe();
@@ -85,7 +85,7 @@ export default function ProfilePage() {
       }
     } catch (e) {
       console.error("Error updating profile:", e);
-      toast.error("An unexpected error occurred");
+      toast.error("មានកំហុសមិនបានរំពឹងទុក");
     } finally {
       setIsLoading(false);
     }
@@ -93,17 +93,17 @@ export default function ProfilePage() {
 
   const membershipStatus = profile?.membership.status ?? "none";
   const statusBadge = useMemo(() => {
-    if (membershipStatus === "approved") return { label: "Approved", cls: "bg-emerald-50 text-emerald-700 border-emerald-200" };
-    if (membershipStatus === "pending") return { label: "Pending review", cls: "bg-amber-50 text-amber-800 border-amber-200" };
-    if (membershipStatus === "denied") return { label: "Denied", cls: "bg-rose-50 text-rose-700 border-rose-200" };
-    return { label: "No membership", cls: "bg-slate-50 text-slate-700 border-slate-200" };
+    if (membershipStatus === "approved") return { label: "បានអនុម័ត", cls: "bg-emerald-50 text-emerald-700 border-emerald-200" };
+    if (membershipStatus === "pending") return { label: "កំពុងរង់ចាំពិនិត្យ", cls: "bg-amber-50 text-amber-800 border-amber-200" };
+    if (membershipStatus === "denied") return { label: "បានបដិសេធ", cls: "bg-rose-50 text-rose-700 border-rose-200" };
+    return { label: "មិនទាន់មានសមាជិកភាព", cls: "bg-slate-50 text-slate-700 border-slate-200" };
   }, [membershipStatus]);
 
   const displayName = useMemo(() => {
     const p = profile?.profile?.full_name ?? "";
     const meta = user && typeof user.user_metadata?.full_name === "string" ? user.user_metadata.full_name : "";
     const email = user?.email ?? profile?.user.email ?? "";
-    return (meta || p || email.split("@")[0] || "User").trim();
+    return (meta || p || email.split("@")[0] || "អ្នកប្រើប្រាស់").trim();
   }, [profile, user]);
 
   const displayEmail = user?.email ?? profile?.user.email ?? "";
@@ -117,7 +117,7 @@ export default function ProfilePage() {
     return (
       <PageContainer>
         <div className="min-h-screen flex items-center justify-center">
-          <LoadingState label="Loading..." />
+          <LoadingState label="កំពុងផ្ទុក..." />
         </div>
       </PageContainer>
     );
@@ -128,11 +128,11 @@ export default function ProfilePage() {
       <PageContainer>
         <div className="min-h-screen flex items-center justify-center p-6">
           <div className="max-w-md w-full rounded-2xl border border-(--border) bg-(--surface-strong) shadow-(--shadow-elev-1) p-6 text-center">
-            <h1 className="text-2xl font-semibold text-gray-900">Sign in to view your profile</h1>
-            <p className="mt-2 text-sm text-gray-600">Your membership status and payment history are linked to your account.</p>
+            <h1 className="text-2xl font-semibold text-gray-900">សូមចូលគណនីដើម្បីមើលប្រវត្តិរូប</h1>
+            <p className="mt-2 text-sm text-gray-600">ស្ថានភាពសមាជិកភាព និងប្រវត្តិបង់ប្រាក់របស់អ្នកត្រូវបានភ្ជាប់ជាមួយគណនីនេះ។</p>
             <div className="mt-5">
               <Button variant="primary" onClick={() => router.push(`/auth/login?redirect=${encodeURIComponent("/profile_page")}`)}>
-                Login
+                ចូលគណនី
               </Button>
             </div>
           </div>
@@ -145,7 +145,7 @@ export default function ProfilePage() {
     return (
       <PageContainer>
         <div className="min-h-screen flex items-center justify-center">
-          <LoadingState label="Loading profile..." />
+          <LoadingState label="កំពុងផ្ទុកប្រវត្តិរូប..." />
         </div>
       </PageContainer>
     );
@@ -161,9 +161,9 @@ export default function ProfilePage() {
         <div className="absolute inset-0 bg-(--brown-soft) opacity-20 z-10" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
           <div className="text-center">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-3">My Profile</h1>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-3">ប្រវត្តិរូបរបស់ខ្ញុំ</h1>
             <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto">
-              Account details, membership status, and payment history.
+              ព័ត៌មានគណនី ស្ថានភាពសមាជិកភាព និងប្រវត្តិបង់ប្រាក់។
             </p>
           </div>
         </div>
@@ -190,29 +190,29 @@ export default function ProfilePage() {
 
                   <div className="mt-5 text-sm text-gray-600 space-y-2">
                     <div className="flex items-center justify-between">
-                      <span>Member since</span>
+                      <span>សមាជិកតាំងពី</span>
                       <span className="font-semibold text-gray-900">{joinDate}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span>Profile created</span>
+                      <span>បង្កើតប្រវត្តិរូប</span>
                       <span className="font-semibold text-gray-900">
                         {profile?.profile?.created_at ? formatDateTime(profile.profile.created_at) : "—"}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span>Profile updated</span>
+                      <span>ធ្វើបច្ចុប្បន្នភាពប្រវត្តិរូប</span>
                       <span className="font-semibold text-gray-900">
                         {profile?.profile?.updated_at ? formatDateTime(profile.profile.updated_at) : "—"}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span>Membership starts</span>
+                      <span>សមាជិកភាពចាប់ផ្តើម</span>
                       <span className="font-semibold text-gray-900">
                         {profile?.membership.membershipStartsAt ? formatDateTime(profile.membership.membershipStartsAt) : "—"}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span>Membership ends</span>
+                      <span>សមាជិកភាពបញ្ចប់</span>
                       <span className="font-semibold text-gray-900">
                         {profile?.membership.membershipEndsAt ? formatDateTime(profile.membership.membershipEndsAt) : "—"}
                       </span>
@@ -222,7 +222,7 @@ export default function ProfilePage() {
                   {membershipStatus !== "approved" ? (
                     <div className="mt-6">
                       <Button variant="primary" fullWidth onClick={() => router.push("/pricing_page")}>
-                        Upgrade membership
+                        ដំឡើងសមាជិកភាព
                       </Button>
                     </div>
                   ) : null}
@@ -232,39 +232,39 @@ export default function ProfilePage() {
 
             <div className="lg:col-span-2 space-y-8">
               <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Membership & Payment</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">សមាជិកភាព និងការបង់ប្រាក់</h3>
 
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
-                    <p className="text-sm text-gray-600">Membership status</p>
+                    <p className="text-sm text-gray-600">ស្ថានភាពសមាជិកភាព</p>
                     <p className="mt-1 text-lg font-semibold text-gray-900">{statusBadge.label}</p>
                     {profile?.profile?.membership_approved_at ? (
                       <p className="mt-2 text-sm text-gray-700">
-                        Approved at: {formatDateTime(profile.profile.membership_approved_at)}
+                        បានអនុម័តនៅ: {formatDateTime(profile.profile.membership_approved_at)}
                       </p>
                     ) : null}
                     {profile?.profile?.membership_denied_at ? (
                       <p className="mt-2 text-sm text-gray-700">
-                        Denied at: {formatDateTime(profile.profile.membership_denied_at)}
+                        បានបដិសេធនៅ: {formatDateTime(profile.profile.membership_denied_at)}
                       </p>
                     ) : null}
                     {profile?.profile?.admin_notified !== null && profile?.profile?.admin_notified !== undefined ? (
                       <p className="mt-2 text-sm text-gray-700">
-                        Admin notified: {profile.profile.admin_notified ? "Yes" : "No"}
+                        បានជូនដំណឹងអ្នកគ្រប់គ្រង: {profile.profile.admin_notified ? "បាទ/ចាស" : "ទេ"}
                       </p>
                     ) : null}
                     {profile?.membership.notes ? (
-                      <p className="mt-2 text-sm text-gray-700">Note: {String(profile.membership.notes)}</p>
+                      <p className="mt-2 text-sm text-gray-700">កំណត់ចំណាំ: {String(profile.membership.notes)}</p>
                     ) : null}
                   </div>
                   <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
-                    <p className="text-sm text-gray-600">Membership starts</p>
+                    <p className="text-sm text-gray-600">សមាជិកភាពចាប់ផ្តើម</p>
                     <p className="mt-1 text-lg font-semibold text-gray-900">
                       {profile?.membership.membershipStartsAt ? formatDateTime(profile.membership.membershipStartsAt) : "—"}
                     </p>
                   </div>
                   <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
-                    <p className="text-sm text-gray-600">Membership ends</p>
+                    <p className="text-sm text-gray-600">សមាជិកភាពបញ្ចប់</p>
                     <p className="mt-1 text-lg font-semibold text-gray-900">
                       {profile?.membership.membershipEndsAt ? formatDateTime(profile.membership.membershipEndsAt) : "—"}
                     </p>
@@ -272,27 +272,27 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="mt-6 rounded-xl border border-gray-200 p-5">
-                  <p className="text-sm font-semibold text-gray-900">Latest proof of payment</p>
+                  <p className="text-sm font-semibold text-gray-900">ភស្តុតាងបង់ប្រាក់ចុងក្រោយ</p>
                   {profile?.latestProof ? (
                     <div className="mt-3 grid sm:grid-cols-2 gap-3 text-sm text-gray-700">
                       <div className="flex justify-between gap-3">
-                        <span className="text-gray-600">Status</span>
+                        <span className="text-gray-600">ស្ថានភាព</span>
                         <span className="font-semibold text-gray-900">{profile.latestProof.status ?? "—"}</span>
                       </div>
                       <div className="flex justify-between gap-3">
-                        <span className="text-gray-600">Reference</span>
+                        <span className="text-gray-600">លេខយោង</span>
                         <span className="font-semibold text-gray-900">{profile.latestProof.reference ?? "—"}</span>
                       </div>
                       <div className="flex justify-between gap-3">
-                        <span className="text-gray-600">Plan</span>
+                        <span className="text-gray-600">គម្រោង</span>
                         <span className="font-semibold text-gray-900">{profile.plan?.name ?? profile.latestProof.planId ?? "—"}</span>
                       </div>
                       <div className="flex justify-between gap-3">
-                        <span className="text-gray-600">Uploaded</span>
+                        <span className="text-gray-600">ថ្ងៃបានផ្ទុកឡើង</span>
                         <span className="font-semibold text-gray-900">{formatDateTime(profile.latestProof.uploadedAt)}</span>
                       </div>
                       <div className="flex justify-between gap-3 sm:col-span-2">
-                        <span className="text-gray-600">Proof</span>
+                        <span className="text-gray-600">ភស្តុតាង</span>
                         {profile.latestProof.proofUrl ? (
                           <a
                             href={profile.latestProof.proofUrl}
@@ -300,7 +300,7 @@ export default function ProfilePage() {
                             rel="noreferrer"
                             className="font-semibold text-(--brown) hover:underline"
                           >
-                            View uploaded image
+                            មើលរូបភាពដែលបានផ្ទុកឡើង
                           </a>
                         ) : (
                           <span className="font-semibold text-gray-900">—</span>
@@ -308,18 +308,18 @@ export default function ProfilePage() {
                       </div>
                     </div>
                   ) : (
-                    <p className="mt-2 text-sm text-gray-600">No proof uploaded yet.</p>
+                    <p className="mt-2 text-sm text-gray-600">មិនទាន់មានការផ្ទុកភស្តុតាងនៅឡើយ។</p>
                   )}
 
                   <div className="mt-4 flex flex-wrap gap-3">
                     <Button variant="outline" onClick={() => router.push("/pricing_page")}>
-                      View plans
+                      មើលគម្រោង
                     </Button>
                     <Button
                       variant="primary"
                       onClick={() => router.push(`/payment${profile?.plan?.id ? `?plan=${encodeURIComponent(profile.plan.id)}` : ""}`)}
                     >
-                      Go to payment
+                      ទៅកាន់ការទូទាត់
                     </Button>
                   </div>
                 </div>
@@ -327,18 +327,18 @@ export default function ProfilePage() {
 
               <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900">Personal Information</h3>
+                  <h3 className="text-2xl font-bold text-gray-900">ព័ត៌មានផ្ទាល់ខ្លួន</h3>
                   {!isEditing ? (
                     <Button onClick={() => setIsEditing(true)} variant="primary" className="px-4 py-2 text-base">
-                      Edit
+                      កែប្រែ
                     </Button>
                   ) : (
                     <div className="space-x-3">
                       <Button onClick={() => setIsEditing(false)} variant="outline" className="px-4 py-2 text-base">
-                        Cancel
+                        បោះបង់
                       </Button>
                       <Button onClick={handleSave} variant="primary" className="px-4 py-2 text-base" disabled={isLoading}>
-                        {isLoading ? "Saving..." : "Save"}
+                        {isLoading ? "កំពុងរក្សាទុក..." : "រក្សាទុក"}
                       </Button>
                     </div>
                   )}
@@ -346,7 +346,7 @@ export default function ProfilePage() {
 
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">ឈ្មោះពេញ</label>
                     {isEditing ? (
                       <input
                         type="text"
@@ -360,13 +360,13 @@ export default function ProfilePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">អាសយដ្ឋានអ៊ីមែល</label>
                     <p className="text-gray-900">{displayEmail}</p>
-                    <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+                    <p className="text-xs text-gray-500 mt-1">អ៊ីមែលមិនអាចកែប្រែបានទេ</p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">លេខទូរស័ព្ទ</label>
                     {isEditing ? (
                       <input
                         type="tel"
@@ -380,35 +380,35 @@ export default function ProfilePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Member Since</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">សមាជិកតាំងពី</label>
                     <p className="text-gray-900">{joinDate}</p>
                   </div>
                 </div>
               </div>
 
               <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Account Settings</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">ការកំណត់គណនី</h3>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center p-4 border-b border-gray-200">
                     <div>
-                      <p className="font-semibold text-gray-900">Sign Out</p>
-                      <p className="text-sm text-gray-600">Sign out of your account</p>
+                      <p className="font-semibold text-gray-900">ចេញពីគណនី</p>
+                      <p className="text-sm text-gray-600">ចេញពីគណនីរបស់អ្នក</p>
                     </div>
                     <Button
                       onClick={async () => {
                         await signOut();
-                        toast.success("Signed out successfully");
+                        toast.success("បានចេញពីគណនីដោយជោគជ័យ");
                       }}
                       variant="outline"
                       className="px-4 py-2 text-base"
                     >
-                      Sign Out
+                      ចេញពីគណនី
                     </Button>
                   </div>
                   <div className="flex justify-between items-center p-4 border-b border-gray-200">
                     <div>
-                      <p className="font-semibold text-gray-900">Email Notifications</p>
-                      <p className="text-sm text-gray-600">Receive updates via email</p>
+                      <p className="font-semibold text-gray-900">ការជូនដំណឹងតាមអ៊ីមែល</p>
+                      <p className="text-sm text-gray-600">ទទួលព័ត៌មានបច្ចុប្បន្នភាពតាមអ៊ីមែល</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input type="checkbox" className="sr-only peer" defaultChecked />
@@ -417,11 +417,11 @@ export default function ProfilePage() {
                   </div>
                   <div className="flex justify-between items-center p-4">
                     <div>
-                      <p className="font-semibold text-red-600">Delete Account</p>
-                      <p className="text-sm text-gray-600">Permanently delete your account</p>
+                      <p className="font-semibold text-red-600">លុបគណនី</p>
+                      <p className="text-sm text-gray-600">លុបគណនីរបស់អ្នកជាអចិន្ត្រៃយ៍</p>
                     </div>
                     <Button variant="outline" className="px-4 py-2 text-base border-red-300 text-red-600 hover:bg-red-50">
-                      Delete
+                      លុប
                     </Button>
                   </div>
                 </div>

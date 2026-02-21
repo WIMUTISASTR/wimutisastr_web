@@ -20,7 +20,7 @@ const DocxViewer = dynamic(() => import("@/components/DocxViewer"), {
     <div className="flex items-center justify-center h-[60vh]">
       <div className="text-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-3"></div>
-        <div className="text-sm text-gray-600">Loading viewer...</div>
+        <div className="text-sm text-gray-600">កំពុងផ្ទុកកម្មវិធីមើលឯកសារ...</div>
       </div>
     </div>
   ),
@@ -66,7 +66,7 @@ export default function ReadDocumentPage() {
         }
       } catch (e: unknown) {
         console.error(e);
-        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load document.");
+        if (!cancelled) setError(e instanceof Error ? e.message : "ផ្ទុកឯកសារមិនជោគជ័យ។");
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -115,7 +115,7 @@ export default function ReadDocumentPage() {
         }
       } catch (e) {
         console.error(e);
-        if (!cancelled) setError("Failed to open document.");
+        if (!cancelled) setError("បើកឯកសារមិនជោគជ័យ។");
       }
     };
     run();
@@ -139,37 +139,37 @@ export default function ReadDocumentPage() {
             <div className="mb-6 flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <Link href={`/law_documents/${categoryId}`} className="text-sm text-gray-600 hover:text-gray-900">
-                  ← Back to {category?.name ?? "Documents"}
+                  ← ត្រឡប់ទៅ {category?.name ?? "ឯកសារ"}
                 </Link>
-                <h1 className="mt-2 text-2xl sm:text-3xl font-semibold text-gray-900 truncate">{current?.title ?? "Read Document"}</h1>
+                <h1 className="mt-2 text-2xl sm:text-3xl font-semibold text-gray-900 truncate">{current?.title ?? "អានឯកសារ"}</h1>
                 <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600">
                   {current?.author ? <span>{current.author}</span> : null}
                   {typeof current?.year === "number" ? <span>{current.year}</span> : null}
-                  {currentIndex >= 0 ? <span>Document {currentIndex + 1} of {books.length}</span> : null}
+                  {currentIndex >= 0 ? <span>ឯកសារ {currentIndex + 1} នៃ {books.length}</span> : null}
                 </div>
               </div>
 
               <div className="shrink-0 flex items-center gap-2">
                 <Button onClick={() => prev && router.push(`/law_documents/${categoryId}/read/${prev.id}`)} variant="secondary" disabled={!prev}>
-                  Prev
+                  មុន
                 </Button>
                 <Button onClick={() => next && router.push(`/law_documents/${categoryId}/read/${next.id}`)} variant="primary" disabled={!next}>
-                  Next
+                  បន្ទាប់
                 </Button>
               </div>
             </div>
 
             {isLoading ? (
               <div className="py-16">
-                <LoadingState label="Loading document..." />
+                <LoadingState label="កំពុងផ្ទុកឯកសារ..." />
               </div>
             ) : error ? (
               <div className="text-center text-red-600 py-16">{error}</div>
             ) : !current ? (
-              <div className="text-center text-gray-600 py-16">Document not found.</div>
+              <div className="text-center text-gray-600 py-16">រកមិនឃើញឯកសារ។</div>
             ) : membershipLoading ? (
               <div className="py-16">
-                <LoadingState label="Checking membership..." />
+                <LoadingState label="កំពុងពិនិត្យសមាជិកភាព..." />
               </div>
             ) : !isFree && membershipStatus !== "approved" ? (
               <div className="grid lg:grid-cols-12 gap-6">
@@ -180,10 +180,10 @@ export default function ReadDocumentPage() {
                       <div className="absolute inset-0 bg-black/40" />
                       <div className="absolute inset-0 flex items-center justify-center p-6 text-center text-white">
                         <div>
-                          <div className="text-xl font-semibold mb-2">Membership required</div>
-                          <div className="text-sm text-white/85 mb-5">You can browse categories and covers, but reading documents is for members only.</div>
+                          <div className="text-xl font-semibold mb-2">ត្រូវការសមាជិកភាព</div>
+                          <div className="text-sm text-white/85 mb-5">អ្នកអាចរកមើលប្រភេទ និងគម្របបាន ប៉ុន្តែការអានឯកសារគឺសម្រាប់សមាជិកប៉ុណ្ណោះ។</div>
                           <Button onClick={() => router.push("/pricing_page")} variant="primary">
-                            Upgrade Membership
+                            ដំឡើងសមាជិកភាព
                           </Button>
                         </div>
                       </div>
@@ -196,9 +196,9 @@ export default function ReadDocumentPage() {
                 <div>
                   <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                     <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between gap-3">
-                      <div className="text-sm font-semibold text-gray-900 truncate">Reader</div>
+                      <div className="text-sm font-semibold text-gray-900 truncate">កម្មវិធីអាន</div>
                       <div className="flex items-center gap-3">
-                        <div className="text-xs text-gray-500">Protected view</div>
+                        <div className="text-xs text-gray-500">ទិដ្ឋភាពការពារ</div>
                         <Button
                           type="button"
                           variant="outline"
@@ -212,7 +212,7 @@ export default function ReadDocumentPage() {
                             if (w) w.opener = null;
                           }}
                         >
-                          View full page
+                          មើលទំព័រពេញ
                         </Button>
                       </div>
                     </div>
@@ -224,7 +224,7 @@ export default function ReadDocumentPage() {
                           <div className="w-full bg-white overflow-auto">
                             <div className="flex items-center justify-between gap-3 p-4 border-b border-gray-200">
                               <div className="min-w-0">
-                                <div className="text-sm font-semibold text-gray-900 truncate">Document Viewer</div>
+                                <div className="text-sm font-semibold text-gray-900 truncate">កម្មវិធីមើលឯកសារ</div>
                                 {viewFilename ? <div className="text-xs text-gray-500 truncate">{viewFilename}</div> : null}
                               </div>
                               <a
@@ -233,7 +233,7 @@ export default function ReadDocumentPage() {
                                 target="_blank"
                                 rel="noreferrer"
                               >
-                                Open / Download
+                                បើក / ទាញយក
                               </a>
                             </div>
                             {/* Client-side DOCX viewer - renders document directly in browser */}
@@ -251,8 +251,8 @@ export default function ReadDocumentPage() {
                         )
                       ) : (
                         <div className="p-6 text-center text-gray-700">
-                          <div className="font-semibold mb-2">Preparing secure reader…</div>
-                          <div className="text-sm text-gray-600">Please wait a moment.</div>
+                          <div className="font-semibold mb-2">កំពុងរៀបចំកម្មវិធីអានមានសុវត្ថិភាព…</div>
+                          <div className="text-sm text-gray-600">សូមរង់ចាំបន្តិច។</div>
                         </div>
                       )}
                     </div>

@@ -80,17 +80,17 @@ class ErrorBoundary extends Component<Props, State> {
             </div>
             
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Something went wrong
+              មានបញ្ហាបានកើតឡើង
             </h2>
             
             <p className="text-gray-600 mb-6">
-              We encountered an unexpected error. Please try refreshing the page or contact support if the problem persists.
+              មានកំហុសមិនបានរំពឹងទុក។ សូមព្យាយាមផ្ទុកទំព័រឡើងវិញ ឬទាក់ទងក្រុមគាំទ្រ ប្រសិនបើបញ្ហានេះនៅតែបន្ត។
             </p>
 
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <details className="mb-6 text-left">
                 <summary className="cursor-pointer text-sm font-semibold text-gray-700 mb-2">
-                  Error Details (Development Only)
+                  លម្អិតកំហុស (សម្រាប់ Development ប៉ុណ្ណោះ)
                 </summary>
                 <pre className="text-xs text-red-600 bg-red-50 p-4 rounded-lg overflow-auto max-h-40">
                   {this.state.error.toString()}
@@ -103,14 +103,14 @@ class ErrorBoundary extends Component<Props, State> {
                 onClick={this.handleReset}
                 className="px-6 py-3 bg-(--primary) text-white rounded-xl font-semibold hover:bg-(--primary-dark) transition-colors shadow-sm hover:shadow-md"
               >
-                Try Again
+                ព្យាយាមម្តងទៀត
               </button>
               
               <button
                 onClick={() => window.location.href = '/'}
                 className="px-6 py-3 bg-white text-gray-700 border-2 border-gray-200 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
               >
-                Go Home
+                ត្រឡប់ទៅទំព័រដើម
               </button>
             </div>
           </div>

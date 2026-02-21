@@ -36,10 +36,10 @@ export default function FeaturedDocumentsSection({
         <div className="text-center mb-20 scroll-animate opacity-0 translate-y-8">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-(--accent)/20 border-2 border-(--accent-dark) rounded-full mb-6">
             <div className="w-2 h-2 bg-(--accent-dark) rounded-full animate-pulse" />
-            <span className="text-sm font-bold text-(--accent-dark) uppercase tracking-wide">Legal Resources</span>
+            <span className="text-sm font-bold text-(--accent-dark) uppercase tracking-wide">ធនធានច្បាប់</span>
           </div>         
           <p className="text-xl text-(--gray-700) max-w-3xl mx-auto font-medium">
-            Access comprehensive legal documents and resources
+            ចូលប្រើឯកសារច្បាប់ និងធនធានសំខាន់ៗយ៉ាងគ្រប់ជ្រុងជ្រោយ
           </p>
         </div>
 
@@ -92,7 +92,7 @@ export default function FeaturedDocumentsSection({
                     <div className="flex flex-col justify-center space-y-6">
                       {/* Title */}
                       <div>
-                        <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[var(--ink)] mb-4 leading-tight group-hover:text-(--accent) transition-colors duration-300">
+                        <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-(--ink) mb-4 leading-tight group-hover:text-(--accent) transition-colors duration-300">
                           {book.title}
                         </h3>
                         
@@ -131,7 +131,7 @@ export default function FeaturedDocumentsSection({
                             className="group/btn"
                           >
                             <span className="flex items-center gap-2">
-                              View Document
+                              មើលឯកសារ
                               <svg className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                               </svg>
@@ -151,7 +151,7 @@ export default function FeaturedDocumentsSection({
                               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                               </svg>
-                              Subscribe to Access
+                              ជាវដើម្បីចូលប្រើ
                               <svg className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                               </svg>
@@ -178,7 +178,7 @@ export default function FeaturedDocumentsSection({
                       ? 'w-12 h-3 bg-(--accent-dark) shadow-lg'
                       : 'w-3 h-3 bg-(--gray-300) hover:bg-(--accent-dark) hover:scale-125'
                   }`}
-                  aria-label={`Go to slide ${index + 1}`}
+                  aria-label={`ទៅស្លាយ ${index + 1}`}
                 />
               ))}
             </div>

@@ -11,9 +11,9 @@ const features = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
-    title: "Video Courses",
-    description: "Learn from expert legal professionals through comprehensive, professionally produced video tutorials covering all aspects of Cambodian law.",
-    cta: "Explore Courses",
+    title: "វគ្គវីដេអូ",
+    description: "សិក្សាពីអ្នកជំនាញច្បាប់តាមវីដេអូបង្រៀនគ្រប់ជ្រុងជ្រោយ ដែលផលិតដោយវិជ្ជាជីវៈ និងគ្របដណ្តប់គ្រប់ទិដ្ឋភាពនៃច្បាប់កម្ពុជា។",
+    cta: "ស្វែងរកវគ្គសិក្សា",
     bgColor: "var(--primary)",
   },
   {
@@ -23,9 +23,9 @@ const features = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
     ),
-    title: "Legal Documents",
-    description: "Access comprehensive legal documents, statutes, case studies, and reference materials to deepen your understanding of Cambodian legal frameworks.",
-    cta: "Browse Documents",
+    title: "ឯកសារច្បាប់",
+    description: "ចូលប្រើឯកសារច្បាប់ ព្រះរាជក្រម ករណីសិក្សា និងឯកសារយោង ដើម្បីពង្រឹងការយល់ដឹងអំពីប្រព័ន្ធច្បាប់កម្ពុជា។",
+    cta: "រកមើលឯកសារ",
     bgColor: "var(--accent)",
   },
 ];
@@ -42,16 +42,16 @@ export default function FeaturesSection() {
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Header */}
         <div className="text-center mb-20 scroll-animate opacity-0 translate-y-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-(--accent)/20 border-2 border-[var(--primary)] rounded-full mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-(--accent)/20 border-2 border-(--primary) rounded-full mb-6">
             <div className="w-2 h-2 bg-(--primary) rounded-full animate-pulse" />
-            <span className="text-sm font-bold text-(--primary) uppercase tracking-wide">Our Features</span>
+            <span className="text-sm font-bold text-(--primary) uppercase tracking-wide">មុខងារសំខាន់ៗ</span>
           </div>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[var(--ink)] mb-6 leading-tight">
-            Everything You Need to{" "}
-            <span className="text-(--primary)">Excel</span>
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-(--ink) mb-6 leading-tight">
+            អ្វីៗដែលអ្នកត្រូវការ{" "}
+            <span className="text-(--primary)">ដើម្បីរីកចម្រើន</span>
           </h2>
           <p className="text-xl text-(--gray-700) max-w-3xl mx-auto font-medium">
-            Comprehensive legal education resources at your fingertips
+            ធនធានអប់រំច្បាប់គ្រប់គ្រាន់នៅចុងម្រាមដៃអ្នក
           </p>
         </div>
 
@@ -63,7 +63,7 @@ export default function FeaturesSection() {
               href={feature.href}
               className={`group relative scroll-animate opacity-0 translate-y-8 delay-${(index + 1) * 100}`}
             >
-              <div className="relative h-full p-8 lg:p-10 rounded-3xl bg-white border-2 border-[var(--gray-200)] hover:border-[var(--primary)] transition-all duration-500 shadow-lg hover:shadow-2xl overflow-hidden card-lift">
+              <div className="relative h-full p-8 lg:p-10 rounded-3xl bg-white border-2 border-(--gray-200) hover:border-(--primary) transition-all duration-500 shadow-lg hover:shadow-2xl overflow-hidden card-lift">
                 {/* Solid Color Overlay on Hover */}
                 <div className="absolute inset-0 bg-(--accent) opacity-0 group-hover:opacity-5 transition-opacity duration-500" />
                 
@@ -79,7 +79,7 @@ export default function FeaturesSection() {
                   </div>
                   
                   {/* Title */}
-                  <h3 className="text-3xl lg:text-4xl font-bold text-[var(--ink)] mb-4 group-hover:text-(--primary) transition-colors duration-300">
+                  <h3 className="text-3xl lg:text-4xl font-bold text-(--ink) mb-4 group-hover:text-(--primary) transition-colors duration-300">
                     {feature.title}
                   </h3>
                   
@@ -115,8 +115,8 @@ export default function FeaturesSection() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                 </svg>
               ),
-              title: "Expert-Led",
-              desc: "Taught by professionals",
+              title: "ដឹកនាំដោយអ្នកជំនាញ",
+              desc: "បង្រៀនដោយអ្នកវិជ្ជាជីវៈ",
             },
             { 
               icon: (
@@ -124,8 +124,8 @@ export default function FeaturesSection() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
               ),
-              title: "Mobile Access",
-              desc: "Learn anywhere, anytime",
+              title: "ចូលប្រើតាមទូរស័ព្ទ",
+              desc: "រៀនបានគ្រប់ទីកន្លែង គ្រប់ពេល",
             },
             { 
               icon: (
@@ -133,8 +133,8 @@ export default function FeaturesSection() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               ),
-              title: "Certified",
-              desc: "Official certifications",
+              title: "មានការទទួលស្គាល់",
+              desc: "ការទទួលស្គាល់ផ្លូវការ",
             },
             { 
               icon: (
@@ -142,18 +142,18 @@ export default function FeaturesSection() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               ),
-              title: "24/7 Support",
-              desc: "Always here to help",
+              title: "គាំទ្រ 24/7",
+              desc: "តែងតែរង់ចាំជួយអ្នក",
             },
           ].map((item, index) => (
             <div 
               key={index}
-              className="p-6 rounded-2xl bg-white border-2 border-[var(--gray-200)] hover:border-[var(--primary)] transition-all duration-300 hover:shadow-lg group"
+              className="p-6 rounded-2xl bg-white border-2 border-(--gray-200) hover:border-(--primary) transition-all duration-300 hover:shadow-lg group"
             >
               <div className="w-12 h-12 bg-(--accent)/20 rounded-xl flex items-center justify-center mb-4 text-(--primary) group-hover:scale-110 transition-transform duration-300">
                 {item.icon}
               </div>
-              <h4 className="font-bold text-[var(--ink)] mb-1 text-lg">{item.title}</h4>
+              <h4 className="font-bold text-(--ink) mb-1 text-lg">{item.title}</h4>
               <p className="text-sm text-(--gray-700)">{item.desc}</p>
             </div>
           ))}

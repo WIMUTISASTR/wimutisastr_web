@@ -80,7 +80,7 @@ export default function VideoCategoryPage() {
         }
       } catch (e: unknown) {
         console.error(e);
-        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load videos.");
+        if (!cancelled) setError(e instanceof Error ? e.message : "ផ្ទុកវីដេអូមិនជោគជ័យ។");
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -118,9 +118,9 @@ export default function VideoCategoryPage() {
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              Back to Courses
+              ត្រឡប់ទៅវគ្គសិក្សា
             </Link>
-            <h1 className="text-3xl font-semibold">{category?.name ?? "Course"}</h1>
+            <h1 className="text-3xl font-semibold">{category?.name ?? "វគ្គសិក្សា"}</h1>
             <p className="text-gray-300 max-w-3xl">{category?.description ?? ""}</p>
           </div>
         </section>
@@ -154,7 +154,7 @@ export default function VideoCategoryPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <p className="text-xl font-semibold text-red-900 mb-2">Error loading videos</p>
+                <p className="text-xl font-semibold text-red-900 mb-2">មានបញ្ហាក្នុងការផ្ទុកវីដេអូ</p>
                 <p className="text-sm text-red-700">{error}</p>
               </div>
             ) : videos.length === 0 ? (
@@ -162,8 +162,8 @@ export default function VideoCategoryPage() {
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
                   <BookOpenIcon className="w-8 h-8 text-gray-400" />
                 </div>
-                <p className="text-xl font-semibold text-gray-900 mb-2">No videos available</p>
-                <p className="text-sm text-gray-600">This course doesn&apos;t have any videos yet.</p>
+                <p className="text-xl font-semibold text-gray-900 mb-2">មិនមានវីដេអូ</p>
+                <p className="text-sm text-gray-600">វគ្គនេះមិនទាន់មានវីដេអូទេ។</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -202,7 +202,7 @@ export default function VideoCategoryPage() {
                             {isLocked && (
                               <div className="absolute inset-0 bg-black/45 flex items-center justify-center">
                                 <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-gray-900">
-                                  Members only
+                                  សមាជិកប៉ុណ្ណោះ
                                 </span>
                               </div>
                             )}
@@ -228,7 +228,7 @@ export default function VideoCategoryPage() {
                                 }}
                               >
                                 <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 group-hover/title:text-(--brown) transition-colors">
-                                  {index + 1}. {video.title ?? "Untitled Lesson"}
+                                  {index + 1}. {video.title ?? "មេរៀនគ្មានចំណងជើង"}
                                 </h3>
                               </Link>
 
@@ -236,19 +236,19 @@ export default function VideoCategoryPage() {
                                 {video.presented_by && (
                                   <div className="flex items-center gap-2">
                                     <UserIcon className="w-4 h-4 text-(--brown)" />
-                                    <span className="font-medium">Presented by:</span>
+                                    <span className="font-medium">បង្ហាញដោយ:</span>
                                     <span className="text-(--brown) font-semibold">{video.presented_by}</span>
                                   </div>
                                 )}
                                 {video.uploaded_at && (
                                   <div className="flex items-center gap-2">
                                     <ClockIcon className="w-4 h-4" />
-                                    <span>Uploaded {formatDate(video.uploaded_at)}</span>
+                                    <span>បានផ្ទុកឡើង {formatDate(video.uploaded_at)}</span>
                                   </div>
                                 )}
                                 <div className="flex items-center gap-2">
                                   <BookOpenIcon className="w-4 h-4" />
-                                  <span>Part of {category?.name ?? "Course"}</span>
+                                  <span>ផ្នែកនៃ {category?.name ?? "វគ្គសិក្សា"}</span>
                                 </div>
                               </div>
 
@@ -267,7 +267,7 @@ export default function VideoCategoryPage() {
                                 className="w-full sm:w-auto"
                               >
                                 <PlayIcon className="w-5 h-5" />
-                                {isLocked ? "Upgrade to Access" : "Watch Now"}
+                                {isLocked ? "ដំឡើងដើម្បីចូលប្រើ" : "មើលឥឡូវនេះ"}
                               </Button>
                             </div>
                           </div>

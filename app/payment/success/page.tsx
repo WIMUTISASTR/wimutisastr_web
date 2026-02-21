@@ -84,10 +84,10 @@ function PaymentSuccessContent() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
           <div className="text-center">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 opacity-0 translate-y-8 delay-100">
-              Payment Successful!
+              ការទូទាត់ជោគជ័យ!
             </h1>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto opacity-0 translate-y-8 delay-300">
-              Thank you for your subscription
+              សូមអរគុណសម្រាប់ការជាវរបស់អ្នក
             </p>
           </div>
         </div>
@@ -117,15 +117,15 @@ function PaymentSuccessContent() {
             </div>
 
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Payment Confirmed
+              ការទូទាត់ត្រូវបានបញ្ជាក់
             </h2>
             <p className="text-gray-600 mb-6">
-              Your payment has been successfully processed. Your subscription is now active.
+              ការទូទាត់របស់អ្នកត្រូវបានដំណើរការដោយជោគជ័យ។ ឥឡូវនេះការជាវរបស់អ្នកបានដំណើរការ។
             </p>
 
             {reference && (
               <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                <p className="text-sm text-gray-600">Payment Reference</p>
+                <p className="text-sm text-gray-600">លេខយោងការទូទាត់</p>
                 <p className="text-lg font-semibold text-gray-900">{reference}</p>
               </div>
             )}
@@ -136,14 +136,14 @@ function PaymentSuccessContent() {
                 variant="primary"
                 className="w-full sm:w-auto px-8 py-3"
               >
-                Access Legal Documents
+                ចូលប្រើឯកសារច្បាប់
               </Button>
               <Button
                 onClick={() => router.push("/law_video")}
                 variant="secondary"
                 className="w-full sm:w-auto px-8 py-3"
               >
-                Browse Video Courses
+                រកមើលវគ្គវីដេអូ
               </Button>
             </div>
           </div>
@@ -158,7 +158,7 @@ export default function PaymentSuccessPage() {
     <Suspense fallback={
       <PageContainer>
         <div className="min-h-screen flex items-center justify-center">
-          <LoadingState label="Loading..." />
+          <LoadingState label="កំពុងផ្ទុក..." />
         </div>
       </PageContainer>
     }>

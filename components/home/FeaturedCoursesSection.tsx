@@ -33,10 +33,10 @@ export default function FeaturedCoursesSection({
         <div className="text-center mb-20 scroll-animate opacity-0 translate-y-8">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-(--accent)/20 border-2 border-(--primary) rounded-full mb-6">
             <div className="w-2 h-2 bg-(--primary) rounded-full animate-pulse" />
-            <span className="text-sm font-bold text-(--primary) uppercase tracking-wide">Popular Courses</span>
+            <span className="text-sm font-bold text-(--primary) uppercase tracking-wide">វគ្គពេញនិយម</span>
           </div>
           <p className="text-xl text-(--gray-700) max-w-3xl mx-auto font-medium">
-            Explore our most popular legal education courses
+            ស្វែងរកវគ្គអប់រំច្បាប់ពេញនិយមបំផុតរបស់យើង
           </p>
         </div>
 
@@ -72,7 +72,7 @@ export default function FeaturedCoursesSection({
                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                               <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
                             </svg>
-                            {cat.videoCount} videos
+                            {cat.videoCount} វីដេអូ
                           </div>
                           
                           {/* Play Button Overlay */}
@@ -94,7 +94,7 @@ export default function FeaturedCoursesSection({
                         {/* Title */}
                         <div>
                           <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-(--ink) mb-4 leading-tight group-hover:text-(--primary) transition-colors duration-300">
-                            {cat.name ?? "Untitled"}
+                            {cat.name ?? "គ្មានចំណងជើង"}
                           </h3>
                           
                           {/* Meta Info */}
@@ -116,7 +116,7 @@ export default function FeaturedCoursesSection({
 
                         {/* Description */}
                         <p className="text-(--gray-700) text-lg leading-relaxed font-medium">
-                          {cat.description || "Comprehensive legal education covering essential topics in Cambodian law."}
+                          {cat.description || "មាតិកាអប់រំច្បាប់គ្រប់ជ្រុងជ្រោយ ដែលគ្របដណ្តប់ប្រធានបទសំខាន់ៗនៃច្បាប់កម្ពុជា។"}
                         </p>
 
                         {/* CTA */}
@@ -132,7 +132,7 @@ export default function FeaturedCoursesSection({
                             className="group/btn"
                           >
                             <span className="flex items-center gap-2">
-                              Start Learning
+                              ចាប់ផ្តើមសិក្សា
                               <svg className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                               </svg>
@@ -140,7 +140,7 @@ export default function FeaturedCoursesSection({
                           </Button>
                           
                           <div className="px-4 py-3 glass rounded-xl border border-(--gray-200)">
-                            <div className="text-xs text-(--gray-700) font-semibold uppercase tracking-wide mb-1">Total Videos</div>
+                            <div className="text-xs text-(--gray-700) font-semibold uppercase tracking-wide mb-1">ចំនួនវីដេអូសរុប</div>
                             <div className="text-2xl font-bold text-(--primary)">{cat.videoCount}</div>
                           </div>
                         </div>
@@ -164,7 +164,7 @@ export default function FeaturedCoursesSection({
                       ? 'w-12 h-3 bg-(--primary) shadow-lg'
                       : 'w-3 h-3 bg-(--gray-300) hover:bg-(--primary) hover:scale-125'
                   }`}
-                  aria-label={`Go to slide ${index + 1}`}
+                  aria-label={`ទៅស្លាយ ${index + 1}`}
                 />
               ))}
             </div>

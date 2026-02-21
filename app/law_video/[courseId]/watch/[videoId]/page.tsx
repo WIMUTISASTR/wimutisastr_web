@@ -17,8 +17,6 @@ function shouldDisableImageOptimization(src: string) {
   return src.includes(".r2.dev/") || /^https?:\/\//i.test(src);
 }
 
-type TabKey = "overview" | "notes" | "qa" | "reviews";
-
 const STORAGE = {
   lastByCourse: "wimutisastr:lastVideoByCourse:v1",
   lastCourseId: "wimutisastr:lastCourseId:v1",
@@ -89,7 +87,6 @@ export default function WatchVideoPage() {
   const [playbackError, setPlaybackError] = useState<string | null>(null);
   const { status: membershipStatus, isLoading: membershipLoading } = useMembership();
 
-  const [activeTab, setActiveTab] = useState<TabKey>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [videoProgress, setVideoProgress] = useState<Record<string, number>>({});
 
@@ -117,7 +114,7 @@ export default function WatchVideoPage() {
         }
       } catch (e: unknown) {
         console.error(e);
-        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load video.");
+        if (!cancelled) setError(e instanceof Error ? e.message : "ផ្ទុកវីដេអូមិនជោគជ័យ។");
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -167,7 +164,7 @@ export default function WatchVideoPage() {
         if (!cancelled) setPlayback(data);
       } catch (e: unknown) {
         console.error(e);
-        if (!cancelled) setPlaybackError(e instanceof Error ? e.message : "Failed to load video playback URL.");
+        if (!cancelled) setPlaybackError(e instanceof Error ? e.message : "ផ្ទុកតំណភ្ជាប់ចាក់វីដេអូមិនជោគជ័យ។");
       } finally {
         if (!cancelled) setPlaybackLoading(false);
       }
@@ -207,12 +204,12 @@ export default function WatchVideoPage() {
                   className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-(--brown) transition-colors group"
                 >
                   <ChevronLeftIcon className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                  <span>Back to Course</span>
+                  <span>ត្រឡប់ទៅវគ្គសិក្សា</span>
                 </Link>
                 <button
                   onClick={() => setSidebarOpen(!sidebarOpen)}
                   className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                  aria-label="Toggle sidebar"
+                  aria-label="បើក/បិទផ្នែកចំហៀង"
                 >
                   <BookOpenIcon className="w-5 h-5 text-gray-600" />
                 </button>
@@ -220,15 +217,15 @@ export default function WatchVideoPage() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="min-w-0 flex-1">
                   <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight mb-2">
-                    {current?.title ?? "Watch Video"}
+                    {current?.title ?? "មើលវីដេអូ"}
                   </h1>
                   <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
                     <span className="flex items-center gap-1">
                       <BookOpenIcon className="w-4 h-4" />
-                      {course?.name ?? "Course"}
+                      {course?.name ?? "វគ្គសិក្សា"}
                     </span>
                     <span>•</span>
-                    <span>Lesson {currentIndex >= 0 ? currentIndex + 1 : "—"} of {videos.length}</span>
+                    <span>មេរៀន {currentIndex >= 0 ? currentIndex + 1 : "—"} នៃ {videos.length}</span>
                     {current?.presented_by && (
                       <>
                         <span>•</span>
@@ -255,22 +252,22 @@ export default function WatchVideoPage() {
             {isLoading ? (
               <div className="text-center text-gray-600 py-20">
                 <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-(--brown) border-t-transparent mb-4"></div>
-                <p className="text-lg">Loading course content...</p>
+                <p className="text-lg">កំពុងផ្ទុកមាតិកាវគ្គសិក្សា...</p>
               </div>
             ) : error ? (
               <div className="text-center text-red-600 py-20">
-                <div className="text-xl font-semibold mb-2">Error loading content</div>
+                <div className="text-xl font-semibold mb-2">មានបញ្ហាក្នុងការផ្ទុកមាតិកា</div>
                 <p>{error}</p>
               </div>
             ) : !current ? (
               <div className="text-center text-gray-600 py-20">
-                <div className="text-xl font-semibold mb-2">Video not found</div>
-                <p>The video you&apos;re looking for doesn&apos;t exist.</p>
+                <div className="text-xl font-semibold mb-2">រកមិនឃើញវីដេអូ</div>
+                <p>វីដេអូដែលអ្នកកំពុងស្វែងរកមិនមានទេ។</p>
               </div>
             ) : membershipLoading ? (
               <div className="text-center text-gray-600 py-20">
                 <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-(--brown) border-t-transparent mb-4"></div>
-                <p>Checking membership status...</p>
+                <p>កំពុងពិនិត្យស្ថានភាពសមាជិកភាព...</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
@@ -282,15 +279,15 @@ export default function WatchVideoPage() {
                       {playbackLoading ? (
                         <div className="absolute inset-0 flex flex-col items-center justify-center text-white/90">
                           <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-white/30 border-t-white mb-4"></div>
-                          <p className="text-lg font-medium">Loading video player...</p>
+                          <p className="text-lg font-medium">កំពុងផ្ទុកកម្មវិធីចាក់វីដេអូ...</p>
                         </div>
                       ) : playbackError ? (
                         <div className="absolute inset-0 flex items-center justify-center p-8 text-center text-white">
                           <div className="max-w-md">
-                            <div className="text-2xl font-bold mb-3">Failed to load video</div>
+                            <div className="text-2xl font-bold mb-3">ផ្ទុកវីដេអូមិនជោគជ័យ</div>
                             <div className="text-sm text-white/80 mb-6">{playbackError}</div>
                             <Button onClick={() => window.location.reload()} variant="primary">
-                              Retry
+                              ព្យាយាមម្តងទៀត
                             </Button>
                           </div>
                         </div>
@@ -307,16 +304,16 @@ export default function WatchVideoPage() {
                           <div className="absolute inset-0 bg-black/55" />
                           <div className="absolute inset-0 flex items-center justify-center p-8 text-center text-white">
                             <div className="max-w-lg animate-slide-up-fade">
-                              <div className="text-3xl font-bold mb-4">Membership Required</div>
+                              <div className="text-3xl font-bold mb-4">ត្រូវការសមាជិកភាព</div>
                               <div className="text-base text-white/90 mb-8 leading-relaxed">
-                                Unlock full access to all video courses, legal documents, and premium content. Join our community of legal professionals and students.
+                                ដោះសោការចូលប្រើពេញលេញទៅកាន់វគ្គវីដេអូ ឯកសារច្បាប់ និងមាតិកាពិសេសទាំងអស់។ ចូលរួមសហគមន៍អ្នកជំនាញច្បាប់ និងនិស្សិតរបស់យើង។
                               </div>
                               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                 <Button onClick={() => router.push("/pricing_page")} variant="primary" size="md">
-                                  Upgrade Membership
+                                  ដំឡើងសមាជិកភាព
                                 </Button>
                                 <Button onClick={() => router.push("/law_video")} variant="outline" size="md" className="bg-white/10 backdrop-blur text-white border-white/20 hover:bg-white/20">
-                                  Browse Courses
+                                  រកមើលវគ្គសិក្សា
                                 </Button>
                               </div>
                             </div>
@@ -345,9 +342,9 @@ export default function WatchVideoPage() {
                       ) : (
                         <div className="absolute inset-0 flex items-center justify-center p-6 text-center text-white">
                           <div>
-                            <div className="text-lg font-semibold mb-2">Unsupported video source</div>
+                            <div className="text-lg font-semibold mb-2">ប្រភពវីដេអូមិនត្រូវបានគាំទ្រ</div>
                             <div className="text-sm text-white/80">
-                              This video doesn’t have a playable R2 source configured in Supabase.
+                              វីដេអូនេះមិនមានប្រភព R2 ដែលអាចចាក់បានក្នុង Supabase ទេ។
                             </div>
                           </div>
                         </div>
@@ -374,84 +371,42 @@ export default function WatchVideoPage() {
                     </div>
                   </div>
 
-                  {/* Enhanced Tabs Section */}
+                  {/* Course Overview Section */}
                   <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden animate-scale-in delay-200">
-                    <div className="px-6 pt-4 border-b border-gray-200 bg-gray-50">
-                      <div className="flex gap-6 overflow-x-auto scrollbar-hide">
-                        {[
-                          { key: "overview" as const, label: "Overview", icon: BookOpenIcon },
-                          { key: "notes" as const, label: "Notes", icon: BookOpenIcon },
-                          { key: "qa" as const, label: "Q&A", icon: BookOpenIcon },
-                          { key: "reviews" as const, label: "Reviews", icon: BookOpenIcon },
-                        ].map((t) => {
-                          const Icon = t.icon;
-                          return (
-                            <button
-                              key={t.key}
-                              type="button"
-                              onClick={() => setActiveTab(t.key)}
-                              className={`pb-4 px-1 text-sm font-semibold whitespace-nowrap border-b-2 transition-all duration-200 flex items-center gap-2 ${
-                                activeTab === t.key
-                                  ? "border-(--brown) text-(--brown)"
-                                  : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
-                              }`}
-                            >
-                              <Icon className="w-4 h-4" />
-                              {t.label}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
                     <div className="p-6">
                       <div className="animate-fadeInUp">
-                        {activeTab === "overview" ? (
-                          <div className="space-y-6">
-                            <div>
-                              <h2 className="text-2xl font-bold text-gray-900 mb-3">{course?.name ?? "Course Overview"}</h2>
-                              {course?.description ? (
-                                <p className="text-gray-700 leading-relaxed">{course.description}</p>
-                              ) : (
-                                <p className="text-gray-600 italic">No description available for this course.</p>
-                              )}
-                            </div>
+                        <div className="space-y-6">
+                          <div>
+                            <h2 className="text-2xl font-bold text-gray-900 mb-3">{course?.name ?? "ទិដ្ឋភាពទូទៅវគ្គសិក្សា"}</h2>
+                            {course?.description ? (
+                              <p className="text-gray-700 leading-relaxed">{course.description}</p>
+                            ) : (
+                              <p className="text-gray-600 italic">មិនមានការពិពណ៌នាសម្រាប់វគ្គនេះទេ។</p>
+                            )}
+                          </div>
 
-                            <div className="rounded-xl border border-gray-200 bg-gray-50 p-6 shadow-sm">
-                              <div className="flex items-start gap-4">
-                                <div className="shrink-0 w-12 h-12 rounded-lg bg-(--brown)/10 flex items-center justify-center">
-                                  <PlayIcon className="w-6 h-6 text-(--brown)" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="text-sm font-semibold text-gray-900 mb-1">Current Lesson</div>
-                                  <div className="text-lg font-bold text-gray-900 mb-2">{current.title ?? "Untitled"}</div>
-                                  {current.presented_by && (
-                                    <div className="flex items-center gap-2 text-sm text-gray-700 mb-3">
-                                      <UserIcon className="w-4 h-4 text-(--brown)" />
-                                      <span className="font-medium">Presented by:</span>
-                                      <span className="text-(--brown) font-semibold">{current.presented_by}</span>
-                                    </div>
-                                  )}
-                                  {current.description ? (
-                                    <div className="text-sm text-gray-600 leading-relaxed">{current.description}</div>
-                                  ) : null}
-                                </div>
+                          <div className="rounded-xl border border-gray-200 bg-gray-50 p-6 shadow-sm">
+                            <div className="flex items-start gap-4">
+                              <div className="shrink-0 w-12 h-12 rounded-lg bg-(--brown)/10 flex items-center justify-center">
+                                <PlayIcon className="w-6 h-6 text-(--brown)" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-semibold text-gray-900 mb-1">មេរៀនបច្ចុប្បន្ន</div>
+                                <div className="text-lg font-bold text-gray-900 mb-2">{current.title ?? "គ្មានចំណងជើង"}</div>
+                                {current.presented_by && (
+                                  <div className="flex items-center gap-2 text-sm text-gray-700 mb-3">
+                                    <UserIcon className="w-4 h-4 text-(--brown)" />
+                                    <span className="font-medium">បង្ហាញដោយ:</span>
+                                    <span className="text-(--brown) font-semibold">{current.presented_by}</span>
+                                  </div>
+                                )}
+                                {current.description ? (
+                                  <div className="text-sm text-gray-600 leading-relaxed">{current.description}</div>
+                                ) : null}
                               </div>
                             </div>
                           </div>
-                        ) : (
-                          <div className="text-center py-12">
-                            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-                              <BookOpenIcon className="w-8 h-8 text-gray-400" />
-                            </div>
-                            <div className="text-lg font-semibold text-gray-900 mb-2">
-                              {activeTab === "notes" && "Notes"}
-                              {activeTab === "qa" && "Questions & Answers"}
-                              {activeTab === "reviews" && "Reviews"}
-                            </div>
-                            <p className="text-gray-600">This section is coming soon. Check back later for updates.</p>
-                          </div>
-                        )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -466,14 +421,14 @@ export default function WatchVideoPage() {
                   <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden sticky top-6">
                     <div className="px-6 py-4 border-b border-gray-200 bg-(--brown)/5">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-lg font-bold text-gray-900">Course Content</h3>
+                        <h3 className="text-lg font-bold text-gray-900">មាតិកាវគ្គសិក្សា</h3>
                         {courseProgress > 0 && (
                           <span className="text-xs font-semibold text-(--brown) bg-(--brown)/10 px-3 py-1 rounded-full">
-                            {courseProgress}% Complete
+                            បញ្ចប់ {courseProgress}%
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600">{videos.length} {videos.length === 1 ? "lesson" : "lessons"}</p>
+                      <p className="text-sm text-gray-600">{videos.length} {videos.length === 1 ? "មេរៀន" : "មេរៀន"}</p>
                     </div>
 
                     <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
@@ -517,7 +472,7 @@ export default function WatchVideoPage() {
                                       isActive ? "text-(--brown)" : "text-gray-900"
                                     }`}
                                   >
-                                    {video.title ?? `Lesson ${idx + 1}`}
+                                    {video.title ?? `មេរៀន ${idx + 1}`}
                                   </div>
                                   {progress > 0 && progress < 0.9 && (
                                     <div className="mt-2">

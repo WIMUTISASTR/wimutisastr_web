@@ -48,23 +48,23 @@ export default function RegisterPage() {
     
     // Check Turnstile verification only if required
     if (turnstileRequired && !turnstileToken) {
-      toast.error("Please complete the security check");
+      toast.error("សូមបំពេញការផ្ទៀងផ្ទាត់សុវត្ថិភាព");
       return;
     }
     
     const newErrors: typeof errors = {};
 
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-      toast.error("Passwords do not match");
+      newErrors.confirmPassword = "ពាក្យសម្ងាត់មិនត្រូវគ្នា";
+      toast.error("ពាក្យសម្ងាត់មិនត្រូវគ្នា");
     }
     if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
-      toast.error("Password must be at least 8 characters");
+      newErrors.password = "ពាក្យសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ 8 តួអក្សរ";
+      toast.error("ពាក្យសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ 8 តួអក្សរ");
     }
     if (!formData.agreeToTerms) {
-      newErrors.agreeToTerms = "Please agree to the terms and conditions";
-      toast.error("Please agree to the terms and conditions");
+      newErrors.agreeToTerms = "សូមយល់ព្រមលក្ខខណ្ឌ និងគោលការណ៍";
+      toast.error("សូមយល់ព្រមលក្ខខណ្ឌ និងគោលការណ៍");
     }
 
     setErrors(newErrors);
@@ -85,7 +85,7 @@ export default function RegisterPage() {
           const turnstileResult = await turnstileResponse.json();
           
           if (!turnstileResult.success) {
-            toast.error("Security verification failed. Please try again.");
+            toast.error("ការផ្ទៀងផ្ទាត់សុវត្ថិភាពបរាជ័យ។ សូមព្យាយាមម្តងទៀត។");
             setLoading(false);
             return;
           }
@@ -102,13 +102,13 @@ export default function RegisterPage() {
         });
 
         if (signUpError) {
-          toast.error(signUpError.message || "Failed to create account. Please try again.");
+          toast.error(signUpError.message || "បង្កើតគណនីមិនជោគជ័យ។ សូមព្យាយាមម្តងទៀត។");
           setLoading(false);
           return;
         }
 
         if (data.user) {
-          toast.success("Account created successfully! Welcome!");
+          toast.success("បង្កើតគណនីបានជោគជ័យ! សូមស្វាគមន៍!");
           // Redirect to home page or show success message
           setTimeout(() => {
             router.push("/");
@@ -116,7 +116,7 @@ export default function RegisterPage() {
           }, 1000);
         }
       } catch (err) {
-        toast.error("An unexpected error occurred. Please try again.");
+        toast.error("មានកំហុសមិនបានរំពឹងទុក។ សូមព្យាយាមម្តងទៀត។");
         setLoading(false);
       }
     }
@@ -142,26 +142,26 @@ export default function RegisterPage() {
       <FormSection>
         <FormCard>
           <FormHeader
-            title="Create Account"
-            subtitle="Join us to access comprehensive legal education resources"
+            title="បង្កើតគណនី"
+            subtitle="ចូលរួមជាមួយយើងដើម្បីចូលប្រើធនធានអប់រំច្បាប់យ៉ាងគ្រប់ជ្រុងជ្រោយ"
           />
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <Input
               type="text"
               name="fullName"
-              label="Full Name"
+              label="ឈ្មោះពេញ"
               value={formData.fullName}
               onChange={handleChange}
               required
-              placeholder="John Doe"
+              placeholder="ឈ្មោះរបស់អ្នក"
               disabled={loading}
             />
 
             <Input
               type="email"
               name="email"
-              label="Email Address"
+              label="អាសយដ្ឋានអ៊ីមែល"
               value={formData.email}
               onChange={handleChange}
               required
@@ -172,13 +172,13 @@ export default function RegisterPage() {
             <Input
               type="password"
               name="password"
-              label="Password"
+              label="ពាក្យសម្ងាត់"
               value={formData.password}
               onChange={handleChange}
               required
               minLength={8}
-              placeholder="At least 8 characters"
-              helperText="Must be at least 8 characters long"
+              placeholder="យ៉ាងហោចណាស់ 8 តួអក្សរ"
+              helperText="ត្រូវមានយ៉ាងហោចណាស់ 8 តួអក្សរ"
               disabled={loading}
               error={errors.password}
             />
@@ -186,11 +186,11 @@ export default function RegisterPage() {
             <Input
               type="password"
               name="confirmPassword"
-              label="Confirm Password"
+              label="បញ្ជាក់ពាក្យសម្ងាត់"
               value={formData.confirmPassword}
               onChange={handleChange}
               required
-              placeholder="Confirm your password"
+              placeholder="បញ្ជាក់ពាក្យសម្ងាត់របស់អ្នក"
               error={errors.confirmPassword}
               disabled={loading}
             />
@@ -204,8 +204,8 @@ export default function RegisterPage() {
               disabled={loading}
               label={
                 <>
-                  I agree to the <FormLink href="#">Terms of Service</FormLink> and{" "}
-                  <FormLink href="#">Privacy Policy</FormLink>
+                  ខ្ញុំយល់ព្រមតាម <FormLink href="#">លក្ខខណ្ឌសេវាកម្ម</FormLink> និង{" "}
+                  <FormLink href="#">គោលការណ៍ឯកជនភាព</FormLink>
                 </>
               }
             />
@@ -222,7 +222,7 @@ export default function RegisterPage() {
             </div>
 
             <Button type="submit" fullWidth disabled={loading || (turnstileRequired && !turnstileToken)}>
-              {loading ? "Creating account..." : "Create Account"}
+              {loading ? "កំពុងបង្កើតគណនី..." : "បង្កើតគណនី"}
             </Button>
           </form>
 
@@ -230,15 +230,15 @@ export default function RegisterPage() {
 
           <div className="text-center">
             <p className="text-gray-600">
-              Already have an account?{" "}
-              <FormLink href="/auth/login">Sign in</FormLink>
+              មានគណនីរួចហើយមែនទេ?{" "}
+              <FormLink href="/auth/login">ចូលគណនី</FormLink>
             </p>
           </div>
         </FormCard>
 
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-500">
-            Creating an account gives you access to our full library of legal resources
+            ការបង្កើតគណនីនឹងអនុញ្ញាតឱ្យអ្នកចូលប្រើបណ្ណាល័យធនធានច្បាប់ពេញលេញរបស់យើង
           </p>
         </div>
       </FormSection>

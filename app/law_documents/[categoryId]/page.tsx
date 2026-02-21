@@ -6,20 +6,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import PageContainer from "@/components/PageContainer";
 import { fetchBooks, type BookCategory, type BookRow } from "@/lib/api/client";
-import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
 import LoadingState from "@/components/LoadingState";
 import { useMembership } from "@/lib/hooks/useMembership";
-
-const FALLBACK_COVER = "/sample_book/cover/book1.png";
 const ALL_CATEGORY_ID = "__all__";
-
-function isAnimatedImageUrl(src: string) {
-  return /\.gif(\?|#|$)/i.test(src);
-}
-
-function shouldDisableImageOptimization(src: string) {
-  return src.includes(".r2.dev/") || /^https?:\/\//i.test(src);
-}
 
 export default function DocumentCategoryPage() {
   const params = useParams();
@@ -30,6 +19,9 @@ export default function DocumentCategoryPage() {
   const [books, setBooks] = useState<BookRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedYear, setSelectedYear] = useState("all");
+  const [accessFilter, setAccessFilter] = useState<"all" | "free" | "members">("all");
   const { status: membershipStatus } = useMembership();
   const isApproved = membershipStatus === "approved";
 
@@ -46,7 +38,7 @@ export default function DocumentCategoryPage() {
         }
       } catch (e: unknown) {
         console.error(e);
-        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load documents.");
+        if (!cancelled) setError(e instanceof Error ? e.message : "ផ្ទុកឯកសារមិនជោគជ័យ។");
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -58,9 +50,30 @@ export default function DocumentCategoryPage() {
   }, [categoryId]);
 
   const category = useMemo(() => categories.find((c) => c.id === categoryId) ?? null, [categories, categoryId]);
+  const categoryNameById = useMemo(
+    () => new Map(categories.map((c) => [c.id, c.name ?? "មិនបានចាត់ប្រភេទ"])),
+    [categories]
+  );
+  const yearOptions = useMemo(() => {
+    return Array.from(new Set(books.map((doc) => doc.year).filter((year) => Number.isFinite(year))))
+      .sort((a, b) => b - a)
+      .map((year) => String(year));
+  }, [books]);
+  const filteredBooks = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return books.filter((doc) => {
+      if (selectedYear !== "all" && String(doc.year) !== selectedYear) return false;
+      const level = doc.access_level === "free" ? "free" : "members";
+      if (accessFilter !== "all" && level !== accessFilter) return false;
+      if (!q) return true;
+      const categoryName = categoryNameById.get(doc.category_id ?? "") ?? "មិនបានចាត់ប្រភេទ";
+      const haystack = `${doc.title} ${doc.author} ${doc.description ?? ""} ${categoryName}`.toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [accessFilter, books, categoryNameById, searchQuery, selectedYear]);
 
   return (
-    <PageContainer>
+    <PageContainer className="law-documents-font">
         <section className="relative bg-slate-900 text-white py-14 overflow-hidden">
           <div className="absolute inset-0 z-0">
             <Image src="/asset/document_background.png" alt="Documents background" fill className="object-cover" priority sizes="100vw" fetchPriority="high" />
@@ -71,93 +84,130 @@ export default function DocumentCategoryPage() {
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              Back to Categories
+              ត្រឡប់ទៅប្រភេទឯកសារ
             </Link>
-            <h1 className="text-3xl font-semibold">{category?.name ?? "Documents"}</h1>
+            <h1 className="text-3xl font-semibold">{category?.name ?? "ឯកសារ"}</h1>
             <p className="text-gray-300 max-w-3xl">{category?.description ?? ""}</p>
           </div>
         </section>
 
         <section className="py-12 px-2 sm:px-4 lg:px-6">
-          <div className="w-[80vw] max-w-[80vw] mx-auto">
+          <div className="w-full max-w-none mx-auto">
             {isLoading ? (
               <div className="py-16">
-                <LoadingState label="Loading documents..." />
+                <LoadingState label="កំពុងផ្ទុកឯកសារ..." />
               </div>
             ) : error ? (
               <div className="text-center text-red-600 py-16">{error}</div>
             ) : books.length === 0 ? (
-              <div className="text-center text-gray-600 py-16">No documents in this category.</div>
+              <div className="text-center text-gray-600 py-16">មិនមានឯកសារក្នុងប្រភេទនេះទេ។</div>
             ) : (
-              <div className="space-y-6">
-                {books.map((doc, index) => {
-                  const cover = normalizeNextImageSrc(doc.cover_url, FALLBACK_COVER, { bucket: "book" });
-                  const unoptimized = isAnimatedImageUrl(cover) || shouldDisableImageOptimization(cover);
-                  const isLocked = !isApproved && doc.access_level !== "free";
-                  return (
-                    <div key={doc.id} className="bg-white overflow-hidden">
-                      <div className="p-6 grid md:grid-cols-3 gap-6">
-                        <Link
-                          href={`/law_documents/${categoryId}/read/${doc.id}`}
-                          className="relative w-full aspect-3/4 overflow-hidden block group bg-gray-100"
-                          aria-label={`Read ${doc.title}`}
-                          onClick={(e) => {
-                            if (!isLocked) return;
-                            e.preventDefault();
-                            router.push("/pricing_page");
-                          }}
-                        >
-                          <Image
-                            src={cover}
-                            alt={doc.title}
-                            fill
-                            className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                            sizes="(max-width: 768px) 100vw, 33vw"
-                            unoptimized={unoptimized}
-                          />
-                          {isLocked && (
-                            <div className="absolute inset-0 bg-black/45 flex items-center justify-center">
-                              <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-gray-900">
-                                Members only
-                              </span>
-                            </div>
-                          )}
-                          <div />
-                        </Link>
+              <div className="space-y-4">
+                <div className="rounded-md border border-(--gray-200) bg-gray-50 p-3">
+                  <div className="grid grid-cols-1 gap-2 md:grid-cols-[160px_180px_1fr_120px]">
+                    <select
+                      value={selectedYear}
+                      onChange={(e) => setSelectedYear(e.target.value)}
+                      className="h-10 rounded border border-(--gray-300) bg-white px-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-(--primary)"
+                    >
+                      <option value="all">គ្រប់ឆ្នាំ</option>
+                      {yearOptions.map((year) => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={accessFilter}
+                      onChange={(e) => setAccessFilter(e.target.value as "all" | "free" | "members")}
+                      className="h-10 rounded border border-(--gray-300) bg-white px-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-(--primary)"
+                    >
+                      <option value="all">សិទ្ធិចូលប្រើទាំងអស់</option>
+                      <option value="free">ឥតគិតថ្លៃ</option>
+                      <option value="members">សមាជិក</option>
+                    </select>
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="ស្វែងរកចំណងជើង អ្នកនិពន្ធ ឬប្រភេទ..."
+                      className="h-10 rounded border border-(--gray-300) bg-white px-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-(--primary)"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery("");
+                        setSelectedYear("all");
+                        setAccessFilter("all");
+                      }}
+                      className="h-10 rounded bg-(--primary) px-4 text-sm font-semibold text-white hover:opacity-90"
+                    >
+                      កំណត់ឡើងវិញ
+                    </button>
+                  </div>
+                </div>
 
-                        <div className="md:col-span-2 flex flex-col justify-center">
-                          <Link
-                            href={`/law_documents/${categoryId}/read/${doc.id}`}
-                            className="group"
-                            onClick={(e) => {
-                              if (!isLocked) return;
-                              e.preventDefault();
-                              router.push("/pricing_page");
-                            }}
-                          >
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-(--brown) transition-colors">
-                              {index + 1}. {doc.title}
-                            </h3>
-                          </Link>
-                          <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                            <span>{doc.author}</span>
-                            <span>{doc.year}</span>
-                          </div>
-                          {doc.description ? <p className="text-gray-700 mb-4">{doc.description}</p> : null}
-                          <div className="flex items-center gap-3">
-                            <button
-                              type="button"
-                              onClick={() => router.push(isLocked ? "/pricing_page" : `/law_documents/${categoryId}/read/${doc.id}`)}
-                              className="rounded-full bg-(--primary) text-white px-8 py-2.5 font-semibold shadow-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-(--primary) focus:ring-offset-2 transition-opacity"
+                {filteredBooks.length === 0 ? (
+                  <div className="text-center text-gray-600 py-10">រកមិនឃើញឯកសារដែលត្រូវគ្នាទេ។</div>
+                ) : (
+                  <div className="overflow-x-auto border border-(--gray-200)">
+                    <table className="min-w-full text-left">
+                      <thead className="bg-(--gray-100)">
+                        <tr className="text-sm font-semibold text-(--ink)">
+                          <th className="px-4 py-3 w-24">ឆ្នាំ</th>
+                          <th className="px-4 py-3">ចំណងជើងសៀវភៅ</th>
+                          <th className="px-4 py-3">ប្រភេទ</th>
+                          <th className="px-4 py-3">អ្នកនិពន្ធ</th>
+                          <th className="px-4 py-3 w-28">សកម្មភាព</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredBooks.map((doc, index) => {
+                          const isLocked = !isApproved && doc.access_level !== "free";
+                          const destination = isLocked ? "/pricing_page" : `/law_documents/${categoryId}/read/${doc.id}`;
+                          const categoryName = categoryNameById.get(doc.category_id ?? "") ?? category?.name ?? "មិនបានចាត់ប្រភេទ";
+                          return (
+                            <tr
+                              key={doc.id}
+                              className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"} cursor-pointer hover:bg-amber-50/40`}
+                              onClick={() => router.push(destination)}
                             >
-                              {isLocked ? "Upgrade to Access" : "Read"}
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                              <td className="px-4 py-3 text-sm text-gray-700 align-top">{doc.year}</td>
+                              <td className="px-4 py-3 align-top">
+                                <div className="font-semibold text-(--ink)">{doc.title}</div>
+                                <div className="mt-1 flex items-center gap-2">
+                                  <span
+                                    className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                                      doc.access_level === "free" ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"
+                                    }`}
+                                  >
+                                    {doc.access_level === "free" ? "ឥតគិតថ្លៃ" : "សមាជិក"}
+                                  </span>
+                                  {isLocked ? (
+                                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-700">
+                                      ជាប់សោ
+                                    </span>
+                                  ) : null}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 text-sm text-gray-700 align-top">{categoryName}</td>
+                              <td className="px-4 py-3 text-sm text-gray-700 align-top">{doc.author}</td>
+                              <td className="px-4 py-3 align-top">
+                                <Link
+                                  href={destination}
+                                  className="inline-flex items-center rounded bg-(--primary) px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {isLocked ? "ដំឡើង" : "អាន"}
+                                </Link>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             )}
           </div>

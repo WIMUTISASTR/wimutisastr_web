@@ -135,14 +135,14 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
         <div className="absolute inset-0 bg-slate-900/65 z-10" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
-          <h1 className="text-3xl sm:text-4xl font-semibold">Video Courses</h1>
+          <h1 className="text-3xl sm:text-4xl font-semibold">វគ្គវីដេអូ</h1>
           <p className="text-gray-300 max-w-3xl mt-2">
-            Explore legal education courses designed for professionals and students.
+            ស្វែងរកវគ្គអប់រំច្បាប់ដែលរៀបចំសម្រាប់អ្នកជំនាញ និងនិស្សិត។
           </p>
 
           <div className="mt-8 max-w-2xl">
             <label className="text-sm font-semibold text-gray-200" htmlFor="law-video-search">
-              Search courses
+              ស្វែងរកវគ្គសិក្សា
             </label>
             <div className="mt-2 relative">
               <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center">
@@ -151,7 +151,7 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
               <input
                 id="law-video-search"
                 type="text"
-                placeholder="Search courses by name or description..."
+                placeholder="ស្វែងរកវគ្គតាមឈ្មោះ ឬការពិពណ៌នា..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-12 py-3 rounded-xl bg-white/90 text-slate-900 placeholder:text-slate-500 shadow-sm ring-1 ring-inset ring-white/20 focus:outline-none focus:ring-2 focus:ring-(--primary) transition-colors"
@@ -161,7 +161,7 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
                   type="button"
                   onClick={() => setSearchQuery("")}
                   className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-slate-700 transition-colors"
-                  aria-label="Clear search"
+                  aria-label="សម្អាតការស្វែងរក"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -179,10 +179,10 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
           {/* Results Count */}
           <div className="mb-6 text-sm text-gray-600 animate-in delay-100">
             {filteredCategories.length === 0 ? (
-              <span>No courses found</span>
+              <span>រកមិនឃើញវគ្គសិក្សា</span>
             ) : (
               <span>
-                {filteredCategories.length} {filteredCategories.length === 1 ? "course" : "courses"} available
+                មាន {filteredCategories.length} {filteredCategories.length === 1 ? "វគ្គ" : "វគ្គ"}
               </span>
             )}
           </div>
@@ -192,14 +192,14 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
                 <SearchIcon className="w-8 h-8 text-gray-400" />
               </div>
-              <p className="text-xl font-semibold text-gray-900 mb-2">No courses found</p>
-              <p className="text-sm text-gray-600 mb-6">Try adjusting your search terms or browse all courses.</p>
+              <p className="text-xl font-semibold text-gray-900 mb-2">រកមិនឃើញវគ្គសិក្សា</p>
+              <p className="text-sm text-gray-600 mb-6">សូមកែសម្រួលពាក្យស្វែងរក ឬរកមើលវគ្គទាំងអស់។</p>
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
                 className="inline-flex items-center gap-2 rounded-xl bg-(--brown) text-white px-6 py-3 text-sm font-semibold hover:bg-(--brown-strong) transition-colors shadow-sm hover:shadow-md"
               >
-                Clear Search
+                សម្អាតការស្វែងរក
               </button>
             </div>
           ) : (
@@ -232,7 +232,7 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
                     <div className="relative w-full aspect-video bg-gray-100 overflow-hidden">
                       <Image
                         src={thumb}
-                        alt={cat.name ?? "Course"}
+                        alt={cat.name ?? "វគ្គសិក្សា"}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-110"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
@@ -251,7 +251,7 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
                       {/* Progress Badge */}
                       {pct > 0 && (
                         <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 text-xs font-bold text-(--brown) shadow-lg">
-                          {pct}% Complete
+                          បញ្ចប់ {pct}%
                         </div>
                       )}
 
@@ -259,7 +259,7 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
                       {total > 0 && (
                         <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-lg flex items-center gap-1.5">
                           <BookOpenIcon className="w-3.5 h-3.5" />
-                          <span>{total} {total === 1 ? "video" : "videos"}</span>
+                          <span>{total} {total === 1 ? "វីដេអូ" : "វីដេអូ"}</span>
                         </div>
                       )}
                     </div>
@@ -268,7 +268,7 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
                     <div className="p-6">
                       <div className="mb-4">
                         <h3 className="text-lg font-bold text-gray-900 leading-tight line-clamp-2 mb-2 group-hover:text-(--brown) transition-colors">
-                          {cat.name ?? "Untitled Course"}
+                          {cat.name ?? "វគ្គគ្មានចំណងជើង"}
                         </h3>
                         {cat.description && (
                           <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
@@ -283,7 +283,7 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
                           {pct === 0 ? (
                             <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">
                               <div className="w-2 h-2 rounded-full bg-gray-300"></div>
-                              <span>Not Started</span>
+                              <span>មិនទាន់ចាប់ផ្តើម</span>
                             </div>
                           ) : (
                             <>
@@ -294,9 +294,9 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
                                 />
                               </div>
                               <div className="flex items-center justify-between text-xs text-gray-600">
-                                <span className="font-medium">{pct}% complete</span>
+                                <span className="font-medium">បានបញ្ចប់ {pct}%</span>
                                 {updated && (
-                                  <span className="text-gray-500">Updated {formatDate(updated)}</span>
+                                  <span className="text-gray-500">បានធ្វើបច្ចុប្បន្នភាព {formatDate(updated)}</span>
                                 )}
                               </div>
                             </>
@@ -308,7 +308,7 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
                       <div className="pt-4 border-t border-gray-100">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-semibold text-(--brown) group-hover:text-(--brown-strong) transition-colors">
-                            {pct === 0 ? "Start Course" : pct === 100 ? "Review Course" : "Continue Learning"}
+                            {pct === 0 ? "ចាប់ផ្តើមវគ្គ" : pct === 100 ? "មើលឡើងវិញ" : "បន្តសិក្សា"}
                           </span>
                           <div className="w-8 h-8 rounded-full bg-(--brown)/10 flex items-center justify-center group-hover:bg-(--brown)/20 transition-colors">
                             <svg className="w-4 h-4 text-(--brown)" fill="none" stroke="currentColor" viewBox="0 0 24 24">

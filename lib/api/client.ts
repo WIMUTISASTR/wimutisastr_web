@@ -161,7 +161,7 @@ export async function apiGet<T>(url: string): Promise<T> {
   } catch (error) {
     clearTimeout(timeoutId);
     if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error('Request timeout - please try again');
+      throw new Error('សំណើអស់ពេលកំណត់ - សូមព្យាយាមម្តងទៀត');
     }
     throw error;
   }
@@ -191,7 +191,7 @@ export async function apiGetPublic<T>(url: string): Promise<T> {
   } catch (error) {
     clearTimeout(timeoutId);
     if (error instanceof Error && error.name === "AbortError") {
-      throw new Error("Request timeout - please try again");
+      throw new Error("សំណើអស់ពេលកំណត់ - សូមព្យាយាមម្តងទៀត");
     }
     throw error;
   }

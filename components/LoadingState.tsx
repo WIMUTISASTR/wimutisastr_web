@@ -30,7 +30,7 @@ const labelTone: Record<LoadingTone, string> = {
 };
 
 export default function LoadingState({
-  label = "Loading...",
+  label = "កំពុងផ្ទុក...",
   tone = "brand",
   size = "md",
   className,

@@ -46,7 +46,7 @@ export default function LawVideoPage() {
         }
       } catch (e: unknown) {
         if (!cancelled) {
-          setError(e instanceof Error ? e.message : "Failed to load courses.");
+          setError(e instanceof Error ? e.message : "ផ្ទុកវគ្គសិក្សាមិនជោគជ័យ។");
           setCategories([]);
           setVideos([]);
         }
@@ -69,13 +69,13 @@ export default function LawVideoPage() {
           <section className="min-h-[50vh] flex items-center justify-center px-4">
             <div className="text-center text-gray-600">
               <div className="inline-block animate-spin rounded-full h-10 w-10 border-4 border-(--brown) border-t-transparent mb-3" />
-              <p>Loading courses...</p>
+              <p>កំពុងផ្ទុកវគ្គសិក្សា...</p>
             </div>
           </section>
         ) : error ? (
           <section className="min-h-[50vh] flex items-center justify-center px-4">
             <div className="text-center text-red-600">
-              <p className="text-lg font-semibold mb-2">Unable to load courses</p>
+              <p className="text-lg font-semibold mb-2">មិនអាចផ្ទុកវគ្គសិក្សា</p>
               <p className="text-sm">{error}</p>
             </div>
           </section>

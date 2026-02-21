@@ -1,25 +1,13 @@
 "use client";
-
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import Button from "@/components/Button";
-import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
 import type { BookCategory, BookRow } from "@/lib/data/books";
 import { useMembership } from "@/lib/hooks/useMembership";
 
 const ALL_CATEGORY_ID = "__all__";
 const UNCATEGORIZED_ID = "__uncategorized__";
-const FALLBACK_COVER = "/sample_book/cover/book1.png";
-
-function isAnimatedImageUrl(src: string) {
-  return /\.gif(\?|#|$)/i.test(src);
-}
-
-function shouldDisableImageOptimization(src: string) {
-  return src.includes(".r2.dev/") || /^https?:\/\//i.test(src);
-}
-
 interface BookGridClientProps {
   categories: BookCategory[];
   books: BookRow[];
@@ -59,8 +47,8 @@ export default function BookGridClient({ categories, books }: BookGridClientProp
     const hasAll = categories.some((c) => c.id === ALL_CATEGORY_ID);
     const allCategory: BookCategory = {
       id: ALL_CATEGORY_ID,
-      name: "All Documents",
-      description: "Browse all available documents.",
+      name: "ឯកសារទាំងអស់",
+      description: "រកមើលឯកសារដែលមានទាំងអស់។",
       cover_url: null,
       parent_id: null,
       created_at: null,
@@ -87,14 +75,14 @@ export default function BookGridClient({ categories, books }: BookGridClientProp
         <div className="absolute inset-0 bg-slate-900/65 z-10" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
-          <h1 className="text-3xl sm:text-4xl font-semibold">Law Documents</h1>
+          <h1 className="text-3xl sm:text-4xl font-semibold">ឯកសារច្បាប់</h1>
           <p className="text-gray-300 max-w-3xl mt-2">
-            Browse categories and read legal documents on this site.
+            រកមើលប្រភេទឯកសារ និងអានឯកសារច្បាប់នៅលើគេហទំព័រនេះ។
           </p>
 
           <div className="mt-8 max-w-2xl">
             <label className="text-sm font-semibold text-gray-200" htmlFor="law-documents-search">
-              Search categories
+              ស្វែងរកប្រភេទឯកសារ
             </label>
             <div className="mt-2 relative">
               <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center">
@@ -111,7 +99,7 @@ export default function BookGridClient({ categories, books }: BookGridClientProp
               <input
                 id="law-documents-search"
                 type="text"
-                placeholder="Search categories..."
+                placeholder="ស្វែងរកប្រភេទឯកសារ..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="block w-full pl-12 pr-4 py-3 rounded-xl bg-white/90 text-slate-900 placeholder:text-slate-500 shadow-sm ring-1 ring-inset ring-white/20 focus:outline-none focus:ring-2 focus:ring-(--primary) transition-colors"
@@ -126,11 +114,11 @@ export default function BookGridClient({ categories, books }: BookGridClientProp
         <div className="w-[80vw] max-w-[80vw] mx-auto">
           {displayCategories.length === 0 ? (
             <div className="rounded-3xl border border-(--gray-200) bg-white px-6 py-10 text-center shadow-sm">
-              <div className="text-xl font-bold text-(--ink)">No categories found</div>
-              <div className="mt-2 text-(--gray-700) font-medium">Try a different search keyword.</div>
+              <div className="text-xl font-bold text-(--ink)">រកមិនឃើញប្រភេទឯកសារ</div>
+              <div className="mt-2 text-(--gray-700) font-medium">សូមសាកល្បងពាក្យស្វែងរកផ្សេងទៀត។</div>
               <div className="mt-6">
                 <Button onClick={() => setSearchQuery("")} variant="outline">
-                  Clear search
+                  សម្អាតការស្វែងរក
                 </Button>
               </div>
             </div>
@@ -138,8 +126,6 @@ export default function BookGridClient({ categories, books }: BookGridClientProp
             <div className="space-y-6">
               {displayCategories.map((cat) => {
                 const list = cat.id === ALL_CATEGORY_ID ? books : byCategory.get(cat.id) ?? [];
-                const thumb = normalizeNextImageSrc(list[0]?.cover_url ?? null, FALLBACK_COVER, { bucket: "book" });
-                const unoptimized = isAnimatedImageUrl(thumb) || shouldDisableImageOptimization(thumb);
                 const hasFree = list.some((b) => b.access_level === "free");
                 const isLocked = !isApproved && !hasFree;
 
@@ -149,7 +135,7 @@ export default function BookGridClient({ categories, books }: BookGridClientProp
                     className="group rounded-none overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-b border-black"
                     role="button"
                     tabIndex={0}
-                    aria-label={`Open category ${cat.name ?? "Untitled"}`}
+                    aria-label={`បើកប្រភេទ ${cat.name ?? "គ្មានចំណងជើង"}`}
                     onClick={() => router.push(`/law_documents/${cat.id}`)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
@@ -157,37 +143,19 @@ export default function BookGridClient({ categories, books }: BookGridClientProp
                       }
                     }}
                   >
-                    <div className="p-8 sm:p-10 flex flex-col sm:flex-row gap-6 sm:gap-8">
-                      <div className="relative w-full sm:w-52 aspect-3/4 rounded-none overflow-hidden shrink-0">
-                        <Image
-                          src={thumb}
-                          alt={cat.name ?? "Category"}
-                          fill
-                          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                          sizes="(max-width: 640px) 100vw, 208px"
-                          unoptimized={unoptimized}
-                          loading="lazy"
-                        />
-                        {isLocked && (
-                          <div className="absolute inset-0 bg-black/45 flex items-center justify-center">
-                            <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-gray-900">
-                              Members only
-                            </span>
-                          </div>
-                        )}
-                        <div/>
-                      </div>
-
+                    <div className="p-8 sm:p-10">
                       <div className="flex-1 min-w-0 flex flex-col justify-between gap-5">
                         <div>
-                          <h3 className="text-2xl font-bold text-(--ink) truncate">{cat.name ?? "Untitled"}</h3>
+                          <h3 className="text-2xl font-bold text-(--ink) truncate">{cat.name ?? "គ្មានចំណងជើង"}</h3>
                           <p className="mt-3 text-(--gray-700) font-medium line-clamp-3 text-lg">
                             {cat.description ?? ""}
                           </p>
                         </div>
 
                         <div className="flex flex-wrap items-center justify-between gap-3">
-                          <div className="text-sm text-(--gray-700) font-semibold">Category</div>
+                          <div className="text-sm text-(--gray-700) font-semibold">
+                            {isLocked ? "សមាជិកប៉ុណ្ណោះ" : "ប្រភេទ"}
+                          </div>
                           <Button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -196,7 +164,7 @@ export default function BookGridClient({ categories, books }: BookGridClientProp
                             variant="primary"
                             size="md"
                           >
-                            {isLocked ? "View" : "View"}
+                            {isLocked ? "មើល" : "មើល"}
                           </Button>
                         </div>
                       </div>
