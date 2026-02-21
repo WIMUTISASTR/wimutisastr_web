@@ -160,7 +160,7 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-slate-700 transition-colors"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-slate-700 transition-colors rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2"
                   aria-label="សម្អាតការស្វែងរក"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -197,7 +197,7 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="inline-flex items-center gap-2 rounded-xl bg-(--brown) text-white px-6 py-3 text-sm font-semibold hover:bg-(--brown-strong) transition-colors shadow-sm hover:shadow-md"
+                className="inline-flex items-center gap-2 rounded-md bg-(--brown) text-white border border-transparent px-5 py-2.5 text-sm font-semibold hover:bg-(--brown-strong) transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--brown) focus-visible:ring-offset-2"
               >
                 សម្អាតការស្វែងរក
               </button>

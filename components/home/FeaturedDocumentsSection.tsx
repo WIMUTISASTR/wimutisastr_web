@@ -173,10 +173,10 @@ export default function FeaturedDocumentsSection({
                 <button
                   key={index}
                   onClick={() => setCurrentBookIndex(index)}
-                  className={`transition-all duration-300 rounded-full ${
+                  className={`transition-all duration-200 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 ${
                     index === currentBookIndex
-                      ? 'w-12 h-3 bg-(--accent-dark) shadow-lg'
-                      : 'w-3 h-3 bg-(--gray-300) hover:bg-(--accent-dark) hover:scale-125'
+                      ? 'w-10 h-2.5 bg-(--accent-dark) shadow-sm'
+                      : 'w-2.5 h-2.5 bg-(--gray-300) hover:bg-(--accent-dark)'
                   }`}
                   aria-label={`ទៅស្លាយ ${index + 1}`}
                 />

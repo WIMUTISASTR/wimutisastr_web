@@ -2,52 +2,44 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/context";
 import Button from "@/components/Button";
 
 export default function Nav() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { user, loading } = useAuth();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   return (
-    <nav 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled 
-          ? "glass-strong shadow-lg border-b border-white/20" 
-          : "bg-transparent border-b border-white/10"
-      }`}
-    >
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-(--gray-200) bg-white shadow-sm">
+      <div className="hidden md:block bg-(--primary-dark) text-white text-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-8 flex items-center justify-between">
+          <span>វេទិកាអប់រំច្បាប់ | WIMUTISASTR Law Office</span>
+          <span>ទំនាក់ទំនង: +855 12 345 678</span>
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
+        <div className="flex justify-between items-center h-20 md:h-16">
           {/* Logo and Brand */}
           <Link 
             href="/" 
             className="flex items-center space-x-3 group transition-all duration-300"
           >
-            <div className="relative w-12 h-12 sm:w-14 sm:h-14 transition-transform duration-300 group-hover:scale-110">
+            <div className="relative w-11 h-11 sm:w-12 sm:h-12 transition-transform duration-300 group-hover:scale-105">
               <Image
                 src="/logo/logo.png"
                 alt="WIMUTISASTR LAW OFFICE Logo"
                 fill
-                className="object-contain drop-shadow-md"
+                className="object-contain"
                 priority
               />
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-lg sm:text-xl font-bold text-(--ink) tracking-tight group-hover:text-(--primary) transition-colors">
+              <h1 className="text-base sm:text-lg font-bold text-(--ink) tracking-tight group-hover:text-(--primary) transition-colors">
                 WIMUTISASTR
               </h1>
               <p className="text-xs text-(--gray-700) font-medium">ការិយាល័យច្បាប់</p>
@@ -55,43 +47,43 @@ export default function Nav() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-2">
+          <div className="hidden md:flex items-center space-x-1">
             <Link
               href="/"
-              className={`px-5 py-2.5 rounded-xl transition-all duration-300 font-semibold text-sm ${
+              className={`px-4 py-2 rounded-md transition-all duration-300 font-semibold text-sm ${
                 pathname === "/"
-                  ? "bg-(--primary) text-white shadow-md"
-                  : "text-(--gray-700) hover:text-(--primary) hover:bg-(--accent)/20"
+                  ? "bg-(--primary) text-white"
+                  : "text-(--gray-700) hover:text-(--primary) hover:bg-(--gray-100)"
               }`}
             >
               ទំព័រដើម
             </Link>
             <Link
               href="/law_video"
-              className={`px-5 py-2.5 rounded-xl transition-all duration-300 font-semibold text-sm ${
+              className={`px-4 py-2 rounded-md transition-all duration-300 font-semibold text-sm ${
                 pathname === "/law_video"
-                  ? "bg-(--primary) text-white shadow-md"
-                  : "text-(--gray-700) hover:text-(--primary) hover:bg-(--accent)/20"
+                  ? "bg-(--primary) text-white"
+                  : "text-(--gray-700) hover:text-(--primary) hover:bg-(--gray-100)"
               }`}
             >
               វីដេអូ
             </Link>
             <Link
               href="/law_documents"
-              className={`px-5 py-2.5 rounded-xl transition-all duration-300 font-semibold text-sm ${
+              className={`px-4 py-2 rounded-md transition-all duration-300 font-semibold text-sm ${
                 pathname === "/law_documents"
-                  ? "bg-(--primary) text-white shadow-md"
-                  : "text-(--gray-700) hover:text-(--primary) hover:bg-(--accent)/20"
+                  ? "bg-(--primary) text-white"
+                  : "text-(--gray-700) hover:text-(--primary) hover:bg-(--gray-100)"
               }`}
             >
               ឯកសារ
             </Link>
             <Link
               href="/about_us"
-              className={`px-5 py-2.5 rounded-xl transition-all duration-300 font-semibold text-sm ${
+              className={`px-4 py-2 rounded-md transition-all duration-300 font-semibold text-sm ${
                 pathname === "/about_us"
-                  ? "bg-(--primary) text-white shadow-md"
-                  : "text-(--gray-700) hover:text-(--primary) hover:bg-(--accent)/20"
+                  ? "bg-(--primary) text-white"
+                  : "text-(--gray-700) hover:text-(--primary) hover:bg-(--gray-100)"
               }`}
             >
               អំពីយើង
@@ -139,7 +131,7 @@ export default function Nav() {
           <button
             type="button"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-white/50 transition-all duration-300 active:scale-95"
+            className="md:hidden p-2 rounded-md border border-transparent hover:bg-gray-100 hover:border-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2"
             aria-label="បើក/បិទម៉ឺនុយ"
           >
             <svg
@@ -174,14 +166,14 @@ export default function Nav() {
             isMenuOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
           }`}
         >
-          <div className="flex flex-col space-y-2 py-4 border-t border-white/20">
+          <div className="flex flex-col space-y-2 py-4 border-t border-gray-200">
             <Link
               href="/"
               onClick={() => setIsMenuOpen(false)}
               className={`px-4 py-3 rounded-xl transition-all duration-300 font-semibold text-sm ${
                 pathname === "/"
                   ? "bg-(--primary) text-white shadow-md"
-                  : "text-(--gray-700) hover:bg-(--accent)/20 hover:text-(--primary)"
+                  : "text-(--gray-700) hover:bg-(--gray-100) hover:text-(--primary)"
               }`}
             >
               ទំព័រដើម
@@ -192,7 +184,7 @@ export default function Nav() {
               className={`px-4 py-3 rounded-xl transition-all duration-300 font-semibold text-sm ${
                 pathname === "/law_video"
                   ? "bg-(--primary) text-white shadow-md"
-                  : "text-(--gray-700) hover:bg-(--accent)/20 hover:text-(--primary)"
+                  : "text-(--gray-700) hover:bg-(--gray-100) hover:text-(--primary)"
               }`}
             >
               វីដេអូ
@@ -203,7 +195,7 @@ export default function Nav() {
               className={`px-4 py-3 rounded-xl transition-all duration-300 font-semibold text-sm ${
                 pathname === "/law_documents"
                   ? "bg-(--primary) text-white shadow-md"
-                  : "text-(--gray-700) hover:bg-(--accent)/20 hover:text-(--primary)"
+                  : "text-(--gray-700) hover:bg-(--gray-100) hover:text-(--primary)"
               }`}
             >
               ឯកសារ
@@ -214,12 +206,12 @@ export default function Nav() {
               className={`px-4 py-3 rounded-xl transition-all duration-300 font-semibold text-sm ${
                 pathname === "/about_us"
                   ? "bg-(--primary) text-white shadow-md"
-                  : "text-(--gray-700) hover:bg-(--accent)/20 hover:text-(--primary)"
+                  : "text-(--gray-700) hover:bg-(--gray-100) hover:text-(--primary)"
               }`}
             >
               អំពីយើង
             </Link>
-            <div className="pt-3 border-t border-white/20 mt-2 space-y-2">
+            <div className="pt-3 border-t border-gray-200 mt-2 space-y-2">
               {!loading && (
                 <>
                   {user ? (

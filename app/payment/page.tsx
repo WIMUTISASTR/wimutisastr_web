@@ -510,7 +510,7 @@ function PaymentPageContent() {
                           />
                           <button
                             onClick={handleRemoveImage}
-                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-lg"
+                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 border border-red-600/20 hover:bg-red-600 transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
                             aria-label="Remove image"
                           >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

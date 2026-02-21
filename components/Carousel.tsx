@@ -88,10 +88,10 @@ export default function Carousel({
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`transition-all duration-300 rounded-full ${
+              className={`transition-all duration-200 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 ${
                 index === currentIndex
-                  ? 'w-12 h-3 bg-(--accent-dark) shadow-lg'
-                  : 'w-3 h-3 bg-(--gray-300) hover:bg-(--accent-dark) hover:scale-125'
+                  ? 'w-10 h-2.5 bg-(--accent-dark) shadow-sm'
+                  : 'w-2.5 h-2.5 bg-(--gray-300) hover:bg-(--accent-dark)'
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />
@@ -104,7 +104,7 @@ export default function Carousel({
         <>
           <button
             onClick={goToPrevious}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 shadow-lg flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-white transition-all z-10"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-gray-200 bg-white/95 shadow-sm flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 z-10"
             aria-label="Previous slide"
           >
             <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,7 +114,7 @@ export default function Carousel({
           
           <button
             onClick={goToNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 shadow-lg flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-white transition-all z-10"
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-gray-200 bg-white/95 shadow-sm flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 z-10"
             aria-label="Next slide"
           >
             <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -16,65 +16,58 @@ export default function HeroSection({ isVisible, mousePosition, home, homeLoadin
   const router = useRouter();
 
   return (
-    <section className="relative overflow-hidden bg-(--paper) pt-20">
-      {/* Background */}
+    <section className="relative overflow-hidden bg-gray-100 pt-20">
       <div className="absolute inset-0 -z-10">
+        <Image src="/asset/aboutUs.png" alt="Hero background" fill className="object-cover opacity-20" priority sizes="100vw" />
+        <div className="absolute inset-0 bg-white/80" />
         <div
-          className="absolute -top-32 -left-32 h-112 w-md rounded-full bg-(--primary) opacity-[0.07] blur-3xl"
+          className="absolute -top-20 -left-20 h-72 w-72 rounded-full bg-white/10 blur-3xl"
           style={{
-            transform: `translate(${mousePosition.x * 0.25}px, ${mousePosition.y * 0.25}px)`,
-            transition: "transform 0.4s ease-out",
+            transform: `translate(${mousePosition.x * 0.35}px, ${mousePosition.y * 0.35}px)`,
+            transition: "transform 0.35s ease-out",
           }}
         />
         <div
-          className="absolute -bottom-40 -right-40 h-136 w-136 rounded-full bg-(--accent) opacity-[0.10] blur-3xl"
+          className="absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-(--accent)/20 blur-3xl"
           style={{
-            transform: `translate(${-mousePosition.x * 0.18}px, ${-mousePosition.y * 0.18}px)`,
-            transition: "transform 0.4s ease-out",
+            transform: `translate(${-mousePosition.x * 0.2}px, ${-mousePosition.y * 0.2}px)`,
+            transition: "transform 0.35s ease-out",
           }}
         />
       </div>
 
-      {/* Content */}
-      <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-20">
-        <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
-          {/* Left Side - Text Content */}
+      <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+        <div className="grid items-center gap-10 lg:grid-cols-12">
           <div
             className={[
-              "space-y-7 transition-all duration-700",
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
-              "lg:col-span-6",
+              "space-y-7 transition-all duration-700 lg:col-span-7 rounded-2xl bg-white/95 p-6 sm:p-8 shadow-lg border border-gray-200",
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6",
             ].join(" ")}
           >
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--brown-rgb)/0.25)] bg-white/70 px-4 py-2 text-xs font-semibold tracking-wide text-(--ink) shadow-sm backdrop-blur">
-              <span className="inline-flex h-2 w-2 rounded-full bg-(--primary)" />
-              ការអប់រំច្បាប់វិជ្ជាជីវៈ
+            <div className="inline-flex items-center gap-2 rounded-full border border-(--primary)/20 bg-(--primary) px-4 py-2 text-xs font-semibold tracking-wide text-white">
+              <span className="inline-flex h-2 w-2 rounded-full bg-(--accent)" />
+              WIMUTISASTR Law Education
             </div>
-            
-            {/* Main Headline */}
-            <h1 className="text-[2.75rem] leading-[1.05] tracking-tight text-(--ink) sm:text-6xl lg:text-7xl">
-              <span className="font-extrabold">សិក្សា</span>{" "}
-              <span className="font-extrabold text-(--primary)">ច្បាប់កម្ពុជា</span>{" "}
-              <span className="font-extrabold">ជាមួយអ្នកជំនាញ</span>
+
+            <h1 className="text-4xl leading-tight tracking-tight text-(--ink) sm:text-5xl lg:text-6xl">
+              មជ្ឈមណ្ឌល
+              <span className="block text-(--primary)">សិក្សាច្បាប់កម្ពុជា</span>
             </h1>
-            
-            {/* Description */}
-            <p className="max-w-xl text-base leading-relaxed text-(--gray-700) sm:text-lg">
-              សិក្សាច្បាប់កម្ពុជាតាមវីដេអូបង្រៀនដោយអ្នកជំនាញ និងឯកសារច្បាប់ដែលរៀបចំជ្រើសរើសយ៉ាងប្រុងប្រយ័ត្ន
-              ដើម្បីជួយសិស្ស និស្សិត អ្នកជំនាញ និងសាធារណជន ឱ្យយល់ច្បាប់បានច្បាស់លាស់ និងមានទំនុកចិត្ត។
+
+            <p className="max-w-2xl text-base leading-relaxed text-gray-700 sm:text-lg">
+              ផ្តល់ជូនវគ្គវីដេអូ និងឯកសារច្បាប់សំខាន់ៗ ដើម្បីជួយឱ្យសិស្ស និស្សិត អ្នកជំនាញ និងសាធារណជន
+              អាចសិក្សា និងយល់ដឹងអំពីច្បាប់កម្ពុជាបានយ៉ាងច្បាស់លាស់។
             </p>
 
-            {/* Benefits */}
-            <ul className="grid gap-3 sm:grid-cols-2">
+            <ul className="grid gap-3 sm:grid-cols-2 max-w-2xl">
               {[
                 "រៀនដោយអ្នកជំនាញដឹកនាំ",
                 "ឯកសារច្បាប់បានផ្ទៀងផ្ទាត់",
                 "មេរៀនច្បាស់លាស់ និងមានរចនាសម្ព័ន្ធ",
                 "ចូលប្រើបានគ្រប់ពេល គ្រប់ទីកន្លែង",
               ].map((item) => (
-                <li key={item} className="flex items-start gap-2 text-sm text-(--gray-700)">
-                  <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[rgb(var(--brown-rgb)/0.12)] text-(--primary)">
+                <li key={item} className="flex items-start gap-2 text-sm text-gray-700">
+                  <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-(--primary)/10 text-(--primary)">
                     <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden="true">
                       <path
                         d="M20 6L9 17l-5-5"
@@ -89,10 +82,9 @@ export default function HeroSection({ isVisible, mousePosition, home, homeLoadin
                 </li>
               ))}
             </ul>
-            
-            {/* CTA Buttons */}
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-              <Button onClick={() => router.push("/law_video")} variant="primary" size="lg" className="group">
+
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <Button onClick={() => router.push("/law_video")} variant="primary" size="lg" className="group min-w-[180px] justify-center">
                 <span className="flex items-center gap-2">
                   ចាប់ផ្តើមសិក្សា
                   <svg
@@ -106,14 +98,17 @@ export default function HeroSection({ isVisible, mousePosition, home, homeLoadin
                   </svg>
                 </span>
               </Button>
-              <Button onClick={() => router.push("/pricing_page")} variant="outline" size="lg">
-                មើលតម្លៃគម្រោង
+              <Button
+                onClick={() => router.push("/law_documents")}
+                variant="outline"
+                size="lg"
+                className="min-w-[180px] justify-center"
+              >
+                មើលឯកសារច្បាប់
               </Button>
-              <span className="text-xs text-(--gray-700) sm:ml-2">ចូលប្រើបានលឿន។ រៀនបានងាយស្រួល។</span>
             </div>
 
-            {/* Stats Preview */}
-            <div className="grid gap-3 pt-3 sm:grid-cols-3">
+            <div className="grid gap-3 pt-4 sm:grid-cols-3 max-w-3xl">
               {[
                 { label: "វគ្គសិក្សា", value: home?.stats.categoriesCount ?? 0 },
                 { label: "វីដេអូ", value: home?.stats.videosCount ?? 0 },
@@ -121,13 +116,13 @@ export default function HeroSection({ isVisible, mousePosition, home, homeLoadin
               ].map((s) => (
                 <div
                   key={s.label}
-                  className="rounded-2xl border border-gray-200 bg-white/70 px-4 py-3 shadow-sm backdrop-blur"
+                  className="rounded-xl border border-gray-200 bg-white px-4 py-3"
                 >
                   <div className="flex items-baseline gap-2">
                     <div className="text-2xl font-extrabold text-(--ink)">
                       {homeLoading ? <span className="inline-block w-10 animate-pulse rounded bg-gray-200">&nbsp;</span> : s.value}
                     </div>
-                    <div className="text-xs font-semibold uppercase tracking-wide text-(--gray-700)">
+                    <div className="text-xs font-semibold uppercase tracking-wide text-gray-700">
                       {s.label}
                     </div>
                   </div>
@@ -136,53 +131,38 @@ export default function HeroSection({ isVisible, mousePosition, home, homeLoadin
             </div>
           </div>
 
-          {/* Right Side - Hero Visual */}
           <div
             className={[
-              "transition-all duration-700 delay-150",
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
-              "lg:col-span-6",
+              "transition-all duration-700 delay-150 lg:col-span-5",
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6",
             ].join(" ")}
           >
-            <div className="relative mx-auto w-full max-w-xl">
-              {/* Glow */}
-              <div className="absolute -inset-6 rounded-4xlbg-(--accent) opacity-[0.18] blur-3xl" />
-
-              {/* Frame */}
-              <div
-                className="relative overflow-hidden rounded-4xl border border-gray-200 bg-white shadow-2xl"
-                style={{
-                  transform: `perspective(1200px) rotateY(${mousePosition.x * 0.012}deg) rotateX(${-mousePosition.y * 0.012}deg)`,
-                  transition: "transform 0.25s ease-out",
-                }}
-              >
-                <div className="relative p-5 sm:p-7">
-                  <div className="rounded-2xl border border-[rgb(var(--brown-rgb)/0.20)] bg-[rgb(var(--brown-rgb)/0.06)] p-4">
-                    <div className="relative aspect-4/3 overflow-hidden bg-white shadow-md">
-                      <Image
-                        src="/asset/hero.png"
-                        alt="ការអប់រំច្បាប់កម្ពុជា"
-                        fill
-                        className="object-cover"
-                        priority
-                        sizes="(max-width: 1024px) 90vw, 42vw"
-                      />
-                    </div>
-                  </div>                                 
+            <div
+              className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl"
+              style={{
+                transform: `perspective(1200px) rotateY(${mousePosition.x * 0.008}deg) rotateX(${-mousePosition.y * 0.008}deg)`,
+                transition: "transform 0.25s ease-out",
+              }}
+            >
+              <div className="relative aspect-4/3">
+                <Image
+                  src="/asset/hero.png"
+                  alt="ការអប់រំច្បាប់កម្ពុជា"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 92vw, 42vw"
+                  priority
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/25 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-5">
+                  <div className="text-white text-sm font-semibold mb-1">ព័ត៌មានសង្ខេប</div>
+                  <div className="text-gray-100 text-xs">
+                    សិក្សាច្បាប់តាមប្រព័ន្ធអនឡាញជាមួយមាតិកាដែលរៀបចំដោយអ្នកជំនាញ។
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
-        <div className="hidden flex-col items-center gap-2 sm:flex">
-          <span className="text-[11px] font-semibold uppercase tracking-widest text-(--gray-700)">រមូរ</span>
-          <svg className="h-6 w-6 text-(--primary)" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
         </div>
       </div>
     </section>

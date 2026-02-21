@@ -11,11 +11,7 @@ import {
   FeaturesSection,
   FeaturedCoursesSection,
   FeaturedDocumentsSection,
-  StatisticsSection,
   TrustedBySection,
-  AccreditationSection,
-  TestimonialsSection,
-  CallToActionSection,
   Footer,
 } from "@/components/home";
 
@@ -168,11 +164,7 @@ export default function Home() {
         hasPaid={hasPaid}
       />
 
-      {/* <StatisticsSection home={home} /> */}
-      {/* <TrustedBySection /> */}
-      <AccreditationSection />
-      <TestimonialsSection />
-      {/* <CallToActionSection /> */}
+      <TrustedBySection />
       <Footer />
     </PageContainer>
   );

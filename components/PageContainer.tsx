@@ -8,7 +8,7 @@ interface PageContainerProps {
 
 export default function PageContainer({ children, className = "" }: PageContainerProps) {
   return (
-    <div className={`min-h-screen bg-(--background) text-(--foreground) pt-20 ${className}`}>
+    <div className={`min-h-screen bg-(--background) text-(--foreground) pt-24 md:pt-28 ${className}`}>
       <Nav />
       {children}
     </div>

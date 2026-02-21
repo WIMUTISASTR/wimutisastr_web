@@ -208,7 +208,7 @@ export default function WatchVideoPage() {
                 </Link>
                 <button
                   onClick={() => setSidebarOpen(!sidebarOpen)}
-                  className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="lg:hidden p-2 rounded-md border border-transparent hover:bg-gray-100 hover:border-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2"
                   aria-label="បើក/បិទផ្នែកចំហៀង"
                 >
                   <BookOpenIcon className="w-5 h-5 text-gray-600" />
@@ -442,10 +442,10 @@ export default function WatchVideoPage() {
                             <button
                               key={video.id}
                               onClick={() => handleGo(video.id)}
-                              className={`w-full text-left p-4 rounded-xl transition-all duration-200 group ${
+                              className={`w-full text-left p-4 rounded-md transition-all duration-200 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 ${
                                 isActive
-                                  ? "bg-(--brown)/10 border-2 border-(--brown) shadow-md"
-                                  : "hover:bg-gray-50 border-2 border-transparent hover:border-gray-200"
+                                  ? "bg-(--brown)/10 border border-(--brown) shadow-sm"
+                                  : "hover:bg-gray-50 border border-transparent hover:border-gray-200"
                               }`}
                             >
                               <div className="flex items-start gap-3">

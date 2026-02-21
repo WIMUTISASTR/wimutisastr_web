@@ -101,14 +101,14 @@ class ErrorBoundary extends Component<Props, State> {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
                 onClick={this.handleReset}
-                className="px-6 py-3 bg-(--primary) text-white rounded-xl font-semibold hover:bg-(--primary-dark) transition-colors shadow-sm hover:shadow-md"
+                className="px-5 py-2.5 bg-(--primary) text-white rounded-md border border-transparent font-semibold hover:bg-(--primary-dark) transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2"
               >
                 ព្យាយាមម្តងទៀត
               </button>
               
               <button
                 onClick={() => window.location.href = '/'}
-                className="px-6 py-3 bg-white text-gray-700 border-2 border-gray-200 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
+                className="px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-md font-semibold hover:bg-gray-50 transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2"
               >
                 ត្រឡប់ទៅទំព័រដើម
               </button>

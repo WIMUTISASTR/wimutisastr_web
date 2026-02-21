@@ -140,7 +140,7 @@ export default function DocumentCategoryPage() {
                         setSelectedYear("all");
                         setAccessFilter("all");
                       }}
-                      className="h-10 rounded bg-(--primary) px-4 text-sm font-semibold text-white hover:opacity-90"
+                      className="h-10 rounded-md bg-(--primary) px-4 text-sm font-semibold text-white border border-transparent shadow-sm hover:bg-(--primary-light) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 transition-colors"
                     >
                       កំណត់ឡើងវិញ
                     </button>

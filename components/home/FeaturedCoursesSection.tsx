@@ -159,10 +159,10 @@ export default function FeaturedCoursesSection({
                 <button
                   key={index}
                   onClick={() => setCurrentCourseIndex(index)}
-                  className={`transition-all duration-300 rounded-full ${
+                  className={`transition-all duration-200 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 ${
                     index === currentCourseIndex
-                      ? 'w-12 h-3 bg-(--primary) shadow-lg'
-                      : 'w-3 h-3 bg-(--gray-300) hover:bg-(--primary) hover:scale-125'
+                      ? 'w-10 h-2.5 bg-(--primary) shadow-sm'
+                      : 'w-2.5 h-2.5 bg-(--gray-300) hover:bg-(--primary)'
                   }`}
                   aria-label={`ទៅស្លាយ ${index + 1}`}
                 />
