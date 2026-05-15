@@ -414,7 +414,6 @@ function PaymentPageContent() {
                 <div className="space-y-6">
                   {/* Baray Online Payment */}
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900">បង់ប្រាក់អនឡាញ (Baray)</h3>
                     <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
                       <div className="flex flex-col items-center text-center space-y-4">
                         <div className="flex items-center space-x-3">
@@ -442,7 +441,7 @@ function PaymentPageContent() {
                               កំពុងដំណើរការ...
                             </span>
                           ) : (
-                            `បង់ $${selectedPlan.price} តាម Baray`
+                            `បង់ $${selectedPlan.price}`
                           )}
                         </Button>
                       </div>
