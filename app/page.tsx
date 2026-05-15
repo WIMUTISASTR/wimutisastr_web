@@ -6,6 +6,7 @@ import { fetchHome, type HomeResponse } from "@/lib/api/client";
 import { throttle } from "@/lib/utils/throttle";
 import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
 import logger from "@/lib/utils/logger";
+import { notify } from "@/lib/utils/notify";
 import {
   HeroSection,
   FeaturesSection,
@@ -28,8 +29,8 @@ export default function Home() {
   useEffect(() => {
     const handleMouseMove = throttle((e: MouseEvent) => {
       setMousePosition({
-        x: (e.clientX / window.innerWidth - 0.5) * 20,
-        y: (e.clientY / window.innerHeight - 0.5) * 20,
+        x: (e.clientX / window.innerWidth - 0.5) * 12,
+        y: (e.clientY / window.innerHeight - 0.5) * 12,
       });
     }, 50); // Throttle to once every 50ms
 
@@ -98,7 +99,10 @@ export default function Home() {
         if (!cancelled) setHome(data);
       } catch (e) {
         logger.error("Failed to load home data:", e);
-        if (!cancelled) setHome(null);
+        if (!cancelled) {
+          setHome(null);
+          notify.error("ផ្ទុកទំព័រដើមមិនជោគជ័យ។ សូមពិនិត្យការតភ្ជាប់របស់អ្នក។");
+        }
       } finally {
         if (!cancelled) setHomeLoading(false);
       }

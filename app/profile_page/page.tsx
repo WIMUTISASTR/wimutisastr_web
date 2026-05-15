@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+import { notify } from "@/lib/utils/notify";
 import { useAuth } from "@/lib/auth/context";
 import { supabase } from "@/lib/supabase/instance";
 import PageContainer from "@/components/PageContainer";
@@ -53,7 +53,7 @@ export default function ProfilePage() {
         });
       } catch (e) {
         console.error("Failed to load profile:", e);
-        toast.error("ផ្ទុកទិន្នន័យប្រវត្តិរូបមិនជោគជ័យ");
+        notify.error("ផ្ទុកទិន្នន័យប្រវត្តិរូបមិនជោគជ័យ");
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -72,10 +72,10 @@ export default function ProfilePage() {
         data: { full_name: edit.fullName, phone: edit.phone },
       });
       if (updateError) {
-        toast.error(updateError.message || "ធ្វើបច្ចុប្បន្នភាពប្រវត្តិរូបមិនជោគជ័យ");
+        notify.error(updateError.message || "ធ្វើបច្ចុប្បន្នភាពប្រវត្តិរូបមិនជោគជ័យ");
         return;
       }
-      toast.success("បានធ្វើបច្ចុប្បន្នភាពប្រវត្តិរូបដោយជោគជ័យ!");
+      notify.success("បានធ្វើបច្ចុប្បន្នភាពប្រវត្តិរូបដោយជោគជ័យ!");
       setIsEditing(false);
       try {
         const data = await fetchProfileMe();
@@ -85,7 +85,7 @@ export default function ProfilePage() {
       }
     } catch (e) {
       console.error("Error updating profile:", e);
-      toast.error("មានកំហុសមិនបានរំពឹងទុក");
+      notify.error("មានកំហុសមិនបានរំពឹងទុក");
     } finally {
       setIsLoading(false);
     }
@@ -397,7 +397,7 @@ export default function ProfilePage() {
                     <Button
                       onClick={async () => {
                         await signOut();
-                        toast.success("បានចេញពីគណនីដោយជោគជ័យ");
+                        notify.success("បានចេញពីគណនីដោយជោគជ័យ");
                       }}
                       variant="outline"
                       className="px-4 py-2 text-base"

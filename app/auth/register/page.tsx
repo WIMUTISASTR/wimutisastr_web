@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+import { notify } from "@/lib/utils/notify";
 import { supabase } from "@/lib/supabase/instance";
 import PageContainer from "@/components/PageContainer";
 import FormSection from "@/components/FormSection";
@@ -48,7 +48,7 @@ export default function RegisterPage() {
     
     // Check Turnstile verification only if required
     if (turnstileRequired && !turnstileToken) {
-      toast.error("សូមបំពេញការផ្ទៀងផ្ទាត់សុវត្ថិភាព");
+      notify.error("សូមបំពេញការផ្ទៀងផ្ទាត់សុវត្ថិភាព");
       return;
     }
     
@@ -56,15 +56,15 @@ export default function RegisterPage() {
 
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "ពាក្យសម្ងាត់មិនត្រូវគ្នា";
-      toast.error("ពាក្យសម្ងាត់មិនត្រូវគ្នា");
+      notify.error("ពាក្យសម្ងាត់មិនត្រូវគ្នា");
     }
     if (formData.password.length < 8) {
       newErrors.password = "ពាក្យសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ 8 តួអក្សរ";
-      toast.error("ពាក្យសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ 8 តួអក្សរ");
+      notify.error("ពាក្យសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ 8 តួអក្សរ");
     }
     if (!formData.agreeToTerms) {
       newErrors.agreeToTerms = "សូមយល់ព្រមលក្ខខណ្ឌ និងគោលការណ៍";
-      toast.error("សូមយល់ព្រមលក្ខខណ្ឌ និងគោលការណ៍");
+      notify.error("សូមយល់ព្រមលក្ខខណ្ឌ និងគោលការណ៍");
     }
 
     setErrors(newErrors);
@@ -85,7 +85,7 @@ export default function RegisterPage() {
           const turnstileResult = await turnstileResponse.json();
           
           if (!turnstileResult.success) {
-            toast.error("ការផ្ទៀងផ្ទាត់សុវត្ថិភាពបរាជ័យ។ សូមព្យាយាមម្តងទៀត។");
+            notify.error("ការផ្ទៀងផ្ទាត់សុវត្ថិភាពបរាជ័យ។ សូមព្យាយាមម្តងទៀត។");
             setLoading(false);
             return;
           }
@@ -102,13 +102,13 @@ export default function RegisterPage() {
         });
 
         if (signUpError) {
-          toast.error(signUpError.message || "បង្កើតគណនីមិនជោគជ័យ។ សូមព្យាយាមម្តងទៀត។");
+          notify.error(signUpError.message || "បង្កើតគណនីមិនជោគជ័យ។ សូមព្យាយាមម្តងទៀត។");
           setLoading(false);
           return;
         }
 
         if (data.user) {
-          toast.success("បង្កើតគណនីបានជោគជ័យ! សូមស្វាគមន៍!");
+          notify.success("បង្កើតគណនីបានជោគជ័យ! សូមស្វាគមន៍!");
           // Redirect to home page or show success message
           setTimeout(() => {
             router.push("/");
@@ -116,7 +116,7 @@ export default function RegisterPage() {
           }, 1000);
         }
       } catch (err) {
-        toast.error("មានកំហុសមិនបានរំពឹងទុក។ សូមព្យាយាមម្តងទៀត។");
+        notify.error("មានកំហុសមិនបានរំពឹងទុក។ សូមព្យាយាមម្តងទៀត។");
         setLoading(false);
       }
     }

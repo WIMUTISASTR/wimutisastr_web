@@ -6,6 +6,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import { fetchVideos, type VideoCategory, type VideoRow } from "@/lib/api/client";
 import type { VideoCategory as GridVideoCategory, VideoRow as GridVideoRow } from "@/lib/data/videos";
 import VideoGridClient from "./VideoGridClient";
+import { notify } from "@/lib/utils/notify";
 
 export default function LawVideoPage() {
   const [categories, setCategories] = useState<GridVideoCategory[]>([]);
@@ -46,7 +47,9 @@ export default function LawVideoPage() {
         }
       } catch (e: unknown) {
         if (!cancelled) {
-          setError(e instanceof Error ? e.message : "ផ្ទុកវគ្គសិក្សាមិនជោគជ័យ។");
+          const message = e instanceof Error ? e.message : "ផ្ទុកវគ្គសិក្សាមិនជោគជ័យ។";
+          setError(message);
+          notify.error(message);
           setCategories([]);
           setVideos([]);
         }

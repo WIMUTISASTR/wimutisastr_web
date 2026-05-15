@@ -10,6 +10,7 @@ import { useParams, useRouter } from "next/navigation";
 import { fetchVideos, type VideoCategory, type VideoRow } from "@/lib/api/client";
 import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
 import { useMembership } from "@/lib/hooks/useMembership";
+import { notify } from "@/lib/utils/notify";
 
 const FALLBACK_THUMB = "/asset/document_background.png";
 
@@ -80,7 +81,11 @@ export default function VideoCategoryPage() {
         }
       } catch (e: unknown) {
         console.error(e);
-        if (!cancelled) setError(e instanceof Error ? e.message : "ផ្ទុកវីដេអូមិនជោគជ័យ។");
+        if (!cancelled) {
+          const message = e instanceof Error ? e.message : "ផ្ទុកវីដេអូមិនជោគជ័យ។";
+          setError(message);
+          notify.error(message);
+        }
       } finally {
         if (!cancelled) setIsLoading(false);
       }

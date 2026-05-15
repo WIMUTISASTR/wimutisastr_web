@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { notify } from "@/lib/utils/notify";
 
 interface DocxViewerProps {
   url: string;
@@ -84,7 +85,9 @@ export default function DocxViewer({ url, className = "" }: DocxViewerProps) {
       } catch (err) {
         console.error("DocxViewer error:", err);
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Failed to load document");
+          const message = err instanceof Error ? err.message : "មិនអាចបើកឯកសារបានទេ។";
+          setError(message);
+          notify.error(message);
           setLoading(false);
         }
       }

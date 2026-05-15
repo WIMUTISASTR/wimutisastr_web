@@ -11,22 +11,22 @@ export default function TrustedBySection() {
   ];
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white border-t border-gray-200">
-      <div className="max-w-7xl mx-auto">
-        <p className="text-center text-gray-600 mb-12 text-lg font-medium scroll-animate opacity-0 translate-y-4">
+    <section className="border-t border-(--gray-200) bg-white py-16 sm:py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <p className="mx-auto mb-10 max-w-2xl text-center text-sm font-medium leading-relaxed text-(--gray-700) sm:text-base scroll-animate opacity-0 translate-y-4">
           ទទួលការជឿទុកចិត្តពីអ្នកជំនាញច្បាប់ និងស្ថាប័ននានា
         </p>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center">
+        <div className="grid grid-cols-2 items-stretch gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-6">
           {partners.map((partner, index) => (
             <div
               key={partner.abbrev}
-              className="flex flex-col items-center space-y-3 p-6 rounded-2xl hover:bg-gray-50 transition-all duration-300 hover:scale-110 hover:shadow-lg scroll-animate opacity-0 translate-y-4"
-              style={{ animationDelay: `${index * 100}ms` }}
+              className="flex flex-col items-center rounded-xl border border-(--gray-200) bg-(--gray-50)/50 px-4 py-6 text-center transition-colors duration-200 hover:border-(--gray-300) hover:bg-white scroll-animate opacity-0 translate-y-4"
+              style={{ animationDelay: `${index * 60}ms` }}
             >
-              <div className="w-20 h-20 rounded-2xl flex items-center justify-center bg-slate-900 ring-2 ring-(--brown)/25 shadow-lg">
-                <span className="text-white font-bold text-sm">{partner.abbrev}</span>
+              <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-slate-900 shadow-md ring-1 ring-(--brown)/20">
+                <span className="text-xs font-bold tracking-wide text-white">{partner.abbrev}</span>
               </div>
-              <p className="text-xs text-gray-600 text-center font-medium">{partner.name}</p>
+              <p className="mt-3 text-xs font-medium leading-snug text-(--gray-700)">{partner.name}</p>
             </div>
           ))}
         </div>

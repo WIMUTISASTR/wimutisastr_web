@@ -10,7 +10,7 @@ import { useEffect, useMemo, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/context";
 import { supabase } from "@/lib/supabase/instance";
-import { toast } from "react-toastify";
+import { notify } from "@/lib/utils/notify";
 
 interface PlanDetails {
   id: string;
@@ -48,6 +48,7 @@ function PaymentPageContent() {
   const [proofImagePreview, setProofImagePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [isBarayLoading, setIsBarayLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -132,6 +133,56 @@ function PaymentPageContent() {
 
   // Auto-checking removed - payment verification will be done manually after proof upload
 
+  const handleBarayPayment = async () => {
+    if (!user) {
+      notify.error("សូមចូលគណនីដើម្បីបង់ប្រាក់");
+      router.push(`/auth/login?redirect=${encodeURIComponent(`/payment${planId ? `?plan=${planId}` : ""}`)}`);
+      return;
+    }
+    if (!selectedPlan) return;
+
+    setIsBarayLoading(true);
+    setErrorMessage("");
+
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session?.access_token) {
+        notify.error("សម័យប្រើប្រាស់ផុតកំណត់។ សូមចូលគណនីម្ដងទៀត។");
+        router.push("/auth/login");
+        return;
+      }
+
+      const res = await fetch("/api/payment/baray/create-intent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          planId: selectedPlan.id,
+          amount: selectedPlan.price,
+          currency: selectedPlan.currency ?? "USD",
+        }),
+      });
+
+      const data = await res.json() as { redirectUrl?: string; error?: string };
+
+      if (!res.ok) {
+        notify.error(data.error || "មិនអាចចាប់ផ្តើមការទូទាត់បានទេ។ សូមព្យាយាមម្តងទៀត។");
+        setErrorMessage(data.error || "");
+        return;
+      }
+
+      if (data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+      }
+    } catch {
+      notify.error("មិនអាចទូទាត់បានទេ។ សូមព្យាយាមម្តងទៀត។");
+    } finally {
+      setIsBarayLoading(false);
+    }
+  };
+
   // Handle proof of payment image upload
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -174,7 +225,7 @@ function PaymentPageContent() {
     // Check if user is authenticated
     if (!user) {
       setErrorMessage("សូមចូលគណនីដើម្បីផ្ទុកភស្តុតាងបង់ប្រាក់");
-      toast.error("សូមចូលគណនីដើម្បីផ្ទុកភស្តុតាងបង់ប្រាក់");
+      notify.error("សូមចូលគណនីដើម្បីផ្ទុកភស្តុតាងបង់ប្រាក់");
       router.push("/auth/login");
       return;
     }
@@ -188,7 +239,7 @@ function PaymentPageContent() {
       
       if (sessionError || !session?.access_token) {
         setErrorMessage("សម័យប្រើប្រាស់ផុតកំណត់។ សូមចូលគណនីម្ដងទៀត។");
-        toast.error("សម័យប្រើប្រាស់ផុតកំណត់។ សូមចូលគណនីម្ដងទៀត។");
+        notify.error("សម័យប្រើប្រាស់ផុតកំណត់។ សូមចូលគណនីម្ដងទៀត។");
         router.push("/auth/login");
         return;
       }
@@ -199,7 +250,7 @@ function PaymentPageContent() {
       formData.append('reference', paymentReference);
       if (!selectedPlan) {
         setErrorMessage("មិនទាន់ផ្ទុកគម្រោងទេ។ សូមត្រឡប់ក្រោយ ហើយជ្រើសរើសគម្រោងម្តងទៀត។");
-        toast.error("មិនទាន់ផ្ទុកគម្រោងទេ។ សូមជ្រើសរើសគម្រោងម្តងទៀត។");
+        notify.error("មិនទាន់ផ្ទុកគម្រោងទេ។ សូមជ្រើសរើសគម្រោងម្តងទៀត។");
         return;
       }
       formData.append('planId', selectedPlan.id);
@@ -216,11 +267,11 @@ function PaymentPageContent() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: "ផ្ទុកភស្តុតាងបង់ប្រាក់មិនជោគជ័យ" }));
         const message = errorData.error || "ផ្ទុកភស្តុតាងបង់ប្រាក់មិនជោគជ័យ";
-        // Use toast for user-facing messaging (and avoid throwing / red overlay)
+        // Use notify for user-facing messaging (and avoid throwing / red overlay)
         if (response.status === 409) {
-          toast.info(message);
+          notify.info(message);
         } else {
-          toast.error(message);
+          notify.error(message);
         }
         setErrorMessage(message);
         return;
@@ -229,12 +280,12 @@ function PaymentPageContent() {
       const data = await response.json();
       setUploadSuccess(true);
       setErrorMessage("");
-      toast.success("បានផ្ទុកភស្តុតាងបង់ប្រាក់រួចរាល់។ សូមរង់ចាំការពិនិត្យពីអ្នកគ្រប់គ្រង។");
+      notify.success("បានផ្ទុកភស្តុតាងបង់ប្រាក់រួចរាល់។ សូមរង់ចាំការពិនិត្យពីអ្នកគ្រប់គ្រង។");
     } catch (error) {
       console.error("Error uploading proof:", error);
       const message = error instanceof Error ? error.message : "ផ្ទុកភស្តុតាងបង់ប្រាក់មិនជោគជ័យ។ សូមព្យាយាមម្តងទៀត។";
       setErrorMessage(message);
-      toast.error(message);
+      notify.error(message);
     } finally {
       setIsUploading(false);
     }
@@ -378,9 +429,56 @@ function PaymentPageContent() {
               <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">ព័ត៌មានការទូទាត់</h2>
 
-                <div className="space-y-6">                  
+                <div className="space-y-6">
+                  {/* Baray Online Payment */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900">បង់ប្រាក់អនឡាញ (Baray)</h3>
+                    <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
+                      <div className="flex flex-col items-center text-center space-y-4">
+                        <div className="flex items-center space-x-3">
+                          <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                          </svg>
+                          <span className="text-blue-800 font-semibold text-lg">ABA · ACLEDA · Wing · Sathapana</span>
+                        </div>
+                        <p className="text-sm text-blue-700">
+                          ទូទាត់ភ្លាមៗ — ការជាវរបស់អ្នកនឹងដំណើរការស្វ័យប្រវត្តិ ដោយមិនចាំបាច់ផ្ទុកភស្តុតាង ឬរង់ចាំការពិនិត្យ។
+                        </p>
+                        <Button
+                          onClick={handleBarayPayment}
+                          variant="primary"
+                          fullWidth
+                          disabled={isBarayLoading}
+                          className="max-w-xs py-3 text-base"
+                        >
+                          {isBarayLoading ? (
+                            <span className="flex items-center justify-center">
+                              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              កំពុងដំណើរការ...
+                            </span>
+                          ) : (
+                            `បង់ $${selectedPlan.price} តាម Baray`
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-200" />
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="bg-white px-4 text-gray-500">ឬទូទាត់តាម KHQR Bakong</span>
+                    </div>
+                  </div>
+
                   {/* KHQR Bakong Payment */}
-                  <div className="space-y-4 pt-4 border-t border-gray-200">
+                  <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">បង់ប្រាក់ដោយ KHQR Bakong</h3>
                     
                     {/* QR Code Display */}

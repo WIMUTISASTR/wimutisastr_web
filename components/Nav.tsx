@@ -79,6 +79,16 @@ export default function Nav() {
               ឯកសារ
             </Link>
             <Link
+              href="/vocche_banche_banchal"
+              className={`px-4 py-2 rounded-md transition-all duration-300 font-semibold text-sm ${
+                pathname === "/vocche_banche_banchal"
+                  ? "bg-(--primary) text-white"
+                  : "text-(--gray-700) hover:text-(--primary) hover:bg-(--gray-100)"
+              }`}
+            >
+              វគ្គបណ្តុុះបណ្តាល
+            </Link>
+            <Link
               href="/about_us"
               className={`px-4 py-2 rounded-md transition-all duration-300 font-semibold text-sm ${
                 pathname === "/about_us"
@@ -199,6 +209,17 @@ export default function Nav() {
               }`}
             >
               ឯកសារ
+            </Link>
+            <Link
+              href="/vocche_banche_banchal"
+              onClick={() => setIsMenuOpen(false)}
+              className={`px-4 py-3 rounded-xl transition-all duration-300 font-semibold text-sm ${
+                pathname === "/vocche_banche_banchal"
+                  ? "bg-(--primary) text-white shadow-md"
+                  : "text-(--gray-700) hover:bg-(--gray-100) hover:text-(--primary)"
+              }`}
+            >
+              វគ្គបណ្តុុះបណ្តាល
             </Link>
             <Link
               href="/about_us"

@@ -7,9 +7,11 @@ export default function ToastProvider() {
   return (
     <ToastContainer
       position="top-right"
-      autoClose={3000}
+      autoClose={3500}
+      limit={5}
+      stacked
+      newestOnTop
       hideProgressBar={false}
-      newestOnTop={false}
       closeOnClick
       rtl={false}
       pauseOnFocusLoss
@@ -17,8 +19,7 @@ export default function ToastProvider() {
       pauseOnHover
       theme="light"
       className="toast-container"
+      toastClassName="font-sans text-sm"
     />
   );
 }
-
-

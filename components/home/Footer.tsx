@@ -4,57 +4,73 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-(--primary-dark) text-gray-200 pt-12 pb-6 px-4 sm:px-6 lg:px-8 border-t-4 border-(--primary)">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-10">
-          <div>
-            <h3 className="text-white font-bold text-lg mb-4">WIMUTISASTR</h3>
-            <p className="text-sm text-gray-300 leading-relaxed">
+    <footer className="border-t-4 border-(--primary) bg-(--primary-dark) px-4 pb-8 pt-14 text-gray-200 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
+          <div className="sm:col-span-2 lg:col-span-1">
+            <p className="text-sm font-semibold uppercase tracking-wide text-white">WIMUTISASTR</p>
+            <p className="mt-3 max-w-sm text-sm leading-relaxed text-gray-300">
               វេទិកាអប់រំច្បាប់កម្ពុជា សម្រាប់វីដេអូសិក្សា និងឯកសារច្បាប់ដែលអាចចូលប្រើបានសម្រាប់សាធារណជន។
             </p>
           </div>
           <div>
-            <h3 className="text-white font-bold text-lg mb-4">អំពីស្ថាប័ន</h3>
-            <div className="space-y-2 text-sm">
-              <Link href="/about_us" className="block text-gray-300 hover:text-white transition-colors">
-                អំពីយើង
-              </Link>
-              <Link href="/contact" className="block text-gray-300 hover:text-white transition-colors">
-                ទំនាក់ទំនង
-              </Link>
-            </div>
+            <h3 className="text-sm font-semibold text-white">អំពីស្ថាប័ន</h3>
+            <ul className="mt-4 space-y-2.5 text-sm">
+              <li>
+                <Link href="/about_us" className="text-gray-300 transition-colors duration-200 hover:text-white">
+                  អំពីយើង
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="text-gray-300 transition-colors duration-200 hover:text-white">
+                  ទំនាក់ទំនង
+                </Link>
+              </li>
+            </ul>
           </div>
           <div>
-            <h3 className="text-white font-bold text-lg mb-4">ធនធានចម្បង</h3>
-            <div className="space-y-3">
-              <Link href="/law_video" className="block text-gray-300 hover:text-white transition-colors text-sm">
-                វីដេអូច្បាប់
-              </Link>
-              <Link href="/law_documents" className="block text-gray-300 hover:text-white transition-colors text-sm">
-                ឯកសារច្បាប់
-              </Link>
-              <Link href="/pricing_page" className="block text-gray-300 hover:text-white transition-colors text-sm">
-                គម្រោងសមាជិកភាព
-              </Link>
-            </div>
+            <h3 className="text-sm font-semibold text-white">ធនធានចម្បង</h3>
+            <ul className="mt-4 space-y-2.5 text-sm">
+              <li>
+                <Link href="/law_video" className="text-gray-300 transition-colors duration-200 hover:text-white">
+                  វីដេអូច្បាប់
+                </Link>
+              </li>
+              <li>
+                <Link href="/law_documents" className="text-gray-300 transition-colors duration-200 hover:text-white">
+                  ឯកសារច្បាប់
+                </Link>
+              </li>
+              <li>
+                <Link href="/pricing_page" className="text-gray-300 transition-colors duration-200 hover:text-white">
+                  គម្រោងសមាជិកភាព
+                </Link>
+              </li>
+            </ul>
           </div>
           <div>
-            <h3 className="text-white font-bold text-lg mb-4">គណនី</h3>
-            <div className="space-y-2 text-sm">
-              <Link href="/auth/login" className="block text-gray-300 hover:text-white transition-colors">
-                ចូលគណនី
-              </Link>
-              <Link href="/auth/register" className="block text-gray-300 hover:text-white transition-colors">
-                ចុះឈ្មោះ
-              </Link>
-              <Link href="/profile_page" className="block text-gray-300 hover:text-white transition-colors">
-                ប្រវត្តិរូប
-              </Link>
-            </div>
+            <h3 className="text-sm font-semibold text-white">គណនី</h3>
+            <ul className="mt-4 space-y-2.5 text-sm">
+              <li>
+                <Link href="/auth/login" className="text-gray-300 transition-colors duration-200 hover:text-white">
+                  ចូលគណនី
+                </Link>
+              </li>
+              <li>
+                <Link href="/auth/register" className="text-gray-300 transition-colors duration-200 hover:text-white">
+                  ចុះឈ្មោះ
+                </Link>
+              </li>
+              <li>
+                <Link href="/profile_page" className="text-gray-300 transition-colors duration-200 hover:text-white">
+                  ប្រវត្តិរូប
+                </Link>
+              </li>
+            </ul>
           </div>
         </div>
 
-        <div className="border-t border-white/15 pt-5 text-center text-xs sm:text-sm text-gray-300">
+        <div className="mt-12 border-t border-white/15 pt-6 text-center text-xs text-gray-400 sm:text-sm">
           <p>&copy; {new Date().getFullYear()} WIMUTISASTR Law Office — រក្សាសិទ្ធិគ្រប់យ៉ាង។</p>
         </div>
       </div>

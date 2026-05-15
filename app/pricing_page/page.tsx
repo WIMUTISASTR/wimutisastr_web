@@ -6,6 +6,7 @@ import Button from "@/components/Button";
 import LoadingState from "@/components/LoadingState";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { notify } from "@/lib/utils/notify";
 
 interface PricingPlan {
   id: string;
@@ -35,13 +36,21 @@ export default function PricingPage() {
         const res = await fetch("/api/pricing-plans", { cache: "no-store" });
         const json = (await res.json().catch(() => ({}))) as { plans?: PricingPlan[]; error?: string };
         if (!res.ok) {
-          if (!cancelled) setPlansError(json.error || "ផ្ទុកគម្រោងមិនជោគជ័យ។");
+          const msg = json.error || "ផ្ទុកគម្រោងមិនជោគជ័យ។";
+          if (!cancelled) {
+            setPlansError(msg);
+            notify.error(msg);
+          }
           return;
         }
         if (!cancelled) setRemotePlans(Array.isArray(json.plans) ? json.plans : []);
       } catch (e) {
         console.error(e);
-        if (!cancelled) setPlansError("ផ្ទុកគម្រោងមិនជោគជ័យ។");
+        if (!cancelled) {
+          const msg = "ផ្ទុកគម្រោងមិនជោគជ័យ។";
+          setPlansError(msg);
+          notify.error(msg);
+        }
       } finally {
         if (!cancelled) setIsPlansLoading(false);
       }

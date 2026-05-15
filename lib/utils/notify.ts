@@ -1,0 +1,26 @@
+import { toast, type Id, type ToastOptions } from "react-toastify";
+
+/**
+ * App-wide toast helpers (react-toastify). Use these instead of importing `toast` directly
+ * so defaults stay consistent (duration, future theme tweaks).
+ */
+export const notify = {
+  success(message: string, options?: ToastOptions): Id {
+    return toast.success(message, { autoClose: 3200, ...options });
+  },
+
+  error(message: string, options?: ToastOptions): Id {
+    return toast.error(message, { autoClose: 5500, ...options });
+  },
+
+  info(message: string, options?: ToastOptions): Id {
+    return toast.info(message, { autoClose: 4200, ...options });
+  },
+
+  warning(message: string, options?: ToastOptions): Id {
+    return toast.warning(message, { autoClose: 4500, ...options });
+  },
+
+  dismiss: toast.dismiss,
+  isActive: toast.isActive,
+};

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { toast } from "react-toastify";
+import { notify } from "@/lib/utils/notify";
 import { supabase } from "@/lib/supabase/instance";
 import PageContainer from "@/components/PageContainer";
 import FormSection from "@/components/FormSection";
@@ -45,7 +45,7 @@ function LoginPageContent() {
     
     // Check Turnstile verification only if it's required and configured
     if (turnstileRequired && !turnstileToken) {
-      toast.error("សូមបំពេញការផ្ទៀងផ្ទាត់សុវត្ថិភាព");
+      notify.error("សូមបំពេញការផ្ទៀងផ្ទាត់សុវត្ថិភាព");
       return;
     }
     
@@ -63,7 +63,7 @@ function LoginPageContent() {
         const turnstileResult = await turnstileResponse.json();
         
         if (!turnstileResult.success) {
-          toast.error("ការផ្ទៀងផ្ទាត់សុវត្ថិភាពបរាជ័យ។ សូមព្យាយាមម្តងទៀត។");
+          notify.error("ការផ្ទៀងផ្ទាត់សុវត្ថិភាពបរាជ័យ។ សូមព្យាយាមម្តងទៀត។");
           setLoading(false);
           return;
         }
@@ -75,13 +75,13 @@ function LoginPageContent() {
       });
 
       if (signInError) {
-        toast.error(signInError.message || "ចូលគណនីមិនជោគជ័យ។ សូមពិនិត្យព័ត៌មានសម្ងាត់របស់អ្នក។");
+        notify.error(signInError.message || "ចូលគណនីមិនជោគជ័យ។ សូមពិនិត្យព័ត៌មានសម្ងាត់របស់អ្នក។");
         setLoading(false);
         return;
       }
 
       if (data.user) {
-        toast.success("សូមស្វាគមន៍ត្រឡប់មកវិញ! ចូលគណនីបានជោគជ័យ។");
+        notify.success("សូមស្វាគមន៍ត្រឡប់មកវិញ! ចូលគណនីបានជោគជ័យ។");
         // Redirect to home page or profile page
         setTimeout(() => {
           router.push(redirectTo);
@@ -89,7 +89,7 @@ function LoginPageContent() {
         }, 1000);
       }
     } catch {
-      toast.error("មានកំហុសមិនបានរំពឹងទុក។ សូមព្យាយាមម្តងទៀត។");
+      notify.error("មានកំហុសមិនបានរំពឹងទុក។ សូមព្យាយាមម្តងទៀត។");
       setLoading(false);
     }
   };

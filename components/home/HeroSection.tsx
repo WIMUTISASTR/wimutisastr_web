@@ -5,6 +5,13 @@ import { useRouter } from "next/navigation";
 import Button from "@/components/Button";
 import type { HomeResponse } from "@/lib/api/client";
 
+/**
+ * Full-bleed hero backdrop (subtle; scrim + opacity keep text readable).
+ * Source (Pexels, free license): https://www.pexels.com/photo/wooden-gavel-on-brown-wooden-table-5669617/
+ * Stored locally at public/asset/hero-law-backdrop.jpg
+ */
+const HERO_BACKDROP_SRC = "/asset/hero-law-backdrop.jpg";
+
 interface HeroSectionProps {
   isVisible: boolean;
   mousePosition: { x: number; y: number };
@@ -16,59 +23,60 @@ export default function HeroSection({ isVisible, mousePosition, home, homeLoadin
   const router = useRouter();
 
   return (
-    <section className="relative overflow-hidden bg-gray-100 pt-20">
-      <div className="absolute inset-0 -z-10">
-        <Image src="/asset/aboutUs.png" alt="Hero background" fill className="object-cover opacity-20" priority sizes="100vw" />
-        <div className="absolute inset-0 bg-white/80" />
-        <div
-          className="absolute -top-20 -left-20 h-72 w-72 rounded-full bg-white/10 blur-3xl"
-          style={{
-            transform: `translate(${mousePosition.x * 0.35}px, ${mousePosition.y * 0.35}px)`,
-            transition: "transform 0.35s ease-out",
-          }}
+    <section className="relative overflow-hidden border-b border-(--gray-200) bg-gray-100 pt-8 sm:pt-10">
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <Image
+          src={HERO_BACKDROP_SRC}
+          alt=""
+          fill
+          className="object-cover object-center opacity-[0.1] sm:opacity-[0.11]"
+          priority
+          sizes="100vw"
+          aria-hidden
         />
+        <div className="absolute inset-0 bg-white/85" />
         <div
-          className="absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-(--accent)/20 blur-3xl"
+          className="absolute -top-32 left-1/2 h-96 w-[min(100%,48rem)] -translate-x-1/2 rounded-full bg-(--primary)/5 blur-3xl"
           style={{
-            transform: `translate(${-mousePosition.x * 0.2}px, ${-mousePosition.y * 0.2}px)`,
+            transform: `translate(-50%, ${mousePosition.y * 0.15}px)`,
             transition: "transform 0.35s ease-out",
           }}
         />
       </div>
 
-      <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
-        <div className="grid items-center gap-10 lg:grid-cols-12">
+      <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-14 sm:py-16 lg:py-20">
+        <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-14">
           <div
             className={[
-              "space-y-7 transition-all duration-700 lg:col-span-7 rounded-2xl bg-white/95 p-6 sm:p-8 shadow-lg border border-gray-200",
+              "space-y-8 transition-all duration-700 lg:col-span-5 xl:col-span-6",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6",
             ].join(" ")}
           >
-            <div className="inline-flex items-center gap-2 rounded-full border border-(--primary)/20 bg-(--primary) px-4 py-2 text-xs font-semibold tracking-wide text-white">
-              <span className="inline-flex h-2 w-2 rounded-full bg-(--accent)" />
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-(--primary)">
               WIMUTISASTR Law Education
-            </div>
-
-            <h1 className="text-4xl leading-tight tracking-tight text-(--ink) sm:text-5xl lg:text-6xl">
-              មជ្ឈមណ្ឌល
-              <span className="block text-(--primary)">សិក្សាច្បាប់កម្ពុជា</span>
-            </h1>
-
-            <p className="max-w-2xl text-base leading-relaxed text-gray-700 sm:text-lg">
-              ផ្តល់ជូនវគ្គវីដេអូ និងឯកសារច្បាប់សំខាន់ៗ ដើម្បីជួយឱ្យសិស្ស និស្សិត អ្នកជំនាញ និងសាធារណជន
-              អាចសិក្សា និងយល់ដឹងអំពីច្បាប់កម្ពុជាបានយ៉ាងច្បាស់លាស់។
             </p>
 
-            <ul className="grid gap-3 sm:grid-cols-2 max-w-2xl">
+            <div className="space-y-4">
+              <h1 className="text-4xl font-semibold leading-[1.1] tracking-tight text-(--ink) sm:text-5xl lg:text-[3.25rem] xl:text-6xl">
+                មជ្ឈមណ្ឌល
+                <span className="mt-1 block text-(--primary)">សិក្សាច្បាប់កម្ពុជា</span>
+              </h1>
+              <p className="max-w-xl text-base leading-relaxed text-(--gray-700) sm:text-lg">
+                ផ្តល់ជូនវគ្គវីដេអូ និងឯកសារច្បាប់សំខាន់ៗ ដើម្បីជួយឱ្យសិស្ស និស្សិត អ្នកជំនាញ និងសាធារណជន
+                អាចសិក្សា និងយល់ដឹងអំពីច្បាប់កម្ពុជាបានយ៉ាងច្បាស់លាស់។
+              </p>
+            </div>
+
+            <ul className="grid max-w-xl gap-3 sm:grid-cols-2">
               {[
                 "រៀនដោយអ្នកជំនាញដឹកនាំ",
                 "ឯកសារច្បាប់បានផ្ទៀងផ្ទាត់",
                 "មេរៀនច្បាស់លាស់ និងមានរចនាសម្ព័ន្ធ",
                 "ចូលប្រើបានគ្រប់ពេល គ្រប់ទីកន្លែង",
               ].map((item) => (
-                <li key={item} className="flex items-start gap-2 text-sm text-gray-700">
-                  <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-(--primary)/10 text-(--primary)">
-                    <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden="true">
+                <li key={item} className="flex items-start gap-3 text-sm text-(--gray-700)">
+                  <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-(--primary)/10 text-(--primary)">
+                    <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5" aria-hidden="true">
                       <path
                         d="M20 6L9 17l-5-5"
                         stroke="currentColor"
@@ -78,22 +86,16 @@ export default function HeroSection({ isVisible, mousePosition, home, homeLoadin
                       />
                     </svg>
                   </span>
-                  <span className="font-medium">{item}</span>
+                  <span className="font-medium leading-snug">{item}</span>
                 </li>
               ))}
             </ul>
 
-            <div className="flex flex-wrap items-center gap-3 pt-1">
-              <Button onClick={() => router.push("/law_video")} variant="primary" size="lg" className="group min-w-[180px] justify-center">
+            <div className="flex flex-wrap items-center gap-3">
+              <Button onClick={() => router.push("/law_video")} variant="primary" size="lg" className="group min-w-[168px] justify-center cursor-pointer">
                 <span className="flex items-center gap-2">
                   ចាប់ផ្តើមសិក្សា
-                  <svg
-                    className="h-5 w-5 transition-transform group-hover:translate-x-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
+                  <svg className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
                 </span>
@@ -102,63 +104,50 @@ export default function HeroSection({ isVisible, mousePosition, home, homeLoadin
                 onClick={() => router.push("/law_documents")}
                 variant="outline"
                 size="lg"
-                className="min-w-[180px] justify-center"
+                className="min-w-[168px] justify-center cursor-pointer"
               >
                 មើលឯកសារច្បាប់
               </Button>
             </div>
 
-            <div className="grid gap-3 pt-4 sm:grid-cols-3 max-w-3xl">
+            <dl className="grid max-w-lg grid-cols-3 gap-px overflow-hidden rounded-xl border border-(--gray-200) bg-(--gray-200) sm:max-w-xl">
               {[
                 { label: "វគ្គសិក្សា", value: home?.stats.categoriesCount ?? 0 },
                 { label: "វីដេអូ", value: home?.stats.videosCount ?? 0 },
                 { label: "ឯកសារ", value: home?.stats.booksCount ?? 0 },
               ].map((s) => (
-                <div
-                  key={s.label}
-                  className="rounded-xl border border-gray-200 bg-white px-4 py-3"
-                >
-                  <div className="flex items-baseline gap-2">
-                    <div className="text-2xl font-extrabold text-(--ink)">
-                      {homeLoading ? <span className="inline-block w-10 animate-pulse rounded bg-gray-200">&nbsp;</span> : s.value}
-                    </div>
-                    <div className="text-xs font-semibold uppercase tracking-wide text-gray-700">
-                      {s.label}
-                    </div>
-                  </div>
+                <div key={s.label} className="bg-white px-3 py-4 text-center sm:px-4">
+                  <dt className="text-[10px] font-semibold uppercase tracking-wide text-(--gray-700) sm:text-xs">{s.label}</dt>
+                  <dd className="mt-1 text-xl font-semibold tabular-nums text-(--ink) sm:text-2xl">
+                    {homeLoading ? <span className="inline-block min-h-7 w-12 animate-pulse rounded bg-(--gray-100)" aria-hidden /> : s.value}
+                  </dd>
                 </div>
               ))}
-            </div>
+            </dl>
           </div>
 
           <div
             className={[
-              "transition-all duration-700 delay-150 lg:col-span-5",
+              "lg:col-span-7 xl:col-span-6 transition-all duration-700 delay-150",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6",
             ].join(" ")}
           >
-            <div
-              className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl"
-              style={{
-                transform: `perspective(1200px) rotateY(${mousePosition.x * 0.008}deg) rotateX(${-mousePosition.y * 0.008}deg)`,
-                transition: "transform 0.25s ease-out",
-              }}
-            >
+            <div className="overflow-hidden border border-(--gray-200) bg-white shadow-lg">
               <div className="relative aspect-4/3">
                 <Image
                   src="/asset/hero.png"
                   alt="ការអប់រំច្បាប់កម្ពុជា"
                   fill
                   className="object-cover"
-                  sizes="(max-width: 1024px) 92vw, 42vw"
+                  sizes="(max-width: 1024px) 92vw, 50vw"
                   priority
                 />
-                <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/25 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-5">
-                  <div className="text-white text-sm font-semibold mb-1">ព័ត៌មានសង្ខេប</div>
-                  <div className="text-gray-100 text-xs">
+                <div className="absolute inset-0 bg-linear-to-t from-black/65 via-black/15 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-white/90">ព័ត៌មានសង្ខេប</p>
+                  <p className="mt-1 max-w-md text-sm leading-relaxed text-white/85">
                     សិក្សាច្បាប់តាមប្រព័ន្ធអនឡាញជាមួយមាតិកាដែលរៀបចំដោយអ្នកជំនាញ។
-                  </div>
+                  </p>
                 </div>
               </div>
             </div>

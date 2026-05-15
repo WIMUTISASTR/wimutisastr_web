@@ -14,9 +14,11 @@ function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const planId = searchParams.get("plan");
   const reference = searchParams.get("reference");
+  // ?ref is set by the Baray custom_success_url redirect
+  const barayRef = searchParams.get("ref");
+  const isBarayPayment = !!barayRef;
 
   useEffect(() => {
-    // Store payment status in localStorage
     if (planId && reference) {
       const paymentData = {
         planId,
@@ -119,14 +121,22 @@ function PaymentSuccessContent() {
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
               ការទូទាត់ត្រូវបានបញ្ជាក់
             </h2>
-            <p className="text-gray-600 mb-6">
-              ការទូទាត់របស់អ្នកត្រូវបានដំណើរការដោយជោគជ័យ។ ឥឡូវនេះការជាវរបស់អ្នកបានដំណើរការ។
-            </p>
+            {isBarayPayment ? (
+              <p className="text-gray-600 mb-6">
+                ការទូទាត់របស់អ្នកបានទទួលដោយជោគជ័យ។ ការជាវរបស់អ្នកនឹងត្រូវបានដំណើរការស្វ័យប្រវត្តិ — មិនចាំបាច់រង់ចាំការពិនិត្យពីអ្នកគ្រប់គ្រងទេ។
+              </p>
+            ) : (
+              <p className="text-gray-600 mb-6">
+                ការទូទាត់របស់អ្នកត្រូវបានដំណើរការដោយជោគជ័យ។ ឥឡូវនេះការជាវរបស់អ្នកបានដំណើរការ។
+              </p>
+            )}
 
-            {reference && (
+            {(reference || barayRef) && (
               <div className="bg-gray-50 rounded-lg p-4 mb-6">
                 <p className="text-sm text-gray-600">លេខយោងការទូទាត់</p>
-                <p className="text-lg font-semibold text-gray-900">{reference}</p>
+                <p className="text-lg font-semibold text-gray-900 font-mono break-all">
+                  {reference ?? barayRef}
+                </p>
               </div>
             )}
 

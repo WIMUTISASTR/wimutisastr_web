@@ -8,6 +8,7 @@ import PageContainer from "@/components/PageContainer";
 import { fetchBooks, type BookCategory, type BookRow } from "@/lib/api/client";
 import LoadingState from "@/components/LoadingState";
 import { useMembership } from "@/lib/hooks/useMembership";
+import { notify } from "@/lib/utils/notify";
 const ALL_CATEGORY_ID = "__all__";
 
 export default function DocumentCategoryPage() {
@@ -38,7 +39,11 @@ export default function DocumentCategoryPage() {
         }
       } catch (e: unknown) {
         console.error(e);
-        if (!cancelled) setError(e instanceof Error ? e.message : "ផ្ទុកឯកសារមិនជោគជ័យ។");
+        if (!cancelled) {
+          const message = e instanceof Error ? e.message : "ផ្ទុកឯកសារមិនជោគជ័យ។";
+          setError(message);
+          notify.error(message);
+        }
       } finally {
         if (!cancelled) setIsLoading(false);
       }

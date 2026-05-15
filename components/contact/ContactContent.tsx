@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { toast } from "react-toastify";
+import { notify } from "@/lib/utils/notify";
 import Button from "@/components/Button";
 
 type ContactFormState = {
@@ -32,17 +32,17 @@ export default function ContactContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.fullName.trim() || !form.email.trim() || !form.message.trim()) {
-      toast.error("សូមបំពេញឈ្មោះ អ៊ីមែល និងសារ។");
+      notify.error("សូមបំពេញឈ្មោះ អ៊ីមែល និងសារ។");
       return;
     }
     try {
       setIsSubmitting(true);
       // Placeholder: no backend yet. This confirms the submission UI.
       await new Promise((resolve) => setTimeout(resolve, 400));
-      toast.success("សូមអរគុណសម្រាប់ការទាក់ទងមកយើង។ យើងនឹងឆ្លើយតបឆាប់ៗនេះ។");
+      notify.success("សូមអរគុណសម្រាប់ការទាក់ទងមកយើង។ យើងនឹងឆ្លើយតបឆាប់ៗនេះ។");
       setForm(INITIAL_FORM);
     } catch {
-      toast.error("មានបញ្ហាបានកើតឡើង។ សូមព្យាយាមម្តងទៀត។");
+      notify.error("មានបញ្ហាបានកើតឡើង។ សូមព្យាយាមម្តងទៀត។");
     } finally {
       setIsSubmitting(false);
     }

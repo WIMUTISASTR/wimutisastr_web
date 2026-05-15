@@ -18,6 +18,23 @@
   unicode-range: U+1780-17FF, U+19E0-19FF;
 }
 
+/* Heading weights: full glyph coverage so Latin + Khmer titles use Kantumruy (not Inter/system). */
+@font-face {
+  font-family: "Kantumruy Pro";
+  src: url("/font/Kantumruy_Pro/static/KantumruyPro-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Kantumruy Pro";
+  src: url("/font/Kantumruy_Pro/static/KantumruyPro-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 .law-documents-font {
   font-family: "Kantumruy Pro", var(--font-body);
 }
@@ -70,7 +87,7 @@
   
   /* Typography */
   --font-body: "Kantumruy Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-heading: "Inter", "Kantumruy Pro", -apple-system, system-ui, sans-serif;
+  --font-heading: "Kantumruy Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   
   /* Radius */
   --radius-sm: 8px;
@@ -106,7 +123,7 @@ body {
   color: white;
 }
 
-/* Headings use modern sans-serif */
+/* Headings and titles: Kantumruy Pro (see --font-heading) */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   font-weight: 700;

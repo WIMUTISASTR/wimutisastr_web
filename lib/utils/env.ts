@@ -21,6 +21,11 @@ interface EnvConfig {
   // Security
   CONTENT_TOKEN_SECRET: string;
 
+  // Baray payment gateway
+  BARAY_API_KEY?: string;
+  BARAY_SK?: string;
+  BARAY_IV?: string;
+
   // Telegram (optional)
   TELEGRAM_BOT_TOKEN?: string;
   TELEGRAM_CHAT_ID?: string;

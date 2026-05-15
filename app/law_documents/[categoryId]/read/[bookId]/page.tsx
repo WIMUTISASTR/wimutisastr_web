@@ -12,6 +12,7 @@ import LoadingState from "@/components/LoadingState";
 import { apiPost, fetchBooks, type BookCategory, type BookRow } from "@/lib/api/client";
 import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
 import { useMembership } from "@/lib/hooks/useMembership";
+import { notify } from "@/lib/utils/notify";
 
 // Dynamic import for DocxViewer to avoid SSR issues with docx-preview
 const DocxViewer = dynamic(() => import("@/components/DocxViewer"), {
@@ -66,7 +67,11 @@ export default function ReadDocumentPage() {
         }
       } catch (e: unknown) {
         console.error(e);
-        if (!cancelled) setError(e instanceof Error ? e.message : "ផ្ទុកឯកសារមិនជោគជ័យ។");
+        if (!cancelled) {
+          const message = e instanceof Error ? e.message : "ផ្ទុកឯកសារមិនជោគជ័យ។";
+          setError(message);
+          notify.error(message);
+        }
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -115,7 +120,11 @@ export default function ReadDocumentPage() {
         }
       } catch (e) {
         console.error(e);
-        if (!cancelled) setError("បើកឯកសារមិនជោគជ័យ។");
+        if (!cancelled) {
+          const message = "បើកឯកសារមិនជោគជ័យ។";
+          setError(message);
+          notify.error(message);
+        }
       }
     };
     run();

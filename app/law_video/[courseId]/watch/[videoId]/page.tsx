@@ -10,6 +10,7 @@ import Button from "@/components/Button";
 import { fetchVideoPlaybackUrl, fetchVideos, type VideoCategory, type VideoPlaybackResponse, type VideoRow } from "@/lib/api/client";
 import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
 import { useMembership } from "@/lib/hooks/useMembership";
+import { notify } from "@/lib/utils/notify";
 
 const FALLBACK_THUMB = "/asset/document_background.png";
 
@@ -114,7 +115,11 @@ export default function WatchVideoPage() {
         }
       } catch (e: unknown) {
         console.error(e);
-        if (!cancelled) setError(e instanceof Error ? e.message : "ផ្ទុកវីដេអូមិនជោគជ័យ។");
+        if (!cancelled) {
+          const message = e instanceof Error ? e.message : "ផ្ទុកវីដេអូមិនជោគជ័យ។";
+          setError(message);
+          notify.error(message);
+        }
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -164,7 +169,11 @@ export default function WatchVideoPage() {
         if (!cancelled) setPlayback(data);
       } catch (e: unknown) {
         console.error(e);
-        if (!cancelled) setPlaybackError(e instanceof Error ? e.message : "ផ្ទុកតំណភ្ជាប់ចាក់វីដេអូមិនជោគជ័យ។");
+        if (!cancelled) {
+          const message = e instanceof Error ? e.message : "ផ្ទុកតំណភ្ជាប់ចាក់វីដេអូមិនជោគជ័យ។";
+          setPlaybackError(message);
+          notify.error(message);
+        }
       } finally {
         if (!cancelled) setPlaybackLoading(false);
       }
