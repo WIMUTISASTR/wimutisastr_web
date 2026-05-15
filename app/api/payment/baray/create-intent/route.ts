@@ -58,8 +58,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Resolve subscription plan for duration + name
+    // Clean up any stale pending Baray records for this user.
+    // These are left over from cancelled/abandoned Baray payment sessions.
+    // Baray intents expire after 15 min so these will never complete via webhook.
     const supabaseAdmin = createClient(env.supabase.url(), env.supabase.serviceRoleKey());
+    await supabaseAdmin
+      .from('payment_proofs')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('status', 'pending')
+      .eq('file_type', 'baray');
     const { data: plan, error: planError } = await supabaseAdmin
       .from('subscription_plans')
       .select('id, name, duration_days, price, currency')

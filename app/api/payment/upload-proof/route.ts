@@ -83,6 +83,7 @@ export async function POST(request: NextRequest) {
       .select("id")
       .eq("user_id", user.id)
       .eq("status", "pending")
+      .neq("file_type", "baray")  // ignore stale abandoned Baray records
       .limit(1);
 
     if (pendingErr) {
