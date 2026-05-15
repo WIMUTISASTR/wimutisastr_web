@@ -9,7 +9,7 @@ const log = logger.child({ module: 'api/payment/baray/create-intent' });
 
 export async function POST(request: NextRequest) {
   try {
-    const rateLimitResult = await rateLimit(request, RateLimitPresets.api);
+    const rateLimitResult = await rateLimit(request, RateLimitPresets.standard);
     if (!rateLimitResult.success) {
       return createRateLimitResponse(rateLimitResult);
     }
