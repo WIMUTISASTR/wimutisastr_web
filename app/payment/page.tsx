@@ -39,10 +39,7 @@ function PaymentPageContent() {
     return plans[0] ?? null;
   }, [plans, planId]);
 
-  const qrImageUrl = selectedPlan?.qrCodeUrl ?? null;
-
   const [paymentReference, setPaymentReference] = useState<string>("");
-  const [paymentStatus, setPaymentStatus] = useState<"pending" | "completed" | "failed">("pending");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [proofImage, setProofImage] = useState<File | null>(null);
   const [proofImagePreview, setProofImagePreview] = useState<string | null>(null);
@@ -50,7 +47,6 @@ function PaymentPageContent() {
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [isBarayLoading, setIsBarayLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -114,24 +110,10 @@ function PaymentPageContent() {
     return () => observer.disconnect();
   }, []);
 
-  // Supabase-only flow:
-  // QR comes from selectedPlan.qrCodeUrl (stored in Supabase).
-  // We generate a client-side reference for proof upload.
   useEffect(() => {
-    if (!selectedPlan) return;
-    if (!qrImageUrl) {
-      setPaymentStatus("failed");
-      setErrorMessage("មិនមាន QR code សម្រាប់គម្រោងនេះទេ។ សូមទាក់ទងអ្នកគ្រប់គ្រង។");
-      return;
-    }
-    if (!paymentReference) {
-      const ref = `REF-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-      setPaymentReference(ref);
-    }
-    setPaymentStatus("pending");
-  }, [selectedPlan, qrImageUrl, paymentReference]);
-
-  // Auto-checking removed - payment verification will be done manually after proof upload
+    if (!selectedPlan || paymentReference) return;
+    setPaymentReference(`REF-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`);
+  }, [selectedPlan, paymentReference]);
 
   const handleBarayPayment = async () => {
     if (!user) {
@@ -467,76 +449,6 @@ function PaymentPageContent() {
                     </div>
                   </div>
 
-                  {/* Divider */}
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-200" />
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                      <span className="bg-white px-4 text-gray-500">ឬទូទាត់តាម KHQR Bakong</span>
-                    </div>
-                  </div>
-
-                  {/* KHQR Bakong Payment */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">បង់ប្រាក់ដោយ KHQR Bakong</h3>
-                    
-                    {/* QR Code Display */}
-                    <div className="bg-gray-50 rounded-xl p-8 border-2 border-[rgb(var(--brown-rgb)/0.3)]">
-                      <div className="flex flex-col items-center">
-                        <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
-                          {qrImageUrl ? (
-                            <div className="flex flex-col items-center">
-                              <Image
-                                src={qrImageUrl}
-                                alt="KHQR code"
-                                width={256}
-                                height={256}
-                                className="rounded-lg"
-                                sizes="256px"
-                              />
-                              {paymentReference && (
-                                <p className="text-xs text-gray-500 mt-2 font-mono">
-                                  Ref: {paymentReference}
-                                </p>
-                              )}
-                            </div>
-                          ) : (
-                            <div className="w-64 h-64 bg-gray-200 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-400">
-                              <div className="text-center">
-                                <svg className="animate-spin h-8 w-8 text-gray-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                <p className="text-sm text-gray-500">មិនមាន QR code</p>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-
-                        {/* Payment Instructions */}
-                        <div className="text-center space-y-3 max-w-md">
-                          <p className="text-lg font-semibold text-gray-900">
-                            ស្កេនដើម្បីបង់ប្រាក់ ${selectedPlan.price}
-                          </p>
-                          <div className="bg-white rounded-lg p-4 space-y-2 text-sm text-gray-700">
-                            <p className="font-semibold text-gray-900">វិធីសាស្ត្របង់ប្រាក់:</p>
-                            <ol className="list-decimal list-inside space-y-1 text-left">
-                              <li>បើកកម្មវិធី Bakong ឬកម្មវិធីធនាគារដែលគាំទ្រ KHQR</li>
-                              <li>ស្កេន QR code ខាងលើ</li>
-                              <li>បញ្ជាក់ចំនួនទឹកប្រាក់: <span className="font-semibold">${selectedPlan.price}</span></li>
-                              <li>បញ្ចប់ការទូទាត់ក្នុងកម្មវិធីរបស់អ្នក</li>
-                              <li>ផ្ទុកភស្តុតាងបង់ប្រាក់ខាងក្រោមបន្ទាប់ពីទូទាត់រួច</li>
-                            </ol>
-                          </div>
-                          <p className="text-xs text-gray-500 mt-2">
-                            បន្ទាប់ពីទូទាត់រួច សូមផ្ទុកភស្តុតាងបង់ប្រាក់សម្រាប់ការផ្ទៀងផ្ទាត់។
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
 
                   {/* Upload Proof of Payment */}
                   <div className="space-y-4 pt-6 border-t border-gray-200">
@@ -685,36 +597,9 @@ function PaymentPageContent() {
                     </svg>
                     <div className="text-sm text-gray-600">
                       <p className="font-semibold text-gray-900 mb-1">ការទូទាត់មានសុវត្ថិភាព</p>
-                      <p>KHQR Bakong គឺជាប្រព័ន្ធទូទាត់ជាតិរបស់កម្ពុជា។ ការទូទាត់របស់អ្នកត្រូវបានដំណើរការដោយសុវត្ថិភាពតាមកម្មវិធីធនាគាររបស់អ្នក។</p>
+                      <p>ការទូទាត់របស់អ្នកត្រូវបានដំណើរការដោយសុវត្ថិភាពតាមធនាគារដែលអ្នកជ្រើសរើស។</p>
                     </div>
                   </div>
-
-                  {/* Retry Button (only shown on failure) */}
-                  {paymentStatus === "failed" && (
-                    <Button
-                      onClick={() => {
-                        setPaymentStatus("pending");
-                        setErrorMessage("");
-                        setPaymentReference("");
-                        // Trigger re-initialization
-                        window.location.reload();
-                      }}
-                      variant="primary"
-                      fullWidth
-                      className="px-6 py-4"
-                    >
-                      ព្យាយាមម្តងទៀត
-                    </Button>
-                  )}
-
-                  {/* Status Message */}
-                  {qrImageUrl ? (
-                    <div className="bg-(--brown-soft) border border-[rgb(var(--brown-rgb)/0.25)] rounded-lg p-4">
-                      <p className="text-sm text-slate-800 text-center">
-                        សូមស្កេន QR code ដោយកម្មវិធី Bakong របស់អ្នកដើម្បីបញ្ចប់ការទូទាត់។ បន្ទាប់ពីទូទាត់រួច សូមផ្ទុកភស្តុតាងខាងក្រោមសម្រាប់ការផ្ទៀងផ្ទាត់ដោយដៃ។
-                      </p>
-                    </div>
-                  ) : null}
                 </div>
               </div>
             </div>

@@ -152,7 +152,12 @@ export async function POST(request: NextRequest) {
       redirectUrl: `https://pay.baray.io/${intent._id}`,
     });
   } catch (error) {
-    log.error('Failed to create Baray payment intent', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    const message = error instanceof Error ? error.message : String(error);
+    log.error('Failed to create Baray payment intent', { message });
+    const isMissingCredentials = message.includes('Missing Baray credentials');
+    return NextResponse.json(
+      { error: isMissingCredentials ? 'Payment gateway is not configured. Please contact support.' : 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
