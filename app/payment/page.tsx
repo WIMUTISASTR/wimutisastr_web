@@ -150,8 +150,8 @@ function PaymentPageContent() {
       const data = await res.json() as { redirectUrl?: string; error?: string };
 
       if (!res.ok) {
-        notify.error(data.error || "មិនអាចចាប់ផ្តើមការទូទាត់បានទេ។ សូមព្យាយាមម្តងទៀត។");
-        setErrorMessage(data.error || "");
+        const reason = encodeURIComponent(data.error || "មិនអាចចាប់ផ្តើមការទូទាត់បានទេ។");
+        router.push(`/payment/failed?reason=${reason}`);
         return;
       }
 
@@ -159,7 +159,7 @@ function PaymentPageContent() {
         window.location.href = data.redirectUrl;
       }
     } catch {
-      notify.error("មិនអាចទូទាត់បានទេ។ សូមព្យាយាមម្តងទៀត។");
+      router.push("/payment/failed");
     } finally {
       setIsBarayLoading(false);
     }

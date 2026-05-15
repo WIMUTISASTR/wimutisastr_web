@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 
 const features = [
@@ -72,19 +73,30 @@ const highlights = [
 export default function FeaturesSection() {
   return (
     <section className="relative overflow-hidden bg-white py-16 sm:py-20 lg:py-24">
+      {/* Background: law books shelf from Unsplash */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute right-0 top-1/4 h-72 w-72 rounded-full bg-(--primary) opacity-[0.04] blur-3xl" />
-        <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-(--accent) opacity-[0.06] blur-3xl" />
+        <Image
+          src="/asset/featureImageBackground.png"
+          alt=""
+          fill
+          className="object-cover object-center"
+          sizes="100vw"
+          priority={false}
+        />
+        {/* Light overlay so existing dark text stays readable */}
+        <div className="absolute inset-0" />
+        {/* Subtle brand tint */}
+        <div className="absolute inset-0 bg-(--primary)/3" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto mb-12 max-w-3xl text-center sm:mb-16 scroll-animate opacity-0 translate-y-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-(--primary)">មុខងារសំខាន់ៗ</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-(--ink) sm:text-4xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white">មុខងារសំខាន់ៗ</p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             អ្វីៗដែលអ្នកត្រូវការ{" "}
-            <span className="text-(--primary)">ដើម្បីរីកចម្រើន</span>
+            <span className="text-white">ដើម្បីរីកចម្រើន</span>
           </h2>
-          <p className="mt-4 text-base leading-relaxed text-(--gray-700) sm:text-lg">
+          <p className="mt-4 text-base leading-relaxed text-white sm:text-lg">
             ធនធានអប់រំច្បាប់គ្រប់គ្រាន់នៅចុងម្រាមដៃអ្នក
           </p>
         </div>

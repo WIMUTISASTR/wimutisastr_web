@@ -14,7 +14,6 @@ import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
 import { useMembership } from "@/lib/hooks/useMembership";
 import { notify } from "@/lib/utils/notify";
 
-// Dynamic import for DocxViewer to avoid SSR issues with docx-preview
 const DocxViewer = dynamic(() => import("@/components/DocxViewer"), {
   ssr: false,
   loading: () => (
@@ -27,7 +26,16 @@ const DocxViewer = dynamic(() => import("@/components/DocxViewer"), {
   ),
 });
 
-const FALLBACK_COVER = "/sample_book/cover/book1.png";
+const PdfViewer = dynamic(() => import("@/components/PdfViewer"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center h-[60vh]">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-3"></div>
+    </div>
+  ),
+});
+
+const FALLBACK_COVER = "/asset/document_background.png";
 const ALL_CATEGORY_ID = "__all__";
 
 function isAnimatedImageUrl(src: string) {
@@ -156,16 +164,7 @@ export default function ReadDocumentPage() {
                   {typeof current?.year === "number" ? <span>{current.year}</span> : null}
                   {currentIndex >= 0 ? <span>ឯកសារ {currentIndex + 1} នៃ {books.length}</span> : null}
                 </div>
-              </div>
-
-              <div className="shrink-0 flex items-center gap-2">
-                <Button onClick={() => prev && router.push(`/law_documents/${categoryId}/read/${prev.id}`)} variant="secondary" disabled={!prev}>
-                  មុន
-                </Button>
-                <Button onClick={() => next && router.push(`/law_documents/${categoryId}/read/${next.id}`)} variant="primary" disabled={!next}>
-                  បន្ទាប់
-                </Button>
-              </div>
+              </div>             
             </div>
 
             {isLoading ? (
@@ -203,31 +202,9 @@ export default function ReadDocumentPage() {
             ) : (
               <div className="grid grid-cols-1 gap-6">
                 <div>
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                    <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between gap-3">
-                      <div className="text-sm font-semibold text-gray-900 truncate">កម្មវិធីអាន</div>
-                      <div className="flex items-center gap-3">
-                        <div className="text-xs text-gray-500">ទិដ្ឋភាពការពារ</div>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          disabled={!isReady}
-                          onClick={() => {
-                            if (!isReady) return;
-                            // Token is in HTTP-only cookie, no need to include in URL
-                            const url = serveUrl ?? `/api/books/serve`;
-                            const w = window.open(url, "_blank", "noopener");
-                            if (w) w.opener = null;
-                          }}
-                        >
-                          មើលទំព័រពេញ
-                        </Button>
-                      </div>
-                    </div>
+                  <div className="bg-whit shadow-sm overflow-hidden">
 
                     <div className="bg-slate-50">
-                      {/* Use native viewers (PDF browser viewer / client-side DOCX viewer) */}
                       {isReady ? (
                         viewExt === "docx" || viewExt === "doc" ? (
                           <div className="w-full bg-white overflow-auto">
@@ -236,26 +213,16 @@ export default function ReadDocumentPage() {
                                 <div className="text-sm font-semibold text-gray-900 truncate">កម្មវិធីមើលឯកសារ</div>
                                 {viewFilename ? <div className="text-xs text-gray-500 truncate">{viewFilename}</div> : null}
                               </div>
-                              <a
-                                className="text-xs font-semibold text-(--brown) hover:underline shrink-0"
-                                href={serveUrl ?? `/api/books/serve`}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                បើក / ទាញយក
-                              </a>
                             </div>
-                            {/* Client-side DOCX viewer - renders document directly in browser */}
                             <DocxViewer
                               url={serveUrl ?? `/api/books/serve`}
                               className="min-h-[65vh]"
                             />
                           </div>
                         ) : (
-                          <iframe
-                            title={current.title}
-                            src={serveUrl ?? `/api/books/serve`}
-                            className="w-full h-[75vh] bg-white"
+                          <PdfViewer
+                            url={serveUrl ?? `/api/books/serve`}
+                            className="min-h-[75vh]"
                           />
                         )
                       ) : (

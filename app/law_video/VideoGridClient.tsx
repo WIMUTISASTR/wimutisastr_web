@@ -20,29 +20,35 @@ function formatDate(d: string | null | undefined) {
   if (!d) return null;
   const date = new Date(d);
   if (Number.isNaN(date.getTime())) return null;
-  return date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" });
+  return date.toLocaleDateString("km-KH", { year: "numeric", month: "short" });
 }
 
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
 }
 
-// Icon components
 const SearchIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
   </svg>
 );
 
-const PlayIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+const PlayIcon = ({ className = "w-6 h-6" }: { className?: string }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 20 20">
     <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
   </svg>
 );
 
-const BookOpenIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+const VideoIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+      d="M15 10l4.553-2.276A1 1 0 0121 8.723v6.554a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+  </svg>
+);
+
+const CheckCircleIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
 );
 
@@ -56,15 +62,13 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
   const [searchQuery, setSearchQuery] = useState("");
   const [watchedIds, setWatchedIds] = useState<Set<string>>(new Set());
 
-  // Load watched videos from localStorage
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE.watched);
       if (raw) {
         const parsed: unknown = JSON.parse(raw);
         if (Array.isArray(parsed)) {
-          const ids = parsed.filter((x): x is string => typeof x === "string");
-          setWatchedIds(new Set(ids));
+          setWatchedIds(new Set(parsed.filter((x): x is string => typeof x === "string")));
         }
       }
     } catch {
@@ -72,98 +76,114 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
     }
   }, []);
 
-  // Calculate stats per category
   const videoStatsByCategory = useMemo(() => {
-    const map = new Map<
-      string,
-      { count: number; lastUpdated: string | null; watchedCount: number; progressPct: number }
-    >();
+    const map = new Map<string, { count: number; lastUpdated: string | null; watchedCount: number; progressPct: number }>();
     for (const v of videos) {
       const catId = v.category_id ?? "";
       if (!catId) continue;
-      const prev = map.get(catId) ?? {
-        count: 0,
-        lastUpdated: null,
-        watchedCount: 0,
-        progressPct: 0,
-      };
+      const prev = map.get(catId) ?? { count: 0, lastUpdated: null, watchedCount: 0, progressPct: 0 };
       const t = v.uploaded_at ? new Date(v.uploaded_at).getTime() : 0;
       const prevT = prev.lastUpdated ? new Date(prev.lastUpdated).getTime() : 0;
       const watchedCount = prev.watchedCount + (watchedIds.has(v.id) ? 1 : 0);
       const count = prev.count + 1;
-      const progressPct = count > 0 ? clamp(Math.round((watchedCount / count) * 100), 0, 100) : 0;
-
       map.set(catId, {
-        count: prev.count + 1,
+        count,
         lastUpdated: t > prevT ? v.uploaded_at ?? null : prev.lastUpdated,
         watchedCount,
-        progressPct,
+        progressPct: count > 0 ? clamp(Math.round((watchedCount / count) * 100), 0, 100) : 0,
       });
     }
     return map;
   }, [videos, watchedIds]);
 
-  // Filter categories based on search
   const filteredCategories = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
-    let list = categories;
-    if (q) {
-      list = list.filter((c) => {
-        const name = (c.name ?? "").toLowerCase();
-        const desc = (c.description ?? "").toLowerCase();
-        return name.includes(q) || desc.includes(q);
-      });
-    }
-    return list;
+    if (!q) return categories;
+    return categories.filter((c) => {
+      const name = (c.name ?? "").toLowerCase();
+      const desc = (c.description ?? "").toLowerCase();
+      return name.includes(q) || desc.includes(q);
+    });
   }, [categories, searchQuery]);
+
+  const totalVideos = videos.length;
+  const totalWatched = watchedIds.size;
 
   return (
     <>
-      {/* Hero Search Section */}
-      <section className="relative bg-slate-900 text-white py-14 overflow-hidden">
-        <div className="absolute inset-0 z-0">
+      {/* Hero */}
+      <section className="relative overflow-hidden bg-[var(--primary-dark)] text-white">
+        {/* Background image */}
+        <div className="absolute inset-0">
           <Image
             src="/asset/document_background.png"
-            alt="Video courses background"
+            alt=""
             fill
             className="object-cover"
             priority
             sizes="100vw"
-            fetchPriority="high"
           />
+          <div className="absolute inset-0 bg-[var(--primary-dark)]/80" />
         </div>
-        <div className="absolute inset-0 bg-slate-900/65 z-10" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
-          <h1 className="text-3xl sm:text-4xl font-semibold">វគ្គវីដេអូ</h1>
-          <p className="text-gray-300 max-w-3xl mt-2">
-            ស្វែងរកវគ្គអប់រំច្បាប់ដែលរៀបចំសម្រាប់អ្នកជំនាញ និងនិស្សិត។
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-10">
+          {/* Label */}
+          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-3 py-1 text-xs font-semibold text-white/80 mb-5">
+            <VideoIcon className="w-3.5 h-3.5" />
+            វគ្គបណ្ដុះបណ្ដាល
+          </div>
+
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight leading-tight">
+            វគ្គសិក្សាច្បាប់
+          </h1>
+          <p className="mt-2 text-[var(--accent-light)] text-base sm:text-lg max-w-2xl leading-relaxed">
+            វគ្គអប់រំច្បាប់ដែលរៀបចំដោយអ្នកជំនាញ — សម្រាប់អ្នកប្រឡូកក្នុងវិស័យច្បាប់ និងនិស្សិតគ្រប់ជំនាន់
           </p>
 
-          <div className="mt-8 max-w-2xl">
-            <label className="text-sm font-semibold text-gray-200" htmlFor="law-video-search">
-              ស្វែងរកវគ្គសិក្សា
-            </label>
-            <div className="mt-2 relative">
+          {/* Stats row */}
+          <div className="mt-6 flex flex-wrap items-center gap-5 text-sm">
+            <div className="flex items-center gap-1.5 text-white/70">
+              <span className="font-bold text-white text-base">{categories.length}</span>
+              <span>វគ្គសិក្សា</span>
+            </div>
+            <div className="w-px h-4 bg-white/20" />
+            <div className="flex items-center gap-1.5 text-white/70">
+              <span className="font-bold text-white text-base">{totalVideos}</span>
+              <span>វីដេអូ</span>
+            </div>
+            {totalWatched > 0 && (
+              <>
+                <div className="w-px h-4 bg-white/20" />
+                <div className="flex items-center gap-1.5 text-emerald-300">
+                  <CheckCircleIcon className="w-4 h-4" />
+                  <span>បានមើល {totalWatched} វីដេអូ</span>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Search */}
+          <div className="mt-8 max-w-xl">
+            <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center">
-                <SearchIcon className="w-5 h-5 text-gray-300" />
+                <SearchIcon className="w-4.5 h-4.5 text-slate-400" />
               </div>
               <input
                 id="law-video-search"
                 type="text"
-                placeholder="ស្វែងរកវគ្គតាមឈ្មោះ ឬការពិពណ៌នា..."
+                placeholder="ស្វែងរកវគ្គតាមឈ្មោះ..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-12 py-3 rounded-xl bg-white/90 text-slate-900 placeholder:text-slate-500 shadow-sm ring-1 ring-inset ring-white/20 focus:outline-none focus:ring-2 focus:ring-(--primary) transition-colors"
+                className="w-full pl-11 pr-10 py-3 rounded-xl bg-white text-slate-900 placeholder:text-slate-400 text-sm shadow-lg focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-slate-700 transition-colors rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2"
+                  className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600 transition"
                   aria-label="សម្អាតការស្វែងរក"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
@@ -173,152 +193,66 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
         </div>
       </section>
 
-      {/* Course Grid Section */}
-      <section className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8 min-h-screen">
+      {/* Grid */}
+      <section className="py-10 px-4 sm:px-6 lg:px-8 min-h-[50vh] bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          {/* Results Count */}
-          <div className="mb-6 text-sm text-gray-600 animate-in delay-100">
-            {filteredCategories.length === 0 ? (
-              <span>រកមិនឃើញវគ្គសិក្សា</span>
-            ) : (
-              <span>
-                មាន {filteredCategories.length} {filteredCategories.length === 1 ? "វគ្គ" : "វគ្គ"}
-              </span>
-            )}
-          </div>
+
+          {/* Result count */}
+          {searchQuery && (
+            <p className="mb-6 text-sm text-gray-500">
+              {filteredCategories.length > 0
+                ? `ទទួលបាន ${filteredCategories.length} វគ្គ`
+                : "រកមិនឃើញ"}
+              {" "}សម្រាប់ <span className="font-semibold text-gray-700">&quot;{searchQuery}&quot;</span>
+            </p>
+          )}
 
           {filteredCategories.length === 0 ? (
-            <div className="mt-12 rounded-2xl border-2 border-gray-200 bg-white p-12 text-center shadow-sm animate-scale-in">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-                <SearchIcon className="w-8 h-8 text-gray-400" />
+            <div className="flex flex-col items-center justify-center py-24 text-center">
+              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                <SearchIcon className="w-7 h-7 text-gray-400" />
               </div>
-              <p className="text-xl font-semibold text-gray-900 mb-2">រកមិនឃើញវគ្គសិក្សា</p>
-              <p className="text-sm text-gray-600 mb-6">សូមកែសម្រួលពាក្យស្វែងរក ឬរកមើលវគ្គទាំងអស់។</p>
+              <p className="text-lg font-semibold text-gray-800 mb-1">រកមិនឃើញវគ្គសិក្សា</p>
+              <p className="text-sm text-gray-500 mb-6 max-w-xs">
+                សូមកែប្រែពាក្យស្វែងរក ឬផ្ទុកវគ្គទាំងអស់
+              </p>
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="inline-flex items-center gap-2 rounded-md bg-(--brown) text-white border border-transparent px-5 py-2.5 text-sm font-semibold hover:bg-(--brown-strong) transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--brown) focus-visible:ring-offset-2"
+                className="inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] text-white px-5 py-2.5 text-sm font-semibold hover:bg-[var(--primary-light)] transition shadow-sm"
               >
-                សម្អាតការស្វែងរក
+                ផ្ទុកវគ្គទាំងអស់
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredCategories.map((cat, index) => {
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {filteredCategories.map((cat) => {
                 const thumb = normalizeNextImageSrc(cat.cover_url, FALLBACK_THUMB, { bucket: "video" });
                 const unoptimized = shouldDisableImageOptimization(thumb);
                 const stats = videoStatsByCategory.get(cat.id);
                 const total = stats?.count ?? 0;
                 const pct = stats?.progressPct ?? 0;
                 const updated = stats?.lastUpdated ?? null;
+                const watched = stats?.watchedCount ?? 0;
 
-                const handleOpen = () => {
-                  router.push(`/law_video/${cat.id}`);
-                };
+                const firstVideo = videos.find((v) => v.category_id === cat.id);
 
                 return (
-                  <div
+                  <CourseCard
                     key={cat.id}
-                    className="group bg-white border-2 border-gray-200 rounded-none overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer animate-scale-in"
-                    style={{ animationDelay: `${index * 50}ms` }}
-                    role="button"
-                    tabIndex={0}
-                    onClick={handleOpen}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") handleOpen();
+                    cat={cat}
+                    thumb={thumb}
+                    unoptimized={unoptimized}
+                    total={total}
+                    pct={pct}
+                    watched={watched}
+                    updated={updated}
+                    onClick={() => {
+                      if (firstVideo) {
+                        router.push(`/law_video/${cat.id}/watch/${firstVideo.id}`);
+                      }
                     }}
-                  >
-                    {/* Course Thumbnail */}
-                    <div className="relative w-full aspect-video bg-gray-100 overflow-hidden">
-                      <Image
-                        src={thumb}
-                        alt={cat.name ?? "វគ្គសិក្សា"}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                        loading="lazy"
-                        unoptimized={unoptimized}
-                      />
-                      <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      
-                      {/* Play Button Overlay */}
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <div className="w-20 h-20 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform">
-                          <PlayIcon className="w-10 h-10 text-(--brown) ml-1" />
-                        </div>
-                      </div>
-
-                      {/* Progress Badge */}
-                      {pct > 0 && (
-                        <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 text-xs font-bold text-(--brown) shadow-lg">
-                          បញ្ចប់ {pct}%
-                        </div>
-                      )}
-
-                      {/* Video Count Badge */}
-                      {total > 0 && (
-                        <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-lg flex items-center gap-1.5">
-                          <BookOpenIcon className="w-3.5 h-3.5" />
-                          <span>{total} {total === 1 ? "វីដេអូ" : "វីដេអូ"}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Course Info */}
-                    <div className="p-6">
-                      <div className="mb-4">
-                        <h3 className="text-lg font-bold text-gray-900 leading-tight line-clamp-2 mb-2 group-hover:text-(--brown) transition-colors">
-                          {cat.name ?? "វគ្គគ្មានចំណងជើង"}
-                        </h3>
-                        {cat.description && (
-                          <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
-                            {cat.description}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Progress Bar */}
-                      {total > 0 && (
-                        <div className="mb-4">
-                          {pct === 0 ? (
-                            <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">
-                              <div className="w-2 h-2 rounded-full bg-gray-300"></div>
-                              <span>មិនទាន់ចាប់ផ្តើម</span>
-                            </div>
-                          ) : (
-                            <>
-                              <div className="h-2 rounded-full bg-gray-200 overflow-hidden mb-2">
-                                <div
-                                  className="h-full bg-(--brown) rounded-full transition-all duration-500"
-                                  style={{ width: `${pct}%` }}
-                                />
-                              </div>
-                              <div className="flex items-center justify-between text-xs text-gray-600">
-                                <span className="font-medium">បានបញ្ចប់ {pct}%</span>
-                                {updated && (
-                                  <span className="text-gray-500">បានធ្វើបច្ចុប្បន្នភាព {formatDate(updated)}</span>
-                                )}
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Action Button */}
-                      <div className="pt-4 border-t border-gray-100">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-semibold text-(--brown) group-hover:text-(--brown-strong) transition-colors">
-                            {pct === 0 ? "ចាប់ផ្តើមវគ្គ" : pct === 100 ? "មើលឡើងវិញ" : "បន្តសិក្សា"}
-                          </span>
-                          <div className="w-8 h-8 rounded-full bg-(--brown)/10 flex items-center justify-center group-hover:bg-(--brown)/20 transition-colors">
-                            <svg className="w-4 h-4 text-(--brown)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  />
                 );
               })}
             </div>
@@ -326,5 +260,128 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
         </div>
       </section>
     </>
+  );
+}
+
+interface CourseCardProps {
+  cat: VideoCategory;
+  thumb: string;
+  unoptimized: boolean;
+  total: number;
+  pct: number;
+  watched: number;
+  updated: string | null;
+  onClick: () => void;
+}
+
+function CourseCard({ cat, thumb, unoptimized, total, pct, watched, updated, onClick }: CourseCardProps) {
+  const isStarted = pct > 0 && pct < 100;
+  const isCompleted = pct === 100;
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onClick(); }}
+      className="group bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2"
+    >
+      {/* Thumbnail */}
+      <div className="relative aspect-video bg-slate-100 overflow-hidden shrink-0">
+        <Image
+          src={thumb}
+          alt={cat.name ?? "វគ្គសិក្សា"}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          loading="lazy"
+          unoptimized={unoptimized}
+        />
+
+        {/* Dark overlay on hover */}
+        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+        {/* Play button */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+          <div className="w-14 h-14 rounded-full bg-white/95 flex items-center justify-center shadow-lg scale-90 group-hover:scale-100 transition-transform duration-200">
+            <PlayIcon className="w-6 h-6 text-[var(--primary)] ml-0.5" />
+          </div>
+        </div>
+
+        {/* Status badge */}
+        {isCompleted && (
+          <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-emerald-500 text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow">
+            <CheckCircleIcon className="w-3 h-3" />
+            បានបញ្ចប់
+          </div>
+        )}
+        {isStarted && (
+          <div className="absolute top-2.5 left-2.5 bg-amber-400 text-amber-900 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow">
+            កំពុងរៀន
+          </div>
+        )}
+
+        {/* Video count */}
+        {total > 0 && (
+          <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1 bg-black/60 backdrop-blur-sm text-white text-[11px] font-medium px-2 py-0.5 rounded-full">
+            <VideoIcon className="w-3 h-3" />
+            {total}
+          </div>
+        )}
+
+        {/* Progress bar at bottom edge */}
+        {pct > 0 && (
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/20">
+            <div
+              className="h-full bg-emerald-400 transition-all duration-500"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Info */}
+      <div className="flex flex-col flex-1 p-4">
+        <h3 className="font-semibold text-gray-900 text-sm leading-snug line-clamp-2 group-hover:text-[var(--primary)] transition-colors mb-1.5">
+          {cat.name ?? "វគ្គគ្មានចំណងជើង"}
+        </h3>
+
+        {cat.description && (
+          <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed mb-3">
+            {cat.description}
+          </p>
+        )}
+
+        {/* Meta row */}
+        <div className="mt-auto flex items-center justify-between text-xs text-gray-400">
+          <div className="flex items-center gap-3">
+            {total > 0 && (
+              <span className="flex items-center gap-1">
+                <VideoIcon className="w-3.5 h-3.5" />
+                {total} វីដេអូ
+              </span>
+            )}
+            {isStarted && watched > 0 && (
+              <span className="text-emerald-600 font-medium">
+                {watched}/{total} ហើយ
+              </span>
+            )}
+          </div>
+          {updated && (
+            <span>{formatDate(updated)}</span>
+          )}
+        </div>
+
+        {/* CTA */}
+        <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
+          <span className="text-xs font-semibold text-[var(--primary)]">
+            {isCompleted ? "មើលឡើងវិញ" : isStarted ? "បន្តសិក្សា" : "ចូលមើលវគ្គ"}
+          </span>
+          <svg className="w-4 h-4 text-[var(--primary)] opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </div>
+    </div>
   );
 }

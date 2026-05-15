@@ -23,6 +23,10 @@ const AUTH_ROUTES = ['/auth/login', '/auth/register'] as const;
  * Check if the pathname matches any of the protected routes
  */
 function isProtectedRoute(pathname: string): boolean {
+  // Post-payment redirect pages must be publicly accessible (Baray redirects here without a live session)
+  if (pathname.startsWith('/payment/success') || pathname.startsWith('/payment/cancel') || pathname.startsWith('/payment/failed')) {
+    return false;
+  }
   return PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
 }
 

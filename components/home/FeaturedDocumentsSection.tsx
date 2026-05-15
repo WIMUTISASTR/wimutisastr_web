@@ -8,7 +8,7 @@ import Button from "@/components/Button";
 import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
 import type { HomeResponse } from "@/lib/api/client";
 
-const FALLBACK_COVER = "/sample_book/cover/book1.png";
+const FALLBACK_COVER = "/asset/document_background.png";
 
 function thumbUnoptimized(src: string) {
   return src.includes(".r2.dev/") || /^https?:\/\//i.test(src);
