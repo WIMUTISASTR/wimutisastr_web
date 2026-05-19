@@ -160,8 +160,9 @@ export async function GET(req: NextRequest) {
         ? [
             {
               id: ALL_CATEGORY_ID,
-              name: "All Documents",
-              description: "Browse all available documents",
+              name: "ឯកសារទាំងអស់",
+              description: "ស្វែងរកឯកសារទាំងអស់",
+         
             },
           ]
         : []),
@@ -169,9 +170,10 @@ export async function GET(req: NextRequest) {
         ? [
             {
               id: UNCATEGORIZED_ID,
-              name: "Uncategorized",
-              description: "Documents that haven’t been assigned to a category yet",
+              name: "មិនប្រភេទ",
+              description: "ឯកសារទាំងនេះមិនទាន់ត្រូវបានបែងចែកទៅក្រុមទេ",
             },
+       
           ]
         : []),
     ];

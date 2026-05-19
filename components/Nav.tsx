@@ -86,7 +86,7 @@ export default function Nav() {
                   : "text-(--gray-700) hover:text-(--primary) hover:bg-(--gray-100)"
               }`}
             >
-              វគ្គបណ្តុុះបណ្តាល
+              វគ្គបណ្តុះបណ្តាល
             </Link>
             <Link
               href="/about_us"

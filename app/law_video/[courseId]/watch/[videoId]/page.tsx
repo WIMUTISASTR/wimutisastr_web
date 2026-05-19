@@ -7,7 +7,13 @@ import { useParams, useRouter } from "next/navigation";
 import PageContainer from "@/components/PageContainer";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Button from "@/components/Button";
-import { fetchVideoPlaybackUrl, fetchVideos, type VideoCategory, type VideoPlaybackResponse, type VideoRow } from "@/lib/api/client";
+import {
+  fetchVideoPlaybackUrl,
+  fetchVideos,
+  type VideoCategory,
+  type VideoPlaybackResponse,
+  type VideoRow,
+} from "@/lib/api/client";
 import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
 import { useMembership } from "@/lib/hooks/useMembership";
 import { notify } from "@/lib/utils/notify";
@@ -24,52 +30,51 @@ const STORAGE = {
 } as const;
 
 function formatShortDate(v: string | null | undefined) {
-  if (!v) return "—";
+  if (!v) return null;
   const d = new Date(v);
-  if (Number.isNaN(d.getTime())) return "—";
-  return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" });
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleDateString("km-KH", { year: "numeric", month: "short", day: "2-digit" });
 }
 
-// Icon components
 const PlayIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 20 20">
     <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
   </svg>
 );
 
-const CheckIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+const CheckIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
   </svg>
 );
 
-const ClockIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-);
-
-const BookOpenIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-  </svg>
-);
-
-const ChevronRightIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+const ChevronRightIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
   </svg>
 );
 
-const ChevronLeftIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+const ChevronLeftIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
   </svg>
 );
 
-const UserIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+const UserIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+  </svg>
+);
+
+const CalendarIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+  </svg>
+);
+
+const LockIcon = ({ className = "w-12 h-12" }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
   </svg>
 );
 
@@ -87,19 +92,17 @@ export default function WatchVideoPage() {
   const [playbackLoading, setPlaybackLoading] = useState(false);
   const [playbackError, setPlaybackError] = useState<string | null>(null);
   const { status: membershipStatus, isLoading: membershipLoading } = useMembership();
-
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [videoProgress, setVideoProgress] = useState<Record<string, number>>({});
+  const [descExpanded, setDescExpanded] = useState(false);
 
-  // Calculate course progress
   const courseProgress = useMemo(() => {
     if (videos.length === 0) return 0;
     const watchedCount = videos.filter((v) => videoProgress[v.id] && videoProgress[v.id] > 0.9).length;
     return Math.round((watchedCount / videos.length) * 100);
   }, [videos, videoProgress]);
 
-  const handleVideoProgress = useCallback((videoId: string, progress: number) => {
-    setVideoProgress((prev) => ({ ...prev, [videoId]: progress }));
+  const handleVideoProgress = useCallback((vId: string, progress: number) => {
+    setVideoProgress((prev) => ({ ...prev, [vId]: progress }));
   }, []);
 
   useEffect(() => {
@@ -114,7 +117,6 @@ export default function WatchVideoPage() {
           setVideos(data.videos);
         }
       } catch (e: unknown) {
-        console.error(e);
         if (!cancelled) {
           const message = e instanceof Error ? e.message : "ផ្ទុកវីដេអូមិនជោគជ័យ។";
           setError(message);
@@ -125,15 +127,15 @@ export default function WatchVideoPage() {
       }
     };
     load();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [courseId]);
 
   const course = useMemo(() => categories.find((c) => c.id === courseId) ?? null, [categories, courseId]);
   const currentIndex = useMemo(() => videos.findIndex((v) => v.id === videoId), [videos, videoId]);
   const current = currentIndex >= 0 ? videos[currentIndex] : null;
   const isFree = current?.access_level === "free";
+  const prev = currentIndex > 0 ? videos[currentIndex - 1] : null;
+  const next = currentIndex >= 0 && currentIndex < videos.length - 1 ? videos[currentIndex + 1] : null;
 
   const persistLastVideo = useCallback(
     (vId: string) => {
@@ -144,31 +146,25 @@ export default function WatchVideoPage() {
         base[courseId] = vId;
         localStorage.setItem(STORAGE.lastByCourse, JSON.stringify(base));
         localStorage.setItem(STORAGE.lastCourseId, courseId);
-      } catch {
-        // ignore
-      }
+      } catch { /* ignore */ }
     },
     [courseId]
   );
 
   useEffect(() => {
     let cancelled = false;
-
     const loadPlayback = async () => {
       setPlayback(null);
       setPlaybackError(null);
-
       if (!current?.id) return;
       if (membershipLoading) return;
       if (!isFree && membershipStatus !== "approved") return;
-
       try {
         setPlaybackLoading(true);
         persistLastVideo(current.id);
         const data = await fetchVideoPlaybackUrl(current.id);
         if (!cancelled) setPlayback(data);
       } catch (e: unknown) {
-        console.error(e);
         if (!cancelled) {
           const message = e instanceof Error ? e.message : "ផ្ទុកតំណភ្ជាប់ចាក់វីដេអូមិនជោគជ័យ។";
           setPlaybackError(message);
@@ -178,19 +174,13 @@ export default function WatchVideoPage() {
         if (!cancelled) setPlaybackLoading(false);
       }
     };
-
     loadPlayback();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [current?.id, isFree, membershipLoading, membershipStatus, persistLastVideo]);
 
   const src = playback?.kind === "r2_proxy" ? playback.url : "";
   const thumb = normalizeNextImageSrc(current?.thumbnail_url, FALLBACK_THUMB, { bucket: "video" });
   const thumbUnoptimized = shouldDisableImageOptimization(thumb);
-
-  const prev = currentIndex > 0 ? videos[currentIndex - 1] : null;
-  const next = currentIndex >= 0 && currentIndex < videos.length - 1 ? videos[currentIndex + 1] : null;
 
   const handleGo = useCallback(
     (vId: string) => {
@@ -202,315 +192,317 @@ export default function WatchVideoPage() {
 
   return (
     <ProtectedRoute>
-      <PageContainer>
-        <section className="py-4 sm:py-6 min-h-screen">
-          <div className="max-w-[1600px] mx-auto px-3 sm:px-6 lg:px-8">
-            {/* Enhanced Top Navigation */}
-            <div className="mb-6 animate-in">
-              <div className="flex items-center justify-between mb-4">
-                <Link
-                  href={`/law_video/${courseId}`}
-                  className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-(--brown) transition-colors group"
-                >
-                  <ChevronLeftIcon className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                  <span>ត្រឡប់ទៅវគ្គសិក្សា</span>
-                </Link>
-                <button
-                  onClick={() => setSidebarOpen(!sidebarOpen)}
-                  className="lg:hidden p-2 rounded-md border border-transparent hover:bg-gray-100 hover:border-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2"
-                  aria-label="បើក/បិទផ្នែកចំហៀង"
-                >
-                  <BookOpenIcon className="w-5 h-5 text-gray-600" />
-                </button>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="min-w-0 flex-1">
-                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight mb-2">
-                    {current?.title ?? "មើលវីដេអូ"}
-                  </h1>
-                  <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
-                    <span className="flex items-center gap-1">
-                      <BookOpenIcon className="w-4 h-4" />
-                      {course?.name ?? "វគ្គសិក្សា"}
-                    </span>
-                    <span>•</span>
-                    <span>មេរៀន {currentIndex >= 0 ? currentIndex + 1 : "—"} នៃ {videos.length}</span>
-                    {current?.presented_by && (
-                      <>
-                        <span>•</span>
-                        <span className="flex items-center gap-1">
-                          <UserIcon className="w-4 h-4" />
-                          {current.presented_by}
-                        </span>
-                      </>
-                    )}
-                    {current?.uploaded_at && (
-                      <>
-                        <span>•</span>
-                        <span className="flex items-center gap-1">
-                          <ClockIcon className="w-4 h-4" />
-                          {formatShortDate(current.uploaded_at)}
-                        </span>
-                      </>
-                    )}
+      <PageContainer className="!bg-gray-950">
+        <div className="text-white">
+          {/* ── Breadcrumb ── */}
+          <div className="flex items-center gap-1.5 px-4 sm:px-6 py-3 text-sm text-gray-400 border-b border-white/8">
+            <Link href="/law_video" className="hover:text-white transition-colors">
+              វគ្គសិក្សា
+            </Link>
+            <ChevronRightIcon className="w-3.5 h-3.5 text-gray-600" />
+            <span className="text-gray-300 truncate max-w-[200px]">{course?.name ?? "..."}</span>
+          </div>
+
+          {/* ── Main layout ── */}
+          <div className="flex flex-col lg:flex-row lg:items-start">
+
+            {/* ══ LEFT: Player + Info ══ */}
+            <div className="flex-1 min-w-0">
+
+              {/* Player area */}
+              <div className="relative w-full aspect-video bg-black">
+                {isLoading || membershipLoading ? (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                    <div className="w-12 h-12 rounded-full border-4 border-white/15 border-t-white animate-spin" />
+                    <p className="text-sm text-gray-400">
+                      {membershipLoading ? "កំពុងពិនិត្យសមាជិកភាព..." : "កំពុងផ្ទុក..."}
+                    </p>
                   </div>
-                </div>               
+                ) : error ? (
+                  <div className="absolute inset-0 flex items-center justify-center p-8 text-center">
+                    <div>
+                      <p className="text-lg font-semibold mb-2">ផ្ទុកមាតិកាមិនជោគជ័យ</p>
+                      <p className="text-sm text-gray-400">{error}</p>
+                    </div>
+                  </div>
+                ) : !current ? (
+                  <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                    រកមិនឃើញវីដេអូ
+                  </div>
+                ) : !isFree && membershipStatus !== "approved" ? (
+                  /* ── Paywall ── */
+                  <div className="absolute inset-0">
+                    <Image
+                      src={thumb}
+                      alt={current.title ?? ""}
+                      fill
+                      className="object-cover opacity-40"
+                      sizes="100vw"
+                      unoptimized={thumbUnoptimized}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/30" />
+                    <div className="absolute inset-0 flex items-center justify-center p-6 text-center">
+                      <div className="max-w-md">
+                        <div className="flex justify-center mb-4 text-gray-400">
+                          <LockIcon />
+                        </div>
+                        <h2 className="text-2xl font-bold mb-3">ត្រូវការសមាជិកភាព</h2>
+                        <p className="text-gray-300 text-sm leading-relaxed mb-6">
+                          ដោះសោការចូលប្រើពេញលេញទៅកាន់វគ្គវីដេអូ ឯកសារច្បាប់ និងមាតិកាពិសេសទាំងអស់។
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                          <Button onClick={() => router.push("/pricing_page")} variant="primary">
+                            ដំឡើងសមាជិកភាព
+                          </Button>
+                          <Button
+                            onClick={() => router.push("/law_video")}
+                            variant="outline"
+                            className="border-white/20 text-white hover:bg-white/10"
+                          >
+                            រកមើលវគ្គផ្សេង
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : playbackLoading ? (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                    <div className="w-12 h-12 rounded-full border-4 border-white/15 border-t-white animate-spin" />
+                    <p className="text-sm text-gray-400">កំពុងផ្ទុកវីដេអូ...</p>
+                  </div>
+                ) : playbackError ? (
+                  <div className="absolute inset-0 flex items-center justify-center p-8 text-center">
+                    <div>
+                      <p className="text-lg font-semibold mb-2">ផ្ទុកវីដេអូមិនជោគជ័យ</p>
+                      <p className="text-sm text-gray-400 mb-4">{playbackError}</p>
+                      <Button onClick={() => window.location.reload()} variant="primary">
+                        ព្យាយាមម្តងទៀត
+                      </Button>
+                    </div>
+                  </div>
+                ) : playback?.kind === "r2_proxy" && src ? (
+                  <video
+                    className="absolute inset-0 w-full h-full"
+                    controls
+                    playsInline
+                    preload="metadata"
+                    poster={thumb}
+                    controlsList="nodownload noremoteplayback"
+                    onContextMenu={(e) => e.preventDefault()}
+                    onTimeUpdate={(e) => {
+                      const video = e.currentTarget;
+                      if (video.duration) {
+                        handleVideoProgress(current.id, video.currentTime / video.duration);
+                      }
+                    }}
+                  >
+                    <source src={src} />
+                  </video>
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-center p-6 text-gray-400">
+                    <p>ប្រភពវីដេអូមិនត្រូវបានគាំទ្រ</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Video info */}
+              <div className="px-4 sm:px-6 py-5 border-b border-white/8 lg:border-b-0">
+                {/* Title */}
+                <h1 className="text-xl sm:text-2xl font-bold text-white leading-snug">
+                  {current?.title ?? "—"}
+                </h1>
+
+                {/* Meta row */}
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2.5 text-sm text-gray-400">
+                  {course?.name && (
+                    <Link
+                      href="/law_video"
+                      className="font-medium text-gray-300 hover:text-white transition-colors"
+                    >
+                      {course.name}
+                    </Link>
+                  )}
+                  {currentIndex >= 0 && (
+                    <>
+                      <span className="text-gray-700">•</span>
+                      <span>មេរៀន {currentIndex + 1} / {videos.length}</span>
+                    </>
+                  )}
+                  {current?.presented_by && (
+                    <>
+                      <span className="text-gray-700">•</span>
+                      <span className="flex items-center gap-1">
+                        <UserIcon />
+                        {current.presented_by}
+                      </span>
+                    </>
+                  )}
+                  {formatShortDate(current?.uploaded_at) && (
+                    <>
+                      <span className="text-gray-700">•</span>
+                      <span className="flex items-center gap-1">
+                        <CalendarIcon />
+                        {formatShortDate(current?.uploaded_at)}
+                      </span>
+                    </>
+                  )}
+                </div>
+
+                {/* Prev / Next + progress */}
+                <div className="flex flex-wrap items-center gap-3 mt-4">
+                  <button
+                    disabled={!prev}
+                    onClick={() => prev && handleGo(prev.id)}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/8 text-sm font-medium text-white disabled:opacity-25 hover:bg-white/15 transition-colors"
+                  >
+                    <ChevronLeftIcon /> មុន
+                  </button>
+                  <button
+                    disabled={!next}
+                    onClick={() => next && handleGo(next.id)}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/8 text-sm font-medium text-white disabled:opacity-25 hover:bg-white/15 transition-colors"
+                  >
+                    បន្ទាប់ <ChevronRightIcon />
+                  </button>
+
+                  {courseProgress > 0 && (
+                    <div className="ml-auto flex items-center gap-2 text-sm text-gray-400">
+                      <div className="w-24 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                          style={{ width: `${courseProgress}%` }}
+                        />
+                      </div>
+                      <span className="text-xs">{courseProgress}% បញ្ចប់</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Description (expandable) */}
+                {current?.description && (
+                  <div className="mt-4">
+                    <button
+                      onClick={() => setDescExpanded((v) => !v)}
+                      className="w-full text-left"
+                    >
+                      <div className={`bg-white/5 rounded-xl px-4 py-3 text-sm text-gray-300 leading-relaxed ${!descExpanded ? "line-clamp-2" : ""}`}>
+                        {current.description}
+                      </div>
+                      <span className="text-xs text-gray-500 mt-1.5 inline-block hover:text-gray-300 transition-colors">
+                        {descExpanded ? "បង្រួម ▲" : "មើលបន្ថែម ▼"}
+                      </span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
-            {isLoading ? (
-              <div className="text-center text-gray-600 py-20">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-(--brown) border-t-transparent mb-4"></div>
-                <p className="text-lg">កំពុងផ្ទុកមាតិកាវគ្គសិក្សា...</p>
-              </div>
-            ) : error ? (
-              <div className="text-center text-red-600 py-20">
-                <div className="text-xl font-semibold mb-2">មានបញ្ហាក្នុងការផ្ទុកមាតិកា</div>
-                <p>{error}</p>
-              </div>
-            ) : !current ? (
-              <div className="text-center text-gray-600 py-20">
-                <div className="text-xl font-semibold mb-2">រកមិនឃើញវីដេអូ</div>
-                <p>វីដេអូដែលអ្នកកំពុងស្វែងរកមិនមានទេ។</p>
-              </div>
-            ) : membershipLoading ? (
-              <div className="text-center text-gray-600 py-20">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-(--brown) border-t-transparent mb-4"></div>
-                <p>កំពុងពិនិត្យស្ថានភាពសមាជិកភាព...</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
-                {/* Main Content Area */}
-                <div className="space-y-6">
-                  {/* Enhanced Video Player */}
-                  <div className="rounded-none border border-gray-200 shadow-lg overflow-hidden animate-scale-in">
-                    <div className="relative w-full aspect-video bg-black">
-                      {playbackLoading ? (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center text-white/90">
-                          <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-white/30 border-t-white mb-4"></div>
-                          <p className="text-lg font-medium">កំពុងផ្ទុកកម្មវិធីចាក់វីដេអូ...</p>
-                        </div>
-                      ) : playbackError ? (
-                        <div className="absolute inset-0 flex items-center justify-center p-8 text-center text-white">
-                          <div className="max-w-md">
-                            <div className="text-2xl font-bold mb-3">ផ្ទុកវីដេអូមិនជោគជ័យ</div>
-                            <div className="text-sm text-white/80 mb-6">{playbackError}</div>
-                            <Button onClick={() => window.location.reload()} variant="primary">
-                              ព្យាយាមម្តងទៀត
-                            </Button>
-                          </div>
-                        </div>
-                      ) : !isFree && membershipStatus !== "approved" ? (
-                        <div className="absolute inset-0">
-                          <Image
-                            src={thumb}
-                            alt={current.title ?? "Video"}
-                            fill
-                            className="object-cover opacity-60"
-                            sizes="(max-width: 1024px) 100vw, 70vw"
-                            unoptimized={thumbUnoptimized}
-                          />
-                          <div className="absolute inset-0 bg-black/55" />
-                          <div className="absolute inset-0 flex items-center justify-center p-8 text-center text-white">
-                            <div className="max-w-lg animate-slide-up-fade">
-                              <div className="text-3xl font-bold mb-4">ត្រូវការសមាជិកភាព</div>
-                              <div className="text-base text-white/90 mb-8 leading-relaxed">
-                                ដោះសោការចូលប្រើពេញលេញទៅកាន់វគ្គវីដេអូ ឯកសារច្បាប់ និងមាតិកាពិសេសទាំងអស់។ ចូលរួមសហគមន៍អ្នកជំនាញច្បាប់ និងនិស្សិតរបស់យើង។
-                              </div>
-                              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                                <Button onClick={() => router.push("/pricing_page")} variant="primary" size="md">
-                                  ដំឡើងសមាជិកភាព
-                                </Button>
-                                <Button onClick={() => router.push("/law_video")} variant="outline" size="md" className="bg-white/10 backdrop-blur text-white border-white/20 hover:bg-white/20">
-                                  រកមើលវគ្គសិក្សា
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ) : playback?.kind === "r2_proxy" && src ? (
-                        // Tokenized same-origin URL; works with <video> without custom headers.
-                        <video
-                          className="absolute inset-0 w-full h-full"
-                          controls
-                          playsInline
-                          preload="metadata"
-                          poster={thumb}
-                          controlsList="nodownload noremoteplayback"
-                          onContextMenu={(e) => e.preventDefault()}
-                          onTimeUpdate={(e) => {
-                            const video = e.currentTarget;
-                            if (video.duration) {
-                              const progress = video.currentTime / video.duration;
-                              handleVideoProgress(current.id, progress);
-                            }
-                          }}
-                        >
-                          <source src={src} />
-                        </video>
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center p-6 text-center text-white">
-                          <div>
-                            <div className="text-lg font-semibold mb-2">ប្រភពវីដេអូមិនត្រូវបានគាំទ្រ</div>
-                            <div className="text-sm text-white/80">
-                              វីដេអូនេះមិនមានប្រភព R2 ដែលអាចចាក់បានក្នុង Supabase ទេ។
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
+            {/* ══ RIGHT: Playlist ══ */}
+            <aside className="w-full lg:w-[380px] xl:w-[420px] shrink-0 border-t border-white/8 lg:border-t-0 lg:border-l lg:border-white/8 lg:sticky lg:top-24 lg:max-h-[calc(100vh-6rem)] flex flex-col bg-gray-900">
 
-                    {/* Video Info Bar */}
-                    <div className="px-6 py-4 border-gray-200 rounded-none">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                        <div className="flex items-center gap-4">
-                          {courseProgress > 0 && (
-                            <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600">
-                              <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-(--brown) rounded-full transition-all duration-500"
-                                  style={{ width: `${courseProgress}%` }}
-                                ></div>
-                              </div>
-                              <span className="font-medium">{courseProgress}%</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+              {/* Playlist header */}
+              <div className="shrink-0 px-4 py-4 border-b border-white/8">
+                <div className="font-bold text-white text-base leading-snug">
+                  {course?.name ?? "វគ្គសិក្សា"}
+                </div>
+                <div className="text-xs text-gray-400 mt-1">
+                  {videos.length} មេរៀន
+                  {courseProgress > 0 && (
+                    <span className="ml-2 text-emerald-400">{courseProgress}% បញ្ចប់</span>
+                  )}
+                </div>
+                {courseProgress > 0 && (
+                  <div className="mt-2 h-1 bg-white/10 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                      style={{ width: `${courseProgress}%` }}
+                    />
                   </div>
+                )}
+              </div>
 
-                  {/* Course Overview Section */}
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden animate-scale-in delay-200">
-                    <div className="p-6">
-                      <div className="animate-fadeInUp">
-                        <div className="space-y-6">
-                          <div>
-                            <h2 className="text-2xl font-bold text-gray-900 mb-3">{course?.name ?? "ទិដ្ឋភាពទូទៅវគ្គសិក្សា"}</h2>
-                            {course?.description ? (
-                              <p className="text-gray-700 leading-relaxed">{course.description}</p>
+              {/* Scrollable video list */}
+              <div className="flex-1 overflow-y-auto">
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-12 text-gray-500 text-sm">
+                    កំពុងផ្ទុក...
+                  </div>
+                ) : (
+                  <div className="py-1">
+                    {videos.map((v, idx) => {
+                      const isActive = v.id === videoId;
+                      const isWatched = (videoProgress[v.id] ?? 0) > 0.9;
+                      const progress = videoProgress[v.id] ?? 0;
+                      const vThumb = normalizeNextImageSrc(v.thumbnail_url, FALLBACK_THUMB, { bucket: "video" });
+                      const vThumbUnoptimized = shouldDisableImageOptimization(vThumb);
+
+                      return (
+                        <button
+                          key={v.id}
+                          onClick={() => handleGo(v.id)}
+                          className={`w-full flex items-start gap-3 px-3 py-2.5 text-left transition-colors border-l-2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-white/30 ${
+                            isActive
+                              ? "bg-white/10 border-emerald-500"
+                              : "hover:bg-white/5 border-transparent"
+                          }`}
+                        >
+                          {/* Number / check */}
+                          <div className="shrink-0 w-5 flex justify-center mt-2">
+                            {isWatched ? (
+                              <CheckIcon className="w-4 h-4 text-emerald-500" />
                             ) : (
-                              <p className="text-gray-600 italic">មិនមានការពិពណ៌នាសម្រាប់វគ្គនេះទេ។</p>
+                              <span className={`text-xs font-mono ${isActive ? "text-emerald-400" : "text-gray-600"}`}>
+                                {idx + 1}
+                              </span>
                             )}
                           </div>
 
-                          <div className="rounded-xl border border-gray-200 bg-gray-50 p-6 shadow-sm">
-                            <div className="flex items-start gap-4">
-                              <div className="shrink-0 w-12 h-12 rounded-lg bg-(--brown)/10 flex items-center justify-center">
-                                <PlayIcon className="w-6 h-6 text-(--brown)" />
+                          {/* Thumbnail */}
+                          <div className="relative shrink-0 w-[108px] aspect-video rounded overflow-hidden bg-gray-800">
+                            <Image
+                              src={vThumb}
+                              alt={v.title ?? ""}
+                              fill
+                              className="object-cover"
+                              sizes="108px"
+                              unoptimized={vThumbUnoptimized}
+                            />
+                            {isActive && (
+                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                <PlayIcon className="w-5 h-5 text-white drop-shadow" />
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-semibold text-gray-900 mb-1">មេរៀនបច្ចុប្បន្ន</div>
-                                <div className="text-lg font-bold text-gray-900 mb-2">{current.title ?? "គ្មានចំណងជើង"}</div>
-                                {current.presented_by && (
-                                  <div className="flex items-center gap-2 text-sm text-gray-700 mb-3">
-                                    <UserIcon className="w-4 h-4 text-(--brown)" />
-                                    <span className="font-medium">បង្ហាញដោយ:</span>
-                                    <span className="text-(--brown) font-semibold">{current.presented_by}</span>
-                                  </div>
-                                )}
-                                {current.description ? (
-                                  <div className="text-sm text-gray-600 leading-relaxed">{current.description}</div>
-                                ) : null}
+                            )}
+                            {progress > 0 && progress < 0.9 && (
+                              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-black/40">
+                                <div
+                                  className="h-full bg-emerald-500"
+                                  style={{ width: `${progress * 100}%` }}
+                                />
                               </div>
-                            </div>
+                            )}
                           </div>
-                        </div>
-                      </div>
-                    </div>
+
+                          {/* Title + presenter */}
+                          <div className="flex-1 min-w-0 pt-0.5">
+                            <p className={`text-sm font-medium line-clamp-2 leading-snug ${
+                              isActive ? "text-white" : "text-gray-300"
+                            }`}>
+                              {v.title ?? `មេរៀន ${idx + 1}`}
+                            </p>
+                            {v.presented_by && (
+                              <p className="text-xs text-gray-500 mt-1 truncate">{v.presented_by}</p>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
-                </div>
-
-                {/* Sidebar - Course Content */}
-                <aside
-                  className={`${
-                    sidebarOpen ? "block" : "hidden"
-                  } lg:block space-y-6 animate-slide-up-fade delay-300`}
-                >
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden sticky top-6">
-                    <div className="px-6 py-4 border-b border-gray-200 bg-(--brown)/5">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-lg font-bold text-gray-900">មាតិកាវគ្គសិក្សា</h3>
-                        {courseProgress > 0 && (
-                          <span className="text-xs font-semibold text-(--brown) bg-(--brown)/10 px-3 py-1 rounded-full">
-                            បញ្ចប់ {courseProgress}%
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-600">{videos.length} {videos.length === 1 ? "មេរៀន" : "មេរៀន"}</p>
-                    </div>
-
-                    <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
-                      <div className="p-4 space-y-1">
-                        {videos.map((video, idx) => {
-                          const isActive = video.id === videoId;
-                          const isWatched = videoProgress[video.id] && videoProgress[video.id] > 0.9;
-                          const progress = videoProgress[video.id] || 0;
-
-                          return (
-                            <button
-                              key={video.id}
-                              onClick={() => handleGo(video.id)}
-                              className={`w-full text-left p-4 rounded-md transition-all duration-200 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 ${
-                                isActive
-                                  ? "bg-(--brown)/10 border border-(--brown) shadow-sm"
-                                  : "hover:bg-gray-50 border border-transparent hover:border-gray-200"
-                              }`}
-                            >
-                              <div className="flex items-start gap-3">
-                                <div className="shrink-0 mt-0.5">
-                                  {isWatched ? (
-                                    <div className="w-6 h-6 rounded-full bg-(--brown) flex items-center justify-center">
-                                      <CheckIcon className="w-4 h-4 text-white" />
-                                    </div>
-                                  ) : (
-                                    <div
-                                      className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-semibold ${
-                                        isActive
-                                          ? "bg-(--brown) text-white"
-                                          : "bg-gray-200 text-gray-600 group-hover:bg-gray-300"
-                                      }`}
-                                    >
-                                      {idx + 1}
-                                    </div>
-                                  )}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div
-                                    className={`text-sm font-semibold mb-1 line-clamp-2 ${
-                                      isActive ? "text-(--brown)" : "text-gray-900"
-                                    }`}
-                                  >
-                                    {video.title ?? `មេរៀន ${idx + 1}`}
-                                  </div>
-                                  {progress > 0 && progress < 0.9 && (
-                                    <div className="mt-2">
-                                      <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                        <div
-                                          className="h-full bg-(--brown) rounded-full transition-all duration-300"
-                                          style={{ width: `${progress * 100}%` }}
-                                        ></div>
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-                                {isActive && (
-                                  <PlayIcon className="w-5 h-5 text-(--brown) shrink-0 mt-0.5" />
-                                )}
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                </aside>
+                )}
               </div>
-            )}
+            </aside>
           </div>
-        </section>
+        </div>
       </PageContainer>
     </ProtectedRoute>
   );
 }
-

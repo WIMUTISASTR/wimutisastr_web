@@ -15,11 +15,11 @@ import {
   TrustedBySection,
   Footer,
 } from "@/components/home";
+import { useAuth } from "@/lib/auth/context";
 
 export default function Home() {
+  const { user } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
-  const [currentBookIndex, setCurrentBookIndex] = useState(0);
-  const [currentCourseIndex, setCurrentCourseIndex] = useState(0);
   const [hasPaid, setHasPaid] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [home, setHome] = useState<HomeResponse | null>(null);
@@ -53,19 +53,23 @@ export default function Home() {
           }
         }
 
-        // Then verify with server for accurate status
+        // Guests are not members; skip server call until signed in.
+        if (!user) {
+          if (!cancelled) setHasPaid(false);
+          return;
+        }
+
         const response = await fetch('/api/payment/verify', {
           method: 'GET',
           credentials: 'include',
         });
 
-        if (response.ok && !cancelled) {
+        if (!cancelled && response.ok) {
           const data = await response.json();
           setHasPaid(data.hasPaid === true);
-          
-          // Update localStorage with verified status
+
           localStorage.setItem('payment_status', JSON.stringify({
-            paid: data.hasPaid,
+            paid: data.hasPaid === true,
             verifiedAt: new Date().toISOString(),
           }));
         }
@@ -87,7 +91,7 @@ export default function Home() {
       cancelled = true;
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, []);
+  }, [user]);
 
   // Load homepage data from backend
   useEffect(() => {
@@ -113,31 +117,11 @@ export default function Home() {
     };
   }, []);
 
-  // Auto-slide carousel for books
-  useEffect(() => {
-    const booksLen = home?.featuredBooks?.length ?? 0;
-    if (booksLen <= 1) return;
-    const interval = setInterval(() => {
-      setCurrentBookIndex((prevIndex) => (prevIndex + 1) % booksLen);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [home?.featuredBooks?.length]);
-
-  // Auto-slide carousel for courses
-  useEffect(() => {
-    const categoriesLen = home?.categories?.length ?? 0;
-    if (categoriesLen <= 1) return;
-    const interval = setInterval(() => {
-      setCurrentCourseIndex((prevIndex) => (prevIndex + 1) % categoriesLen);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [home?.categories?.length]);
-
-  // Scroll animations - using reusable hook
-  useScrollAnimation({
-    threshold: 0.1,
-    rootMargin: '0px',
-  });
+  // Re-run when home sections mount after API load (avoids invisible opacity-0 blocks).
+  useScrollAnimation(
+    { threshold: 0.1, rootMargin: '0px' },
+    [homeLoading, home?.categories?.length ?? 0, home?.featuredBooks?.length ?? 0]
+  );
 
   // Set initial visibility
   useEffect(() => {
@@ -155,18 +139,9 @@ export default function Home() {
 
       <FeaturesSection />
 
-      <FeaturedCoursesSection
-        home={home}
-        currentCourseIndex={currentCourseIndex}
-        setCurrentCourseIndex={setCurrentCourseIndex}
-      />
+      <FeaturedCoursesSection home={home} />
 
-      <FeaturedDocumentsSection
-        home={home}
-        currentBookIndex={currentBookIndex}
-        setCurrentBookIndex={setCurrentBookIndex}
-        hasPaid={hasPaid}
-      />
+      <FeaturedDocumentsSection home={home} hasPaid={hasPaid} />
 
       <TrustedBySection />
       <Footer />

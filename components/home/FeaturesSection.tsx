@@ -3,6 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 
+/**
+ * Full-bleed features band backdrop (legal theme; navy scrim keeps copy readable).
+ * Source (Pexels, free license): https://www.pexels.com/photo/gavel-on-wooden-desk-5668772/
+ * Stored locally at public/asset/features-section-backdrop.jpg
+ */
+const FEATURES_BACKDROP_SRC = "/asset/features-section-backdrop.jpg";
+
 const features = [
   {
     href: "/law_video",
@@ -13,7 +20,7 @@ const features = [
       </svg>
     ),
     title: "វគ្គវីដេអូ",
-    description: "សិក្សាពីអ្នកជំនាញច្បាប់តាមវីដេអូបង្រៀនគ្រប់ជ្រុងជ្រោយ ដែលផលិតដោយវិជ្ជាជីវៈ និងគ្របដណ្តប់គ្រប់ទិដ្ឋភាពនៃច្បាប់កម្ពុជា។",
+    description: "សិក្សាពីអ្នកជំនាញច្បាប់តាមវីដេអូបង្រៀនគ្រប់ជ្រុងជ្រោយ ដែលផលិតដោយវិជ្ជាជីវៈ និងគ្របដណ្តប់គ្រប់ទិដ្ឋភាពនៃច្បាប់។",
     cta: "ស្វែងរកវគ្គសិក្សា",
     iconWrapClass: "bg-(--primary) text-white",
   },
@@ -25,7 +32,7 @@ const features = [
       </svg>
     ),
     title: "ឯកសារច្បាប់",
-    description: "ចូលប្រើឯកសារច្បាប់ ព្រះរាជក្រម ករណីសិក្សា និងឯកសារយោង ដើម្បីពង្រឹងការយល់ដឹងអំពីប្រព័ន្ធច្បាប់កម្ពុជា។",
+    description: "ចូលប្រើឯកសារច្បាប់ ព្រះរាជក្រម ករណីសិក្សា និងឯកសារយោង ដើម្បីពង្រឹងការយល់ដឹងអំពីប្រព័ន្ធច្បាប់។",
     cta: "រកមើលឯកសារ",
     iconWrapClass: "bg-(--accent) text-white",
   },
@@ -72,31 +79,35 @@ const highlights = [
 
 export default function FeaturesSection() {
   return (
-    <section className="relative overflow-hidden bg-white py-16 sm:py-20 lg:py-24">
-      {/* Background: law books shelf from Unsplash */}
-      <div className="pointer-events-none absolute inset-0">
+    <section className="relative isolate overflow-hidden py-16 sm:py-20 lg:py-24">
+      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
         <Image
-          src="/asset/featureImageBackground.png"
+          src={FEATURES_BACKDROP_SRC}
           alt=""
           fill
-          className="object-cover object-center"
+          priority
+          className="object-cover object-[center_35%]"
           sizes="100vw"
-          priority={false}
         />
-        {/* Light overlay so existing dark text stays readable */}
-        <div className="absolute inset-0" />
-        {/* Subtle brand tint */}
-        <div className="absolute inset-0 bg-(--primary)/3" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(135deg, color-mix(in srgb, var(--primary-dark) 72%, transparent) 0%, color-mix(in srgb, var(--primary) 58%, transparent) 50%, color-mix(in srgb, var(--primary-dark) 68%, transparent) 100%)",
+          }}
+        />
+        <div className="absolute -left-24 top-1/4 h-72 w-72 rounded-full bg-(--accent) opacity-[0.12] blur-3xl" />
+        <div className="absolute -right-16 bottom-0 h-80 w-80 rounded-full bg-(--accent-light) opacity-[0.1] blur-3xl" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto mb-12 max-w-3xl text-center sm:mb-16 scroll-animate opacity-0 translate-y-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white">មុខងារសំខាន់ៗ</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-(--accent-light)">មុខងារសំខាន់ៗ</p>
           <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             អ្វីៗដែលអ្នកត្រូវការ{" "}
-            <span className="text-white">ដើម្បីរីកចម្រើន</span>
+            <span className="text-(--accent-light)">ដើម្បីរីកចម្រើន</span>
           </h2>
-          <p className="mt-4 text-base leading-relaxed text-white sm:text-lg">
+          <p className="mt-4 text-base leading-relaxed text-white/90 sm:text-lg">
             ធនធានអប់រំច្បាប់គ្រប់គ្រាន់នៅចុងម្រាមដៃអ្នក
           </p>
         </div>
@@ -134,7 +145,7 @@ export default function FeaturesSection() {
           {highlights.map((item) => (
             <div
               key={item.title}
-              className="rounded-xl border border-(--gray-200) bg-(--gray-50)/80 p-5 transition-colors duration-200 hover:border-(--primary)/25 hover:bg-white"
+              className="rounded-xl border border-white/15 bg-white/95 p-5 shadow-sm backdrop-blur-sm transition-colors duration-200 hover:border-white/30 hover:bg-white"
             >
               <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-(--primary)/10 text-(--primary)">
                 {item.icon}

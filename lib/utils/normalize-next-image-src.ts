@@ -12,6 +12,15 @@ export function normalizeNextImageSrc(
   const value = (src ?? "").trim();
   if (!value) return fallback ?? "";
 
+  // Never use tokenized stream URLs as image sources (causes 401/404 in DevTools).
+  if (
+    value.includes("/api/videos/serve") ||
+    value.includes("/api/books/serve") ||
+    value.includes("/api/storage/view-token")
+  ) {
+    return fallback ?? "";
+  }
+
   // Already relative (Next can optimize without remote host config)
   if (value.startsWith("/")) return value;
 

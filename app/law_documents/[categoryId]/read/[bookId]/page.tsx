@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -10,7 +9,6 @@ import Button from "@/components/Button";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import LoadingState from "@/components/LoadingState";
 import { apiPost, fetchBooks, type BookCategory, type BookRow } from "@/lib/api/client";
-import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
 import { useMembership } from "@/lib/hooks/useMembership";
 import { notify } from "@/lib/utils/notify";
 
@@ -35,16 +33,7 @@ const PdfViewer = dynamic(() => import("@/components/PdfViewer"), {
   ),
 });
 
-const FALLBACK_COVER = "/asset/document_background.png";
 const ALL_CATEGORY_ID = "__all__";
-
-function isAnimatedImageUrl(src: string) {
-  return /\.gif(\?|#|$)/i.test(src);
-}
-
-function shouldDisableImageOptimization(src: string) {
-  return src.includes(".r2.dev/") || /^https?:\/\//i.test(src);
-}
 
 export default function ReadDocumentPage() {
   const params = useParams();
@@ -98,9 +87,6 @@ export default function ReadDocumentPage() {
   const prev = currentIndex > 0 ? books[currentIndex - 1] : null;
   const next = currentIndex >= 0 && currentIndex < books.length - 1 ? books[currentIndex + 1] : null;
 
-  const cover = normalizeNextImageSrc(current?.cover_url, FALLBACK_COVER, { bucket: "book" });
-  const coverUnoptimized = isAnimatedImageUrl(cover) || shouldDisableImageOptimization(cover);
-  
   // Track if we have a valid token cookie set (ready state from API)
   const [isReady, setIsReady] = useState(false);
   
@@ -180,23 +166,25 @@ export default function ReadDocumentPage() {
                 <LoadingState label="កំពុងពិនិត្យសមាជិកភាព..." />
               </div>
             ) : !isFree && membershipStatus !== "approved" ? (
-              <div className="grid lg:grid-cols-12 gap-6">
-                <div className="lg:col-span-8">
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                    <div className="relative w-full aspect-4/3 bg-black">
-                      <Image src={cover} alt={current.title} fill className="object-cover opacity-65" sizes="(max-width: 1024px) 100vw, 66vw" unoptimized={coverUnoptimized} />
-                      <div className="absolute inset-0 bg-black/40" />
-                      <div className="absolute inset-0 flex items-center justify-center p-6 text-center text-white">
-                        <div>
-                          <div className="text-xl font-semibold mb-2">ត្រូវការសមាជិកភាព</div>
-                          <div className="text-sm text-white/85 mb-5">អ្នកអាចរកមើលប្រភេទ និងគម្របបាន ប៉ុន្តែការអានឯកសារគឺសម្រាប់សមាជិកប៉ុណ្ណោះ។</div>
-                          <Button onClick={() => router.push("/pricing_page")} variant="primary">
-                            ដំឡើងសមាជិកភាព
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              <div className="rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center shadow-sm sm:px-10">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-600">
+                  <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    />
+                  </svg>
+                </div>
+                <h2 className="mt-5 text-xl font-semibold text-slate-900">ត្រូវការសមាជិកភាព</h2>
+                <p className="mt-2 mx-auto max-w-md text-sm leading-relaxed text-slate-600">
+                  អ្នកអាចរកមើលប្រភេទ និងគម្របបាន ប៉ុន្តែការអានឯកសារគឺសម្រាប់សមាជិកប៉ុណ្ណោះ។
+                </p>
+                <div className="mt-6">
+                  <Button onClick={() => router.push("/pricing_page")} variant="primary">
+                    ដំឡើងសមាជិកភាព
+                  </Button>
                 </div>
               </div>
             ) : (

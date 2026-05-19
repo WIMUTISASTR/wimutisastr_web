@@ -150,23 +150,7 @@ export default function BookGridClient({ categories, books }: BookGridClientProp
                           <p className="mt-3 text-(--gray-700) font-medium line-clamp-3 text-lg">
                             {cat.description ?? ""}
                           </p>
-                        </div>
-
-                        <div className="flex flex-wrap items-center justify-between gap-3">
-                          <div className="text-sm text-(--gray-700) font-semibold">
-                            {isLocked ? "សមាជិកប៉ុណ្ណោះ" : "ប្រភេទ"}
-                          </div>
-                          <Button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              router.push(`/law_documents/${cat.id}`);
-                            }}
-                            variant="primary"
-                            size="md"
-                          >
-                            {isLocked ? "មើល" : "មើល"}
-                          </Button>
-                        </div>
+                        </div>                       
                       </div>
                     </div>
                   </div>

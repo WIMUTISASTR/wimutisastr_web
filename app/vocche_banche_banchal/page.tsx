@@ -72,7 +72,7 @@ export default function VoccheBancheBanchalPage() {
             WIMUTISASTR
           </p>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-5 leading-tight opacity-0 translate-y-8 delay-100">
-            វគ្គបណ្តុុះបណ្តាល
+            វគ្គបណ្តុះបណ្តាល
           </h1>
           <p className="text-lg sm:text-xl text-gray-200 max-w-3xl mx-auto opacity-0 translate-y-8 delay-200">
             បង្កើនសមត្ថភាពអនុវត្តច្បាប់ និងដោះស្រាយបញ្ហាក្នុងការងារជាមួយការបណ្តុះបណ្តាលពីអ្នកជំនាញការិយាល័យច្បាប់។

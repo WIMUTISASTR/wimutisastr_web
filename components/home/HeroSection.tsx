@@ -59,11 +59,11 @@ export default function HeroSection({ isVisible, mousePosition, home, homeLoadin
             <div className="space-y-4">
               <h1 className="text-4xl font-semibold leading-[1.1] tracking-tight text-(--ink) sm:text-5xl lg:text-[3.25rem] xl:text-6xl">
                 មជ្ឈមណ្ឌល
-                <span className="mt-1 block text-(--primary)">សិក្សាច្បាប់កម្ពុជា</span>
+                <span className="mt-1 block text-(--primary)">សិក្សាច្បាប់</span>
               </h1>
               <p className="max-w-xl text-base leading-relaxed text-(--gray-700) sm:text-lg">
                 ផ្តល់ជូនវគ្គវីដេអូ និងឯកសារច្បាប់សំខាន់ៗ ដើម្បីជួយឱ្យសិស្ស និស្សិត អ្នកជំនាញ និងសាធារណជន
-                អាចសិក្សា និងយល់ដឹងអំពីច្បាប់កម្ពុជាបានយ៉ាងច្បាស់លាស់។
+                អាចសិក្សា និងយល់ដឹងអំពីច្បាប់បានយ៉ាងច្បាស់លាស់។
               </p>
             </div>
 
@@ -136,7 +136,7 @@ export default function HeroSection({ isVisible, mousePosition, home, homeLoadin
               <div className="relative aspect-4/3">
                 <Image
                   src="/asset/hero.png"
-                  alt="ការអប់រំច្បាប់កម្ពុជា"
+                  alt="ការអប់រំច្បាប់"
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 92vw, 50vw"

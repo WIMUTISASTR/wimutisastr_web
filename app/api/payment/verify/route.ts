@@ -16,11 +16,11 @@ export async function GET(request: NextRequest) {
 
     if (authError || !user) {
       return NextResponse.json(
-        { 
-          hasPaid: false, 
-          message: 'User not authenticated' 
+        {
+          hasPaid: false,
+          membershipStatus: 'none',
         },
-        { status: 401 }
+        { status: 200 }
       );
     }
 
@@ -41,12 +41,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Check for approved payment proofs
+    // Check for verified payment proofs
     const { data: proofs, error: proofsError } = await supabase
       .from('payment_proofs')
       .select('status, membership_ends_at')
       .eq('user_id', user.id)
-      .eq('status', 'approved')
+      .eq('status', 'verified')
       .order('membership_ends_at', { ascending: false })
       .limit(1);
 
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
     // 1. They have an approved payment proof
     // 2. Their membership hasn't expired
     const latestProof = proofs?.[0];
-    const hasPaid = latestProof && latestProof.status === 'approved';
+    const hasPaid = latestProof && latestProof.status === 'verified';
     const membershipEndsAt = latestProof?.membership_ends_at || null;
     
     // Check if membership has expired
