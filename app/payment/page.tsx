@@ -6,7 +6,7 @@ import { Suspense } from "react";
 import PageContainer from "@/components/PageContainer";
 import Button from "@/components/Button";
 import LoadingState from "@/components/LoadingState";
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/context";
 import { supabase } from "@/lib/supabase/instance";
@@ -39,14 +39,7 @@ function PaymentPageContent() {
     return plans[0] ?? null;
   }, [plans, planId]);
 
-  const [paymentReference, setPaymentReference] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [proofImage, setProofImage] = useState<File | null>(null);
-  const [proofImagePreview, setProofImagePreview] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
   const [isBarayLoading, setIsBarayLoading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -110,11 +103,6 @@ function PaymentPageContent() {
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    if (!selectedPlan || paymentReference) return;
-    setPaymentReference(`REF-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`);
-  }, [selectedPlan, paymentReference]);
-
   const handleBarayPayment = async () => {
     if (!user) {
       notify.error("សូមចូលគណនីដើម្បីបង់ប្រាក់");
@@ -124,7 +112,6 @@ function PaymentPageContent() {
     if (!selectedPlan) return;
 
     setIsBarayLoading(true);
-    setErrorMessage("");
 
     try {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -162,114 +149,6 @@ function PaymentPageContent() {
       router.push("/payment/failed");
     } finally {
       setIsBarayLoading(false);
-    }
-  };
-
-  // Handle proof of payment image upload
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        setErrorMessage("សូមផ្ទុកឡើងឯកសាររូបភាព (JPG, PNG ជាដើម)");
-        return;
-      }
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setErrorMessage("ទំហំរូបភាពត្រូវតិចជាង 5MB");
-        return;
-      }
-      setProofImage(file);
-      setErrorMessage("");
-      // Create preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProofImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleRemoveImage = () => {
-    setProofImage(null);
-    setProofImagePreview(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
-  const handleUploadProof = async () => {
-    if (!proofImage || !paymentReference) {
-      setErrorMessage("សូមជ្រើសរើសរូបភាព និងត្រូវប្រាកដថាមានលេខយោងការទូទាត់");
-      return;
-    }
-
-    // Check if user is authenticated
-    if (!user) {
-      setErrorMessage("សូមចូលគណនីដើម្បីផ្ទុកភស្តុតាងបង់ប្រាក់");
-      notify.error("សូមចូលគណនីដើម្បីផ្ទុកភស្តុតាងបង់ប្រាក់");
-      router.push("/auth/login");
-      return;
-    }
-
-    setIsUploading(true);
-    setErrorMessage("");
-
-    try {
-      // Get the current session token
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError || !session?.access_token) {
-        setErrorMessage("សម័យប្រើប្រាស់ផុតកំណត់។ សូមចូលគណនីម្ដងទៀត។");
-        notify.error("សម័យប្រើប្រាស់ផុតកំណត់។ សូមចូលគណនីម្ដងទៀត។");
-        router.push("/auth/login");
-        return;
-      }
-
-      // Create FormData to send the image
-      const formData = new FormData();
-      formData.append('proof', proofImage);
-      formData.append('reference', paymentReference);
-      if (!selectedPlan) {
-        setErrorMessage("មិនទាន់ផ្ទុកគម្រោងទេ។ សូមត្រឡប់ក្រោយ ហើយជ្រើសរើសគម្រោងម្តងទៀត។");
-        notify.error("មិនទាន់ផ្ទុកគម្រោងទេ។ សូមជ្រើសរើសគម្រោងម្តងទៀត។");
-        return;
-      }
-      formData.append('planId', selectedPlan.id);
-      formData.append('amount', selectedPlan.price.toString());
-
-      const response = await fetch('/api/payment/upload-proof', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: "ផ្ទុកភស្តុតាងបង់ប្រាក់មិនជោគជ័យ" }));
-        const message = errorData.error || "ផ្ទុកភស្តុតាងបង់ប្រាក់មិនជោគជ័យ";
-        // Use notify for user-facing messaging (and avoid throwing / red overlay)
-        if (response.status === 409) {
-          notify.info(message);
-        } else {
-          notify.error(message);
-        }
-        setErrorMessage(message);
-        return;
-      }
-
-      const data = await response.json();
-      setUploadSuccess(true);
-      setErrorMessage("");
-      notify.success("បានផ្ទុកភស្តុតាងបង់ប្រាក់រួចរាល់។ សូមរង់ចាំការពិនិត្យពីអ្នកគ្រប់គ្រង។");
-    } catch (error) {
-      console.error("Error uploading proof:", error);
-      const message = error instanceof Error ? error.message : "ផ្ទុកភស្តុតាងបង់ប្រាក់មិនជោគជ័យ។ សូមព្យាយាមម្តងទៀត។";
-      setErrorMessage(message);
-      notify.error(message);
-    } finally {
-      setIsUploading(false);
     }
   };
 
@@ -449,136 +328,6 @@ function PaymentPageContent() {
                   </div>
 
 
-                  {/* Upload Proof of Payment */}
-                  <div className="space-y-4 pt-6 border-t border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">ផ្ទុកភស្តុតាងបង់ប្រាក់</h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                      បន្ទាប់ពីបង់ប្រាក់រួច អ្នកអាចផ្ទុករូបថតអេក្រង់ ឬរូបថតបញ្ជាក់ការទូទាត់ ដើម្បីឱ្យពិនិត្យបានលឿនជាងមុន។
-                    </p>
-                    {!user ? (
-                      <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-                        <p className="font-semibold">ត្រូវចូលគណនីដើម្បីផ្ទុកភស្តុតាង</p>
-                        <p className="mt-1 text-amber-800/90">
-                          អ្នកអាចស្កេន និងបង់ប្រាក់ឥឡូវនេះបាន ប៉ុន្តែត្រូវចូលគណនីដើម្បីផ្ទុកភស្តុតាងសម្រាប់អ្នកគ្រប់គ្រងពិនិត្យ។
-                        </p>
-                        <div className="mt-3">
-                          <Button
-                            variant="primary"
-                            onClick={() => {
-                              const redirectPath = `/payment${planId ? `?plan=${encodeURIComponent(planId)}` : ""}`;
-                              router.push(`/auth/login?redirect=${encodeURIComponent(redirectPath)}`);
-                            }}
-                          >
-                            ចូលគណនី
-                          </Button>
-                        </div>
-                      </div>
-                    ) : null}
-
-                    {!proofImagePreview ? (
-                      <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-(--brown) transition-colors">
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageSelect}
-                          className="hidden"
-                          id="proof-upload"
-                        />
-                        <label
-                          htmlFor="proof-upload"
-                          className="cursor-pointer flex flex-col items-center"
-                        >
-                          <svg
-                            className="w-12 h-12 text-gray-400 mb-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                            />
-                          </svg>
-                          <p className="text-gray-700 font-medium mb-1">ចុចដើម្បីផ្ទុកភស្តុតាងបង់ប្រាក់</p>
-                          <p className="text-sm text-gray-500">PNG, JPG up to 5MB</p>
-                        </label>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        <div className="relative rounded-xl overflow-hidden border-2 border-gray-200">
-                          <Image
-                            src={proofImagePreview}
-                            alt="Proof of payment preview"
-                            width={600}
-                            height={400}
-                            className="w-full h-auto object-contain bg-gray-50"
-                            unoptimized
-                          />
-                          <button
-                            onClick={handleRemoveImage}
-                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 border border-red-600/20 hover:bg-red-600 transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
-                            aria-label="Remove image"
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-                        <div className="flex gap-3">
-                          <Button
-                            onClick={handleUploadProof}
-                            variant="primary"
-                            fullWidth
-                            disabled={isUploading || uploadSuccess}
-                            className="px-6 py-3"
-                          >
-                            {isUploading ? (
-                              <span className="flex items-center justify-center">
-                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                កំពុងផ្ទុកឡើង...
-                              </span>
-                            ) : uploadSuccess ? (
-                              <span className="flex items-center justify-center">
-                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                                ផ្ទុកឡើងជោគជ័យ
-                              </span>
-                            ) : (
-                              "ផ្ទុកភស្តុតាង"
-                            )}
-                          </Button>
-                          <Button
-                            onClick={handleRemoveImage}
-                            variant="outline"
-                            className="px-6 py-3"
-                          >
-                            ប្តូររូបភាព
-                          </Button>
-                        </div>
-                        {uploadSuccess && (
-                          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                            <div className="flex items-start space-x-2">
-                              <svg className="w-5 h-5 text-green-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                              <div>
-                                <p className="text-green-700 font-semibold">បានផ្ទុកភស្តុតាងជោគជ័យ!</p>
-                                <p className="text-green-600 text-sm mt-1">យើងនឹងផ្ទៀងផ្ទាត់ការទូទាត់របស់អ្នកឆាប់ៗនេះ។ អ្នកក៏អាចរង់ចាំការផ្ទៀងផ្ទាត់ស្វ័យប្រវត្តិផងដែរ។</p>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
                   {/* Security Notice */}
                   <div className="bg-gray-50 rounded-lg p-4 flex items-start space-x-3">
                       <svg
@@ -605,6 +354,7 @@ function PaymentPageContent() {
           </div>
         </div>
       </section>
+
     </PageContainer>
   );
 }

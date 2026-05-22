@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import * as pdfjsLib from "pdfjs-dist";
 import type { PDFDocumentProxy, RenderTask } from "pdfjs-dist";
 import LoadingState from "@/components/LoadingState";
+import { getReadingPage, saveReadingPage } from "@/lib/utils/readingProgress";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
@@ -13,10 +14,11 @@ const SCALE_STEP = 0.2;
 
 interface PdfViewerProps {
   url: string;
+  bookId?: string;
   className?: string;
 }
 
-export default function PdfViewer({ url, className = "" }: PdfViewerProps) {
+export default function PdfViewer({ url, bookId, className = "" }: PdfViewerProps) {
   const [pdf, setPdf] = useState<PDFDocumentProxy | null>(null);
   const [numPages, setNumPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -29,6 +31,14 @@ export default function PdfViewer({ url, className = "" }: PdfViewerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const renderTaskRef = useRef<RenderTask | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const hasAutoFitRef = useRef(false);
+  const hasRestoredPageRef = useRef(false);
+
+  const goTo = useCallback((page: number) => {
+    const clamped = Math.max(1, Math.min(page, numPages || 1));
+    setCurrentPage(clamped);
+    setPageInputValue(String(clamped));
+  }, [numPages]);
 
   // Load document
   useEffect(() => {
@@ -37,6 +47,10 @@ export default function PdfViewer({ url, className = "" }: PdfViewerProps) {
     setLoadError(null);
     setPdf(null);
     setCurrentPage(1);
+    setPageInputValue("1");
+    hasAutoFitRef.current = false;
+    hasRestoredPageRef.current = false;
+    setScale(1.0);
 
     pdfjsLib
       .getDocument({ url, withCredentials: true })
@@ -58,6 +72,57 @@ export default function PdfViewer({ url, className = "" }: PdfViewerProps) {
     };
   }, [url]);
 
+  // Fit to container width on first load
+  useEffect(() => {
+    if (!pdf || hasAutoFitRef.current || !containerRef.current) return;
+
+    let cancelled = false;
+
+    const autoFit = async () => {
+      try {
+        const page = await pdf.getPage(1);
+        if (cancelled || !containerRef.current) return;
+
+        const containerWidth = containerRef.current.clientWidth - 32;
+        const unscaledViewport = page.getViewport({ scale: 1 });
+        const fitScale = Math.min(
+          MAX_SCALE,
+          Math.max(MIN_SCALE, containerWidth / unscaledViewport.width)
+        );
+
+        hasAutoFitRef.current = true;
+        setScale(parseFloat(fitScale.toFixed(2)));
+      } catch (err) {
+        console.error("PDF auto-fit error:", err);
+      }
+    };
+
+    autoFit();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [pdf]);
+
+  // Restore saved reading position
+  useEffect(() => {
+    if (!pdf || !bookId || hasRestoredPageRef.current) return;
+
+    const saved = getReadingPage(bookId);
+    hasRestoredPageRef.current = true;
+
+    if (saved && saved <= pdf.numPages && saved !== 1) {
+      setCurrentPage(saved);
+      setPageInputValue(String(saved));
+    }
+  }, [pdf, bookId]);
+
+  // Persist reading position
+  useEffect(() => {
+    if (!bookId || !pdf || currentPage < 1) return;
+    saveReadingPage(bookId, currentPage);
+  }, [bookId, pdf, currentPage]);
+
   // Render page whenever pdf, currentPage, or scale changes
   useEffect(() => {
     if (!pdf || !canvasRef.current) return;
@@ -65,7 +130,6 @@ export default function PdfViewer({ url, className = "" }: PdfViewerProps) {
     let cancelled = false;
 
     const renderPage = async () => {
-      // Cancel any in-progress render
       if (renderTaskRef.current) {
         try { renderTaskRef.current.cancel(); } catch {}
         renderTaskRef.current = null;
@@ -77,23 +141,10 @@ export default function PdfViewer({ url, className = "" }: PdfViewerProps) {
         const page = await pdf.getPage(currentPage);
         if (cancelled) return;
 
-        // Fit to container width on first load
-        let resolvedScale = scale;
-        if (containerRef.current) {
-          const containerWidth = containerRef.current.clientWidth - 32; // subtract padding
-          const unscaledViewport = page.getViewport({ scale: 1 });
-          const fitScale = containerWidth / unscaledViewport.width;
-          // Only auto-fit on initial render (scale === 1.3 default and fits better)
-          resolvedScale = scale;
-          // If scale pushes beyond container, keep it but let the container scroll
-          void fitScale; // used for reference only
-        }
-
-        const viewport = page.getViewport({ scale: resolvedScale });
+        const viewport = page.getViewport({ scale });
         const canvas = canvasRef.current!;
         const ctx = canvas.getContext("2d")!;
 
-        // Retina / HiDPI support
         const dpr = window.devicePixelRatio || 1;
         canvas.style.width = `${viewport.width}px`;
         canvas.style.height = `${viewport.height}px`;
@@ -109,7 +160,6 @@ export default function PdfViewer({ url, className = "" }: PdfViewerProps) {
         if (!cancelled) setIsPageRendering(false);
       } catch (err: unknown) {
         if (cancelled) return;
-        // RenderingCancelledException is expected when switching pages fast
         if (err instanceof Error && err.name === "RenderingCancelledException") return;
         console.error("Page render error:", err);
         setIsPageRendering(false);
@@ -127,11 +177,25 @@ export default function PdfViewer({ url, className = "" }: PdfViewerProps) {
     };
   }, [pdf, currentPage, scale]);
 
-  const goTo = useCallback((page: number) => {
-    const clamped = Math.max(1, Math.min(page, numPages));
-    setCurrentPage(clamped);
-    setPageInputValue(String(clamped));
-  }, [numPages]);
+  // Keyboard page navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) return;
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        goTo(currentPage - 1);
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        goTo(currentPage + 1);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [currentPage, goTo]);
 
   const zoomIn = () => setScale((s) => Math.min(parseFloat((s + SCALE_STEP).toFixed(1)), MAX_SCALE));
   const zoomOut = () => setScale((s) => Math.max(parseFloat((s - SCALE_STEP).toFixed(1)), MIN_SCALE));
@@ -167,9 +231,7 @@ export default function PdfViewer({ url, className = "" }: PdfViewerProps) {
 
   return (
     <div className={`flex flex-col bg-slate-100 ${className}`}>
-      {/* Top toolbar — zoom only */}
       <div className="sticky top-0 z-20 flex items-center justify-between gap-3 bg-slate-800 text-white px-4 py-2 shadow-md">
-        {/* Rendering indicator */}
         <div className="flex items-center gap-1.5 text-xs text-white/60 min-w-0">
           {isPageRendering && (
             <>
@@ -182,7 +244,6 @@ export default function PdfViewer({ url, className = "" }: PdfViewerProps) {
           )}
         </div>
 
-        {/* Zoom */}
         <div className="flex items-center gap-2">
           <button
             onClick={zoomOut}
@@ -212,14 +273,12 @@ export default function PdfViewer({ url, className = "" }: PdfViewerProps) {
         </div>
       </div>
 
-      {/* Canvas area */}
       <div ref={containerRef} className="flex-1 overflow-auto flex justify-center py-6 px-4">
         <div className="shadow-2xl bg-white">
           <canvas ref={canvasRef} className="block" />
         </div>
       </div>
 
-      {/* Bottom bar — page navigation */}
       <div className="sticky bottom-0 z-20 flex items-center justify-center gap-3 bg-slate-800 text-white px-4 py-2 shadow-md">
         <button
           onClick={() => goTo(currentPage - 1)}

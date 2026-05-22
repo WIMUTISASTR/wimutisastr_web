@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import PageContainer from "@/components/PageContainer";
 import Button from "@/components/Button";
@@ -35,6 +35,24 @@ const PdfViewer = dynamic(() => import("@/components/PdfViewer"), {
 
 const ALL_CATEGORY_ID = "__all__";
 
+function requestElementFullscreen(element: HTMLElement) {
+  if (element.requestFullscreen) return element.requestFullscreen();
+  const webkitElement = element as HTMLElement & { webkitRequestFullscreen?: () => Promise<void> };
+  if (webkitElement.webkitRequestFullscreen) return webkitElement.webkitRequestFullscreen();
+  return Promise.reject(new Error("Fullscreen is not supported"));
+}
+
+function exitElementFullscreen() {
+  if (document.exitFullscreen) return document.exitFullscreen();
+  const webkitDocument = document as Document & { webkitExitFullscreen?: () => Promise<void> };
+  if (webkitDocument.webkitExitFullscreen) return webkitDocument.webkitExitFullscreen();
+  return Promise.reject(new Error("Fullscreen is not supported"));
+}
+
+function getFullscreenElement() {
+  return document.fullscreenElement ?? (document as Document & { webkitFullscreenElement?: Element }).webkitFullscreenElement ?? null;
+}
+
 export default function ReadDocumentPage() {
   const params = useParams();
   const router = useRouter();
@@ -49,6 +67,8 @@ export default function ReadDocumentPage() {
   const [viewExt, setViewExt] = useState<string | null>(null);
   const [viewFilename, setViewFilename] = useState<string | null>(null);
   const [viewUrl, setViewUrl] = useState<string | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const viewerRef = useRef<HTMLDivElement>(null);
   const { status: membershipStatus, isLoading: membershipLoading } = useMembership();
 
   useEffect(() => {
@@ -127,6 +147,66 @@ export default function ReadDocumentPage() {
     };
   }, [bookId, current?.id, isFree, membershipStatus]);
 
+  useEffect(() => {
+    const syncFullscreen = () => setIsFullscreen(getFullscreenElement() === viewerRef.current);
+    document.addEventListener("fullscreenchange", syncFullscreen);
+    document.addEventListener("webkitfullscreenchange", syncFullscreen);
+    return () => {
+      document.removeEventListener("fullscreenchange", syncFullscreen);
+      document.removeEventListener("webkitfullscreenchange", syncFullscreen);
+    };
+  }, []);
+
+  const toggleFullscreen = useCallback(async () => {
+    if (!viewerRef.current) return;
+    try {
+      if (getFullscreenElement() === viewerRef.current) {
+        await exitElementFullscreen();
+      } else {
+        await requestElementFullscreen(viewerRef.current);
+      }
+    } catch (e) {
+      console.error(e);
+      notify.error("មិនអាចបើករបៀបពេញអេកranបានទេ។");
+    }
+  }, []);
+
+  const navigateToBook = useCallback(
+    (id: string) => {
+      router.push(`/law_documents/${categoryId}/read/${id}`);
+    },
+    [categoryId, router]
+  );
+
+  useEffect(() => {
+    if (!isReady || membershipLoading) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) return;
+
+      if (e.key === "f" || e.key === "F") {
+        e.preventDefault();
+        void toggleFullscreen();
+        return;
+      }
+
+      if (e.altKey && e.key === "ArrowLeft" && prev) {
+        e.preventDefault();
+        navigateToBook(prev.id);
+        return;
+      }
+
+      if (e.altKey && e.key === "ArrowRight" && next) {
+        e.preventDefault();
+        navigateToBook(next.id);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isReady, membershipLoading, navigateToBook, next, prev, toggleFullscreen]);
+
   // URL for serving content - cookie will be sent automatically
   const serveUrl = useMemo(() => {
     if (!isReady && !viewToken) return null;
@@ -137,21 +217,50 @@ export default function ReadDocumentPage() {
   return (
     <ProtectedRoute>
       <PageContainer>
-        <section className="py-8 px-2 sm:px-4 lg:px-6">
+        <section className={`px-2 sm:px-4 lg:px-6 ${isFullscreen ? "py-0" : "py-8"}`}>
           <div className="max-w-7xl mx-auto">
-            <div className="mb-6 flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <Link href={`/law_documents/${categoryId}`} className="text-sm text-gray-600 hover:text-gray-900">
-                  ← ត្រឡប់ទៅ {category?.name ?? "ឯកសារ"}
-                </Link>
-                <h1 className="mt-2 text-2xl sm:text-3xl font-semibold text-gray-900 truncate">{current?.title ?? "អានឯកសារ"}</h1>
-                <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600">
-                  {current?.author ? <span>{current.author}</span> : null}
-                  {typeof current?.year === "number" ? <span>{current.year}</span> : null}
-                  {currentIndex >= 0 ? <span>ឯកសារ {currentIndex + 1} នៃ {books.length}</span> : null}
+            {!isFullscreen && (
+              <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
+                  <Link href={`/law_documents/${categoryId}`} className="text-sm text-gray-600 hover:text-gray-900">
+                    ← ត្រឡប់ទៅ {category?.name ?? "ឯកសារ"}
+                  </Link>
+                  <h1 className="mt-2 text-2xl sm:text-3xl font-semibold text-gray-900 truncate">{current?.title ?? "អានឯកសារ"}</h1>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600">
+                    {current?.author ? <span>{current.author}</span> : null}
+                    {typeof current?.year === "number" ? <span>{current.year}</span> : null}
+                    {currentIndex >= 0 ? <span>ឯកសារ {currentIndex + 1} នៃ {books.length}</span> : null}
+                  </div>
                 </div>
-              </div>             
-            </div>
+
+                {!isLoading && !error && current && (isFree || membershipStatus === "approved") && books.length > 1 ? (
+                  <div className="flex shrink-0 items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => prev && navigateToBook(prev.id)}
+                      disabled={!prev}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-(--primary) hover:text-(--primary) disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                      <span className="hidden sm:inline">មុន</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => next && navigateToBook(next.id)}
+                      disabled={!next}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-(--primary) hover:text-(--primary) disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <span className="hidden sm:inline">បន្ទាប់</span>
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            )}
 
             {isLoading ? (
               <div className="py-16">
@@ -190,27 +299,69 @@ export default function ReadDocumentPage() {
             ) : (
               <div className="grid grid-cols-1 gap-6">
                 <div>
-                  <div className="bg-whit shadow-sm overflow-hidden">
+                  <div
+                    ref={viewerRef}
+                    className={`overflow-hidden bg-white shadow-sm ${
+                      isFullscreen ? "flex h-full w-full flex-col bg-slate-100" : ""
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3">
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-semibold text-slate-900">
+                          {viewExt === "docx" || viewExt === "doc" ? "កម្មវិធីមើលឯកសារ" : "អានឯកសារ PDF"}
+                        </div>
+                        {viewFilename ? (
+                          <div className="truncate text-xs text-slate-500">{viewFilename}</div>
+                        ) : null}
+                      </div>
+                      {isReady ? (
+                        <button
+                          type="button"
+                          onClick={toggleFullscreen}
+                          className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-(--primary) hover:text-(--primary)"
+                          aria-label={isFullscreen ? "ចាកចេញពីអេកranពេញ" : "មើលពេញអេកran"}
+                        >
+                          {isFullscreen ? (
+                            <>
+                              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 9V4.5M9 9H4.5M9 9L3.5 3.5M15 9h4.5M15 9V4.5M15 9l5.5-5.5M9 15v4.5M9 15H4.5M9 15l-5.5 5.5M15 15h4.5M15 15v4.5m0-4.5l5.5 5.5"
+                                />
+                              </svg>
+                              <span className="hidden sm:inline">ចាកចេញ</span>
+                            </>
+                          ) : (
+                            <>
+                              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                                />
+                              </svg>
+                              <span className="hidden sm:inline">ពេញអេកran</span>
+                            </>
+                          )}
+                        </button>
+                      ) : null}
+                    </div>
 
-                    <div className="bg-slate-50">
+                    <div className={`bg-slate-50 ${isFullscreen ? "min-h-0 flex-1" : ""}`}>
                       {isReady ? (
                         viewExt === "docx" || viewExt === "doc" ? (
-                          <div className="w-full bg-white overflow-auto">
-                            <div className="flex items-center justify-between gap-3 p-4 border-b border-gray-200">
-                              <div className="min-w-0">
-                                <div className="text-sm font-semibold text-gray-900 truncate">កម្មវិធីមើលឯកសារ</div>
-                                {viewFilename ? <div className="text-xs text-gray-500 truncate">{viewFilename}</div> : null}
-                              </div>
-                            </div>
-                            <DocxViewer
-                              url={serveUrl ?? `/api/books/serve`}
-                              className="min-h-[65vh]"
-                            />
-                          </div>
+                          <DocxViewer
+                            url={serveUrl ?? `/api/books/serve`}
+                            className={isFullscreen ? "min-h-0 h-full" : "min-h-[65vh]"}
+                          />
                         ) : (
                           <PdfViewer
                             url={serveUrl ?? `/api/books/serve`}
-                            className="min-h-[75vh]"
+                            bookId={bookId}
+                            className={isFullscreen ? "min-h-0 h-full" : "min-h-[75vh]"}
                           />
                         )
                       ) : (

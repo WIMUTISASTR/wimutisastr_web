@@ -6,7 +6,7 @@ import type { BookCategory, BookRow } from "@/lib/api/client";
 
 const PAGE_SIZE = 10;
 
-type SortKey = "title" | "category";
+type SortKey = "title" | "category" | "year";
 type SortDir = "asc" | "desc";
 
 interface DocumentsTableProps {
@@ -113,10 +113,12 @@ export default function DocumentsTable({
       let cmp = 0;
       if (sortKey === "title") {
         cmp = (a.title ?? "").localeCompare(b.title ?? "", "km");
-      } else {
+      } else if (sortKey === "category") {
         const aCat = getCategoryLines(a.category_id).primary;
         const bCat = getCategoryLines(b.category_id).primary;
         cmp = aCat.localeCompare(bCat, "km");
+      } else {
+        cmp = (a.year ?? 0) - (b.year ?? 0);
       }
       return sortDir === "asc" ? cmp : -cmp;
     });
@@ -172,10 +174,11 @@ export default function DocumentsTable({
       </div>
 
       <div className="w-full overflow-x-auto">
-        <table className="w-full min-w-[720px] table-fixed border-collapse text-base">
+        <table className="w-full min-w-[780px] table-fixed border-collapse text-base">
           <colgroup>
-            <col className="w-[52%]" />
-            <col className="w-[30%]" />
+            <col className="w-[45%]" />
+            <col className="w-[28%]" />
+            <col className="w-[5.5rem]" />
             <col className="w-[6.5rem]" />
           </colgroup>
           <thead>
@@ -184,10 +187,13 @@ export default function DocumentsTable({
                 <ThButton label="ចំណងជើង" sortKey="title" activeKey={sortKey} dir={sortDir} onSort={toggleSort} />
               </th>
               <th className="hidden py-3.5 pl-2 pr-4 text-left md:table-cell sm:pl-3">
-                <ThButton label="តាមក្រសួង/ស្ថាប័ន" sortKey="category" activeKey={sortKey} dir={sortDir} onSort={toggleSort} />
+                <ThButton label="ការពិពណ៌នា" sortKey="category" activeKey={sortKey} dir={sortDir} onSort={toggleSort} />
+              </th>
+              <th className="px-3 py-3.5 text-center sm:px-4">
+                <ThButton label="ឆ្នាំ" sortKey="year" activeKey={sortKey} dir={sortDir} onSort={toggleSort} align="center" />
               </th>
               <th className="px-5 py-3.5 text-center sm:px-6">
-                <span className="text-sm font-semibold tracking-wide text-slate-700">ទាញយក</span>
+                <span className="text-sm font-semibold tracking-wide text-slate-700">អាន</span>
               </th>
             </tr>
           </thead>
@@ -213,28 +219,15 @@ export default function DocumentsTable({
                       <span className="text-base font-medium text-slate-900 leading-snug group-hover:text-(--primary) transition-colors line-clamp-2">
                         {doc.title}
                       </span>
-                      <span className="mt-1.5 flex flex-wrap items-center gap-2">
-                        {doc.author && (
-                          <span className="text-sm text-slate-500">{doc.author}</span>
-                        )}
-                        {doc.year ? (
-                          <span className="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-                            {doc.year}
-                          </span>
-                        ) : null}
-                        <span
-                          className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${
-                            isFree
-                              ? "bg-amber-50 text-amber-800 ring-1 ring-amber-200/80"
-                              : "bg-slate-100 text-slate-600 ring-1 ring-slate-200/80"
-                          }`}
-                        >
-                          {isFree ? "ឥតគិតថ្លៃ" : "សមាជិក"}
-                        </span>
-                      </span>
+                      {doc.author ? (
+                        <span className="mt-1.5 block text-sm text-slate-500">{doc.author}</span>
+                      ) : null}
                       <span className="md:hidden mt-2 block text-sm text-slate-500 leading-relaxed">
                         <span className="font-medium text-slate-700">{primary}</span>
                         {secondary ? <span className="block mt-0.5">{secondary}</span> : null}
+                        {Number.isFinite(doc.year) ? (
+                          <span className="mt-1 block tabular-nums text-slate-600">ឆ្នាំ {doc.year}</span>
+                        ) : null}
                       </span>
                     </button>
                   </td>
@@ -244,11 +237,15 @@ export default function DocumentsTable({
                       <div className="text-sm text-slate-500 mt-1 leading-relaxed">{secondary}</div>
                     ) : null}
                   </td>
+                  <td className="px-3 py-4 align-middle text-center tabular-nums text-base text-slate-700 sm:px-4">
+                    {Number.isFinite(doc.year) ? doc.year : "—"}
+                  </td>
                   <td className="px-5 py-4 align-middle text-center sm:px-6">
                     <button
                       type="button"
                       onClick={() => handleOpen(doc)}
-                      title={isLocked ? "ត្រូវការសមាជិកភាព" : "ទាញយកឯកសារ"}
+                      title={isLocked ? "ត្រូវការសមាជិកភាព" : "អានឯកសារ"}
+                      aria-label={isLocked ? "ត្រូវការសមាជិកភាព" : "អានឯកសារ"}
                       className={`inline-flex h-10 w-10 items-center justify-center rounded-lg border transition-all ${
                         isLocked
                           ? "border-slate-200 bg-slate-50 text-slate-400 hover:border-slate-300 hover:bg-slate-100"
@@ -270,7 +267,7 @@ export default function DocumentsTable({
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             strokeWidth={2}
-                            d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4"
+                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                           />
                         </svg>
                       )}

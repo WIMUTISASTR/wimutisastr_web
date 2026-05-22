@@ -271,57 +271,16 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                <div className="mt-6 rounded-xl border border-gray-200 p-5">
-                  <p className="text-sm font-semibold text-gray-900">ភស្តុតាងបង់ប្រាក់ចុងក្រោយ</p>
-                  {profile?.latestProof ? (
-                    <div className="mt-3 grid sm:grid-cols-2 gap-3 text-sm text-gray-700">
-                      <div className="flex justify-between gap-3">
-                        <span className="text-gray-600">ស្ថានភាព</span>
-                        <span className="font-semibold text-gray-900">{profile.latestProof.status ?? "—"}</span>
-                      </div>
-                      <div className="flex justify-between gap-3">
-                        <span className="text-gray-600">លេខយោង</span>
-                        <span className="font-semibold text-gray-900">{profile.latestProof.reference ?? "—"}</span>
-                      </div>
-                      <div className="flex justify-between gap-3">
-                        <span className="text-gray-600">គម្រោង</span>
-                        <span className="font-semibold text-gray-900">{profile.plan?.name ?? profile.latestProof.planId ?? "—"}</span>
-                      </div>
-                      <div className="flex justify-between gap-3">
-                        <span className="text-gray-600">ថ្ងៃបានផ្ទុកឡើង</span>
-                        <span className="font-semibold text-gray-900">{formatDateTime(profile.latestProof.uploadedAt)}</span>
-                      </div>
-                      <div className="flex justify-between gap-3 sm:col-span-2">
-                        <span className="text-gray-600">ភស្តុតាង</span>
-                        {profile.latestProof.proofUrl ? (
-                          <a
-                            href={profile.latestProof.proofUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="font-semibold text-(--brown) hover:underline"
-                          >
-                            មើលរូបភាពដែលបានផ្ទុកឡើង
-                          </a>
-                        ) : (
-                          <span className="font-semibold text-gray-900">—</span>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="mt-2 text-sm text-gray-600">មិនទាន់មានការផ្ទុកភស្តុតាងនៅឡើយ។</p>
-                  )}
-
-                  <div className="mt-4 flex flex-wrap gap-3">
-                    <Button variant="outline" onClick={() => router.push("/pricing_page")}>
-                      មើលគម្រោង
-                    </Button>
-                    <Button
-                      variant="primary"
-                      onClick={() => router.push(`/payment${profile?.plan?.id ? `?plan=${encodeURIComponent(profile.plan.id)}` : ""}`)}
-                    >
-                      ទៅកាន់ការទូទាត់
-                    </Button>
-                  </div>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <Button variant="outline" onClick={() => router.push("/pricing_page")}>
+                    មើលគម្រោង
+                  </Button>
+                  <Button
+                    variant="primary"
+                    onClick={() => router.push(`/payment${profile?.plan?.id ? `?plan=${encodeURIComponent(profile.plan.id)}` : ""}`)}
+                  >
+                    ទៅកាន់ការទូទាត់
+                  </Button>
                 </div>
               </div>
 

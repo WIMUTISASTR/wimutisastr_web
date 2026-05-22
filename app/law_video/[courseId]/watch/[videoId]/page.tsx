@@ -192,41 +192,41 @@ export default function WatchVideoPage() {
 
   return (
     <ProtectedRoute>
-      <PageContainer className="!bg-gray-950">
-        <div className="text-white">
+      <PageContainer>
+        <div className="text-gray-900">
           {/* ── Breadcrumb ── */}
-          <div className="flex items-center gap-1.5 px-4 sm:px-6 py-3 text-sm text-gray-400 border-b border-white/8">
-            <Link href="/law_video" className="hover:text-white transition-colors">
+          <div className="flex items-center gap-1.5 px-4 sm:px-6 py-3 text-sm text-gray-500 border-b border-gray-200">
+            <Link href="/law_video" className="hover:text-gray-900 transition-colors">
               វគ្គសិក្សា
             </Link>
-            <ChevronRightIcon className="w-3.5 h-3.5 text-gray-600" />
-            <span className="text-gray-300 truncate max-w-[200px]">{course?.name ?? "..."}</span>
+            <ChevronRightIcon className="w-3.5 h-3.5 text-gray-400" />
+            <span className="text-gray-700 truncate max-w-[200px]">{course?.name ?? "..."}</span>
           </div>
 
           {/* ── Main layout ── */}
           <div className="flex flex-col lg:flex-row lg:items-start">
 
             {/* ══ LEFT: Player + Info ══ */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 lg:pl-6 xl:pl-10">
 
               {/* Player area */}
               <div className="relative w-full aspect-video bg-black">
                 {isLoading || membershipLoading ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                    <div className="w-12 h-12 rounded-full border-4 border-white/15 border-t-white animate-spin" />
-                    <p className="text-sm text-gray-400">
+                    <div className="w-12 h-12 rounded-full border-4 border-white/20 border-t-white animate-spin" />
+                    <p className="text-sm text-gray-300">
                       {membershipLoading ? "កំពុងពិនិត្យសមាជិកភាព..." : "កំពុងផ្ទុក..."}
                     </p>
                   </div>
                 ) : error ? (
-                  <div className="absolute inset-0 flex items-center justify-center p-8 text-center">
+                  <div className="absolute inset-0 flex items-center justify-center p-8 text-center text-white">
                     <div>
                       <p className="text-lg font-semibold mb-2">ផ្ទុកមាតិកាមិនជោគជ័យ</p>
-                      <p className="text-sm text-gray-400">{error}</p>
+                      <p className="text-sm text-gray-300">{error}</p>
                     </div>
                   </div>
                 ) : !current ? (
-                  <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                  <div className="absolute inset-0 flex items-center justify-center text-gray-300">
                     រកមិនឃើញវីដេអូ
                   </div>
                 ) : !isFree && membershipStatus !== "approved" ? (
@@ -267,14 +267,14 @@ export default function WatchVideoPage() {
                   </div>
                 ) : playbackLoading ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                    <div className="w-12 h-12 rounded-full border-4 border-white/15 border-t-white animate-spin" />
-                    <p className="text-sm text-gray-400">កំពុងផ្ទុកវីដេអូ...</p>
+                    <div className="w-12 h-12 rounded-full border-4 border-white/20 border-t-white animate-spin" />
+                    <p className="text-sm text-gray-300">កំពុងផ្ទុកវីដេអូ...</p>
                   </div>
                 ) : playbackError ? (
-                  <div className="absolute inset-0 flex items-center justify-center p-8 text-center">
+                  <div className="absolute inset-0 flex items-center justify-center p-8 text-center text-white">
                     <div>
                       <p className="text-lg font-semibold mb-2">ផ្ទុកវីដេអូមិនជោគជ័យ</p>
-                      <p className="text-sm text-gray-400 mb-4">{playbackError}</p>
+                      <p className="text-sm text-gray-300 mb-4">{playbackError}</p>
                       <Button onClick={() => window.location.reload()} variant="primary">
                         ព្យាយាមម្តងទៀត
                       </Button>
@@ -299,38 +299,38 @@ export default function WatchVideoPage() {
                     <source src={src} />
                   </video>
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-center p-6 text-gray-400">
+                  <div className="absolute inset-0 flex items-center justify-center text-center p-6 text-gray-300">
                     <p>ប្រភពវីដេអូមិនត្រូវបានគាំទ្រ</p>
                   </div>
                 )}
               </div>
 
               {/* Video info */}
-              <div className="px-4 sm:px-6 py-5 border-b border-white/8 lg:border-b-0">
+              <div className="px-4 sm:px-6 py-5 border-b border-gray-200 lg:border-b-0">
                 {/* Title */}
-                <h1 className="text-xl sm:text-2xl font-bold text-white leading-snug">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-snug">
                   {current?.title ?? "—"}
                 </h1>
 
                 {/* Meta row */}
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2.5 text-sm text-gray-400">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2.5 text-sm text-gray-500">
                   {course?.name && (
                     <Link
                       href="/law_video"
-                      className="font-medium text-gray-300 hover:text-white transition-colors"
+                      className="font-medium text-gray-700 hover:text-gray-900 transition-colors"
                     >
                       {course.name}
                     </Link>
                   )}
                   {currentIndex >= 0 && (
                     <>
-                      <span className="text-gray-700">•</span>
+                      <span className="text-gray-300">•</span>
                       <span>មេរៀន {currentIndex + 1} / {videos.length}</span>
                     </>
                   )}
                   {current?.presented_by && (
                     <>
-                      <span className="text-gray-700">•</span>
+                      <span className="text-gray-300">•</span>
                       <span className="flex items-center gap-1">
                         <UserIcon />
                         {current.presented_by}
@@ -339,7 +339,7 @@ export default function WatchVideoPage() {
                   )}
                   {formatShortDate(current?.uploaded_at) && (
                     <>
-                      <span className="text-gray-700">•</span>
+                      <span className="text-gray-300">•</span>
                       <span className="flex items-center gap-1">
                         <CalendarIcon />
                         {formatShortDate(current?.uploaded_at)}
@@ -353,21 +353,21 @@ export default function WatchVideoPage() {
                   <button
                     disabled={!prev}
                     onClick={() => prev && handleGo(prev.id)}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/8 text-sm font-medium text-white disabled:opacity-25 hover:bg-white/15 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gray-100 text-sm font-medium text-gray-700 disabled:opacity-30 hover:bg-gray-200 transition-colors"
                   >
                     <ChevronLeftIcon /> មុន
                   </button>
                   <button
                     disabled={!next}
                     onClick={() => next && handleGo(next.id)}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/8 text-sm font-medium text-white disabled:opacity-25 hover:bg-white/15 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gray-100 text-sm font-medium text-gray-700 disabled:opacity-30 hover:bg-gray-200 transition-colors"
                   >
                     បន្ទាប់ <ChevronRightIcon />
                   </button>
 
                   {courseProgress > 0 && (
-                    <div className="ml-auto flex items-center gap-2 text-sm text-gray-400">
-                      <div className="w-24 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <div className="ml-auto flex items-center gap-2 text-sm text-gray-500">
+                      <div className="w-24 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-emerald-500 rounded-full transition-all duration-500"
                           style={{ width: `${courseProgress}%` }}
@@ -385,10 +385,10 @@ export default function WatchVideoPage() {
                       onClick={() => setDescExpanded((v) => !v)}
                       className="w-full text-left"
                     >
-                      <div className={`bg-white/5 rounded-xl px-4 py-3 text-sm text-gray-300 leading-relaxed ${!descExpanded ? "line-clamp-2" : ""}`}>
+                      <div className={`bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-600 leading-relaxed ${!descExpanded ? "line-clamp-2" : ""}`}>
                         {current.description}
                       </div>
-                      <span className="text-xs text-gray-500 mt-1.5 inline-block hover:text-gray-300 transition-colors">
+                      <span className="text-xs text-gray-400 mt-1.5 inline-block hover:text-gray-600 transition-colors">
                         {descExpanded ? "បង្រួម ▲" : "មើលបន្ថែម ▼"}
                       </span>
                     </button>
@@ -398,21 +398,21 @@ export default function WatchVideoPage() {
             </div>
 
             {/* ══ RIGHT: Playlist ══ */}
-            <aside className="w-full lg:w-[380px] xl:w-[420px] shrink-0 border-t border-white/8 lg:border-t-0 lg:border-l lg:border-white/8 lg:sticky lg:top-24 lg:max-h-[calc(100vh-6rem)] flex flex-col bg-gray-900">
+            <aside className="w-full lg:w-[380px] xl:w-[420px] shrink-0 border-t border-gray-200 lg:border-t-0 lg:border-l lg:border-gray-200 lg:sticky lg:top-24 lg:max-h-[calc(100vh-6rem)] flex flex-col bg-gray-50">
 
               {/* Playlist header */}
-              <div className="shrink-0 px-4 py-4 border-b border-white/8">
-                <div className="font-bold text-white text-base leading-snug">
+              <div className="shrink-0 px-4 py-4 border-b border-gray-200">
+                <div className="font-bold text-gray-900 text-base leading-snug">
                   {course?.name ?? "វគ្គសិក្សា"}
                 </div>
-                <div className="text-xs text-gray-400 mt-1">
+                <div className="text-xs text-gray-500 mt-1">
                   {videos.length} មេរៀន
                   {courseProgress > 0 && (
-                    <span className="ml-2 text-emerald-400">{courseProgress}% បញ្ចប់</span>
+                    <span className="ml-2 text-emerald-600">{courseProgress}% បញ្ចប់</span>
                   )}
                 </div>
                 {courseProgress > 0 && (
-                  <div className="mt-2 h-1 bg-white/10 rounded-full overflow-hidden">
+                  <div className="mt-2 h-1 bg-gray-200 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-emerald-500 rounded-full transition-all duration-500"
                       style={{ width: `${courseProgress}%` }}
@@ -424,7 +424,7 @@ export default function WatchVideoPage() {
               {/* Scrollable video list */}
               <div className="flex-1 overflow-y-auto">
                 {isLoading ? (
-                  <div className="flex items-center justify-center py-12 text-gray-500 text-sm">
+                  <div className="flex items-center justify-center py-12 text-gray-400 text-sm">
                     កំពុងផ្ទុក...
                   </div>
                 ) : (
@@ -440,10 +440,10 @@ export default function WatchVideoPage() {
                         <button
                           key={v.id}
                           onClick={() => handleGo(v.id)}
-                          className={`w-full flex items-start gap-3 px-3 py-2.5 text-left transition-colors border-l-2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-white/30 ${
+                          className={`w-full flex items-start gap-3 px-3 py-2.5 text-left transition-colors border-l-2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-gray-300 ${
                             isActive
-                              ? "bg-white/10 border-emerald-500"
-                              : "hover:bg-white/5 border-transparent"
+                              ? "bg-emerald-50 border-emerald-500"
+                              : "hover:bg-gray-100 border-transparent"
                           }`}
                         >
                           {/* Number / check */}
@@ -451,14 +451,14 @@ export default function WatchVideoPage() {
                             {isWatched ? (
                               <CheckIcon className="w-4 h-4 text-emerald-500" />
                             ) : (
-                              <span className={`text-xs font-mono ${isActive ? "text-emerald-400" : "text-gray-600"}`}>
+                              <span className={`text-xs font-mono ${isActive ? "text-emerald-600" : "text-gray-400"}`}>
                                 {idx + 1}
                               </span>
                             )}
                           </div>
 
                           {/* Thumbnail */}
-                          <div className="relative shrink-0 w-[108px] aspect-video rounded overflow-hidden bg-gray-800">
+                          <div className="relative shrink-0 w-[108px] aspect-video rounded overflow-hidden bg-gray-200">
                             <Image
                               src={vThumb}
                               alt={v.title ?? ""}
@@ -468,12 +468,12 @@ export default function WatchVideoPage() {
                               unoptimized={vThumbUnoptimized}
                             />
                             {isActive && (
-                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                              <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                                 <PlayIcon className="w-5 h-5 text-white drop-shadow" />
                               </div>
                             )}
                             {progress > 0 && progress < 0.9 && (
-                              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-black/40">
+                              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-black/20">
                                 <div
                                   className="h-full bg-emerald-500"
                                   style={{ width: `${progress * 100}%` }}
@@ -485,12 +485,12 @@ export default function WatchVideoPage() {
                           {/* Title + presenter */}
                           <div className="flex-1 min-w-0 pt-0.5">
                             <p className={`text-sm font-medium line-clamp-2 leading-snug ${
-                              isActive ? "text-white" : "text-gray-300"
+                              isActive ? "text-gray-900" : "text-gray-700"
                             }`}>
                               {v.title ?? `មេរៀន ${idx + 1}`}
                             </p>
                             {v.presented_by && (
-                              <p className="text-xs text-gray-500 mt-1 truncate">{v.presented_by}</p>
+                              <p className="text-xs text-gray-400 mt-1 truncate">{v.presented_by}</p>
                             )}
                           </div>
                         </button>

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import PageContainer from "@/components/PageContainer";
 import { fetchBooks, type BookCategory, type BookRow } from "@/lib/api/client";
 import LoadingState from "@/components/LoadingState";
@@ -16,15 +16,16 @@ const ALL_CATEGORY_ID = "__all__";
 export default function DocumentCategoryPage() {
   const params = useParams();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const categoryId = params.categoryId as string;
 
   const [categories, setCategories] = useState<BookCategory[]>([]);
   const [books, setBooks] = useState<BookRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedYear, setSelectedYear] = useState("all");
-  const [accessFilter, setAccessFilter] = useState<"all" | "free" | "members">("all");
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get("q") ?? "");
+  const [selectedYear, setSelectedYear] = useState(() => searchParams.get("year") ?? "all");
   const { status: membershipStatus } = useMembership();
   const isApproved = membershipStatus === "approved";
 
@@ -54,6 +55,19 @@ export default function DocumentCategoryPage() {
     return () => { cancelled = true; };
   }, [categoryId]);
 
+  useEffect(() => {
+    const params = new URLSearchParams();
+    const trimmed = searchQuery.trim();
+    if (trimmed) params.set("q", trimmed);
+    if (selectedYear !== "all") params.set("year", selectedYear);
+    const qs = params.toString();
+    const nextUrl = qs ? `${pathname}?${qs}` : pathname;
+    const currentUrl = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
+    if (nextUrl !== currentUrl) {
+      router.replace(nextUrl, { scroll: false });
+    }
+  }, [pathname, router, searchParams, searchQuery, selectedYear]);
+
   const category = useMemo(() => categories.find((c) => c.id === categoryId) ?? null, [categories, categoryId]);
 
   const categoryNameById = useMemo(
@@ -72,15 +86,13 @@ export default function DocumentCategoryPage() {
     const q = searchQuery.trim().toLowerCase();
     return books.filter((doc) => {
       if (selectedYear !== "all" && String(doc.year) !== selectedYear) return false;
-      const level = doc.access_level === "free" ? "free" : "members";
-      if (accessFilter !== "all" && level !== accessFilter) return false;
       if (!q) return true;
       const cat = categoryNameById.get(doc.category_id ?? "") ?? "មិនបានចាត់ប្រភេទ";
-      return `${doc.title} ${doc.author} ${doc.description ?? ""} ${cat}`.toLowerCase().includes(q);
+      return `${doc.title} ${doc.author} ${doc.description ?? ""} ${cat} ${doc.year ?? ""}`.toLowerCase().includes(q);
     });
-  }, [accessFilter, books, categoryNameById, searchQuery, selectedYear]);
+  }, [books, categoryNameById, searchQuery, selectedYear]);
 
-  const hasActiveFilters = searchQuery || selectedYear !== "all" || accessFilter !== "all";
+  const hasActiveFilters = searchQuery || selectedYear !== "all";
 
   return (
     <PageContainer className="law-documents-font">
@@ -168,24 +180,6 @@ export default function DocumentCategoryPage() {
                   <option value="all">គ្រប់ឆ្នាំ</option>
                   {yearOptions.map((y) => <option key={y} value={y}>{y}</option>)}
                 </select>
-
-                {/* Access pills */}
-                <div className="flex shrink-0 items-center gap-1 rounded-lg border border-slate-200 bg-slate-50/50 p-1">
-                  {(["all", "free", "members"] as const).map((f) => (
-                    <button
-                      key={f}
-                      type="button"
-                      onClick={() => setAccessFilter(f)}
-                      className={`rounded-md px-3.5 py-2 text-xs font-semibold transition-all ${
-                        accessFilter === f
-                          ? "bg-(--primary) text-white shadow-sm"
-                          : "text-slate-600 hover:bg-white hover:text-slate-900"
-                      }`}
-                    >
-                      {f === "all" ? "ទាំងអស់" : f === "free" ? "ឥតគិតថ្លៃ" : "សមាជិក"}
-                    </button>
-                  ))}
-                </div>
               </div>
 
               {hasActiveFilters && (
@@ -197,7 +191,6 @@ export default function DocumentCategoryPage() {
                     onClick={() => {
                       setSearchQuery("");
                       setSelectedYear("all");
-                      setAccessFilter("all");
                     }}
                     className="font-medium text-(--primary) hover:underline"
                   >
@@ -214,7 +207,7 @@ export default function DocumentCategoryPage() {
                   </svg>
                   <p className="font-medium">រកមិនឃើញឯកសារដែលត្រូវគ្នា</p>
                   <button
-                    onClick={() => { setSearchQuery(""); setSelectedYear("all"); setAccessFilter("all"); }}
+                    onClick={() => { setSearchQuery(""); setSelectedYear("all"); }}
                     className="mt-3 text-sm text-(--primary) underline"
                   >
                     សម្អាតតម្រង

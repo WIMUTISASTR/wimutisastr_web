@@ -23,7 +23,7 @@ export default function HeroSection({ isVisible, mousePosition, home, homeLoadin
   const router = useRouter();
 
   return (
-    <section className="relative overflow-hidden border-b border-(--gray-200) bg-gray-100 pt-8 sm:pt-10">
+    <section className="relative min-h-svh overflow-hidden border-b border-(--gray-200) bg-gray-100 pt-4 sm:pt-6 flex items-center">
       <div className="pointer-events-none absolute inset-0 -z-10">
         <Image
           src={HERO_BACKDROP_SRC}

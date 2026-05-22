@@ -143,7 +143,7 @@ export default function Home() {
 
       <FeaturedDocumentsSection home={home} hasPaid={hasPaid} />
 
-      <TrustedBySection />
+      {/* <TrustedBySection /> */}
       <Footer />
     </PageContainer>
   );
