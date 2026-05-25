@@ -319,7 +319,7 @@ export default function ReadDocumentPage() {
                           type="button"
                           onClick={toggleFullscreen}
                           className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-(--primary) hover:text-(--primary)"
-                          aria-label={isFullscreen ? "ចាកចេញពីអេកranពេញ" : "មើលពេញអេកran"}
+                          aria-label={isFullscreen ? "ចាកចេញពីអេក្រង់ពេញ" : "មើលពេញអេក្រង់"}
                         >
                           {isFullscreen ? (
                             <>
@@ -343,7 +343,7 @@ export default function ReadDocumentPage() {
                                   d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
                                 />
                               </svg>
-                              <span className="hidden sm:inline">ពេញអេកran</span>
+                              <span className="hidden sm:inline">ពេញអេក្រង់</span>
                             </>
                           )}
                         </button>

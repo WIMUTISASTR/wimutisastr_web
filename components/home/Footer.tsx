@@ -2,8 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useAuth } from "@/lib/auth/context";
 
 export default function Footer() {
+  const { user, loading } = useAuth();
   return (
     <footer className="border-t-4 border-(--primary) bg-(--primary-dark) px-4 pb-8 pt-14 text-gray-200 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
@@ -68,21 +70,26 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-white">គណនី</h3>
             <ul className="mt-4 space-y-2.5 text-sm">
-              <li>
-                <Link href="/auth/login" className="text-gray-300 transition-colors duration-200 hover:text-white">
-                  ចូលគណនី
-                </Link>
-              </li>
-              <li>
-                <Link href="/auth/register" className="text-gray-300 transition-colors duration-200 hover:text-white">
-                  ចុះឈ្មោះ
-                </Link>
-              </li>
-              <li>
-                <Link href="/profile_page" className="text-gray-300 transition-colors duration-200 hover:text-white">
-                  ប្រវត្តិរូប
-                </Link>
-              </li>
+              {!loading && user ? (
+                <li>
+                  <Link href="/profile_page" className="text-gray-300 transition-colors duration-200 hover:text-white">
+                    ប្រវត្តិរូប
+                  </Link>
+                </li>
+              ) : (
+                <>
+                  <li>
+                    <Link href="/auth/login" className="text-gray-300 transition-colors duration-200 hover:text-white">
+                      ចូលគណនី
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/auth/register" className="text-gray-300 transition-colors duration-200 hover:text-white">
+                      ចុះឈ្មោះ
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
         </div>

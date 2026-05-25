@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
 import type { VideoCategory, VideoRow } from "@/lib/data/videos";
 import { useMembership } from "@/lib/hooks/useMembership";
+import { isActiveApprovedMembership } from "@/lib/utils/membership";
 import {
   categoryHasFreePreview,
   getVideosInCategory,
@@ -71,8 +72,8 @@ interface VideoGridClientProps {
 
 export default function VideoGridClient({ categories, videos }: VideoGridClientProps) {
   const router = useRouter();
-  const { status: membershipStatus } = useMembership();
-  const isApproved = membershipStatus === "approved";
+  const { status: membershipStatus, membershipEndsAt } = useMembership();
+  const isApproved = isActiveApprovedMembership(membershipStatus, membershipEndsAt);
   const [searchQuery, setSearchQuery] = useState("");
   const [watchedIds, setWatchedIds] = useState<Set<string>>(new Set());
 
@@ -266,6 +267,7 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
                     updated={updated}
                     hasFree={hasFree}
                     isLocked={isLocked}
+                    isApproved={isApproved}
                     onClick={() => {
                       if (targetVideo) {
                         router.push(`/law_video/${cat.id}/watch/${targetVideo.id}`);
@@ -296,6 +298,7 @@ interface CourseCardProps {
   updated: string | null;
   hasFree: boolean;
   isLocked: boolean;
+  isApproved: boolean;
   onClick: () => void;
 }
 
@@ -309,6 +312,7 @@ function CourseCard({
   updated,
   hasFree,
   isLocked,
+  isApproved,
   onClick,
 }: CourseCardProps) {
   const isStarted = pct > 0 && pct < 100;
@@ -351,7 +355,7 @@ function CourseCard({
             សមាជិក
           </div>
         )}
-        {!isLocked && hasFree && (
+        {!isLocked && hasFree && !isApproved && (
           <div className="absolute top-2.5 left-2.5 bg-sky-500 text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow">
             មើលឥតគិតថ្លៃ
           </div>
@@ -428,9 +432,11 @@ function CourseCard({
                 ? "មើលឡើងវិញ"
                 : isStarted
                   ? "បន្តសិក្សា"
-                  : hasFree
-                    ? "មើលឥតគិតថ្លៃ"
-                    : "ចូលមើលវគ្គ"}
+                  : isApproved
+                    ? "ចូលមើលវគ្គ"
+                    : hasFree
+                      ? "មើលឥតគិតថ្លៃ"
+                      : "ចូលមើលវគ្គ"}
           </span>
           <svg className="w-4 h-4 text-[var(--primary)] opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

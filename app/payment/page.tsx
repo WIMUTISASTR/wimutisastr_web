@@ -9,8 +9,10 @@ import LoadingState from "@/components/LoadingState";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/context";
+import { useMembership } from "@/lib/hooks/useMembership";
 import { supabase } from "@/lib/supabase/instance";
 import { notify } from "@/lib/utils/notify";
+import { formatMembershipDateTime, isActiveApprovedMembership } from "@/lib/utils/membership";
 
 interface PlanDetails {
   id: string;
@@ -28,7 +30,9 @@ function PaymentPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const { status: membershipStatus, membershipEndsAt, isLoading: membershipLoading } = useMembership();
   const planId = searchParams.get("plan") || "";
+  const hasActiveMembership = isActiveApprovedMembership(membershipStatus, membershipEndsAt);
   const [plans, setPlans] = useState<PlanDetails[]>([]);
   const [isPlansLoading, setIsPlansLoading] = useState(true);
   const [plansError, setPlansError] = useState<string | null>(null);
@@ -152,12 +156,69 @@ function PaymentPageContent() {
     }
   };
 
-  if (authLoading) {
+  if (authLoading || membershipLoading) {
     return (
       <PageContainer>
         <div className="min-h-screen flex items-center justify-center">
           <LoadingState label="កំពុងផ្ទុក..." />
         </div>
+      </PageContainer>
+    );
+  }
+
+  if (hasActiveMembership) {
+    return (
+      <PageContainer>
+        <section className="relative bg-slate-900 text-white py-20 overflow-hidden">
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/asset/aboutUs.png"
+              alt=""
+              fill
+              className="object-cover"
+              priority
+              sizes="100vw"
+            />
+          </div>
+          <div className="absolute inset-0 bg-slate-900/65 z-10" />
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20 text-center">
+            <h1 className="text-4xl sm:text-5xl font-bold mb-4">សមាជិកភាពរបស់អ្នកសកម្មរួចហើយ</h1>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              អ្នកមានសមាជិកភាពពេញលេញ — មិនចាំបាច់ទូទាត់ម្តងទៀតទេ
+            </p>
+          </div>
+        </section>
+
+        <section className="py-16 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-xl mx-auto bg-white rounded-xl shadow-lg border border-gray-200 p-8 text-center">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+              <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">បានអនុម័ត</h2>
+            <p className="text-sm text-gray-600 mb-6">
+              សមាជិកភាពរបស់អ្នកមានសុពលភាពរហូតដល់{" "}
+              <span className="font-semibold text-gray-900">
+                {formatMembershipDateTime(membershipEndsAt)}
+              </span>
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button onClick={() => router.push("/law_video")} variant="primary">
+                ចាប់ផ្តើមសិក្សា
+              </Button>
+              <Button onClick={() => router.push("/profile_page")} variant="outline">
+                ប្រវត្តិរូប
+              </Button>
+            </div>
+            <p className="mt-6 text-xs text-gray-500">
+              ចង់បន្តគម្រោងបន្ទាប់ពីផុតកំណត់?{" "}
+              <Link href="/pricing_page" className="text-(--brown-strong) underline hover:text-(--brown)">
+                មើលគម្រោង
+              </Link>
+            </p>
+          </div>
+        </section>
       </PageContainer>
     );
   }

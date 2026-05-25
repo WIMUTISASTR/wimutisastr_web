@@ -15,6 +15,7 @@ import {
 } from "@/lib/api/client";
 import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
 import { useMembership } from "@/lib/hooks/useMembership";
+import { isActiveApprovedMembership } from "@/lib/utils/membership";
 import { canWatchVideo } from "@/lib/utils/videoAccess";
 import { notify } from "@/lib/utils/notify";
 
@@ -91,7 +92,7 @@ export default function WatchVideoPage() {
   const [playback, setPlayback] = useState<VideoPlaybackResponse | null>(null);
   const [playbackLoading, setPlaybackLoading] = useState(false);
   const [playbackError, setPlaybackError] = useState<string | null>(null);
-  const { status: membershipStatus, isLoading: membershipLoading } = useMembership();
+  const { status: membershipStatus, membershipEndsAt, isLoading: membershipLoading } = useMembership();
   const [videoProgress, setVideoProgress] = useState<Record<string, number>>({});
   const [descExpanded, setDescExpanded] = useState(false);
 
@@ -133,7 +134,7 @@ export default function WatchVideoPage() {
   const course = useMemo(() => categories.find((c) => c.id === courseId) ?? null, [categories, courseId]);
   const currentIndex = useMemo(() => videos.findIndex((v) => v.id === videoId), [videos, videoId]);
   const current = currentIndex >= 0 ? videos[currentIndex] : null;
-  const isApproved = membershipStatus === "approved";
+  const isApproved = isActiveApprovedMembership(membershipStatus, membershipEndsAt);
   const canPlayCurrent = canWatchVideo(current, isApproved);
   const prev = currentIndex > 0 ? videos[currentIndex - 1] : null;
   const next = currentIndex >= 0 && currentIndex < videos.length - 1 ? videos[currentIndex + 1] : null;
@@ -500,7 +501,7 @@ export default function WatchVideoPage() {
                             {v.presented_by && (
                               <p className="text-xs text-gray-400 mt-1 truncate">{v.presented_by}</p>
                             )}
-                            {vLocked && (
+                            {vLocked && !isApproved && (
                               <p className="text-[11px] text-amber-700 mt-1 font-medium">សមាជិកភាព</p>
                             )}
                             {v.access_level === "free" && !vLocked && (

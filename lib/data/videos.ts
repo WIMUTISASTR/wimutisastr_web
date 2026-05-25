@@ -25,7 +25,8 @@ export type VideoRow = {
   id: string;
   title: string | null;
   description: string | null;
-  file_url: string | null;
+  /** Omitted on public listing responses; never send to the client when set. */
+  file_url?: string | null;
   thumbnail_url: string | null;
   category_id: string | null;
   uploaded_at: string | null;
