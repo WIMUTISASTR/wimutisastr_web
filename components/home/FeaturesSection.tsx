@@ -102,13 +102,12 @@ export default function FeaturesSection() {
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto mb-12 max-w-3xl text-center sm:mb-16 scroll-animate opacity-0 translate-y-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-(--accent-light)">មុខងារសំខាន់ៗ</p>
           <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-            អ្វីៗដែលអ្នកត្រូវការ{" "}
-            <span className="text-(--accent-light)">ដើម្បីរីកចម្រើន</span>
+            មុខងារសំខាន់ៗ{" "}
+            <span className="text-(--accent-light)">ដែលធ្វើអោយអ្នកយល់ដឹងអំពីច្បាប់</span>
           </h2>
           <p className="mt-4 text-base leading-relaxed text-white/90 sm:text-lg">
-            ធនធានអប់រំច្បាប់គ្រប់គ្រាន់នៅចុងម្រាមដៃអ្នក
+            ផ្តល់ជូននៅវគ្គសិក្សាច្បាប់ និង ឯកសារច្បាប់
           </p>
         </div>
 

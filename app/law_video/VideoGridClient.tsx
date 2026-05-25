@@ -5,6 +5,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
 import type { VideoCategory, VideoRow } from "@/lib/data/videos";
+import { useMembership } from "@/lib/hooks/useMembership";
+import {
+  categoryHasFreePreview,
+  getVideosInCategory,
+  getWatchTargetVideo,
+} from "@/lib/utils/videoAccess";
 
 const FALLBACK_THUMB = "/asset/document_background.png";
 
@@ -52,6 +58,12 @@ const CheckCircleIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   </svg>
 );
 
+const LockIcon = ({ className = "w-3 h-3" }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+  </svg>
+);
+
 interface VideoGridClientProps {
   categories: VideoCategory[];
   videos: VideoRow[];
@@ -59,6 +71,8 @@ interface VideoGridClientProps {
 
 export default function VideoGridClient({ categories, videos }: VideoGridClientProps) {
   const router = useRouter();
+  const { status: membershipStatus } = useMembership();
+  const isApproved = membershipStatus === "approved";
   const [searchQuery, setSearchQuery] = useState("");
   const [watchedIds, setWatchedIds] = useState<Set<string>>(new Set());
 
@@ -235,7 +249,10 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
                 const updated = stats?.lastUpdated ?? null;
                 const watched = stats?.watchedCount ?? 0;
 
-                const firstVideo = videos.find((v) => v.category_id === cat.id);
+                const inCategory = getVideosInCategory(videos, cat.id);
+                const hasFree = categoryHasFreePreview(videos, cat.id);
+                const isLocked = !isApproved && !hasFree && inCategory.length > 0;
+                const targetVideo = getWatchTargetVideo(videos, cat.id, isApproved);
 
                 return (
                   <CourseCard
@@ -247,9 +264,15 @@ export default function VideoGridClient({ categories, videos }: VideoGridClientP
                     pct={pct}
                     watched={watched}
                     updated={updated}
+                    hasFree={hasFree}
+                    isLocked={isLocked}
                     onClick={() => {
-                      if (firstVideo) {
-                        router.push(`/law_video/${cat.id}/watch/${firstVideo.id}`);
+                      if (targetVideo) {
+                        router.push(`/law_video/${cat.id}/watch/${targetVideo.id}`);
+                        return;
+                      }
+                      if (isLocked) {
+                        router.push("/pricing_page");
                       }
                     }}
                   />
@@ -271,10 +294,23 @@ interface CourseCardProps {
   pct: number;
   watched: number;
   updated: string | null;
+  hasFree: boolean;
+  isLocked: boolean;
   onClick: () => void;
 }
 
-function CourseCard({ cat, thumb, unoptimized, total, pct, watched, updated, onClick }: CourseCardProps) {
+function CourseCard({
+  cat,
+  thumb,
+  unoptimized,
+  total,
+  pct,
+  watched,
+  updated,
+  hasFree,
+  isLocked,
+  onClick,
+}: CourseCardProps) {
   const isStarted = pct > 0 && pct < 100;
   const isCompleted = pct === 100;
 
@@ -309,13 +345,24 @@ function CourseCard({ cat, thumb, unoptimized, total, pct, watched, updated, onC
         </div>
 
         {/* Status badge */}
+        {isLocked && (
+          <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-slate-900/75 text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow">
+            <LockIcon className="w-3 h-3" />
+            សមាជិក
+          </div>
+        )}
+        {!isLocked && hasFree && (
+          <div className="absolute top-2.5 left-2.5 bg-sky-500 text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow">
+            មើលឥតគិតថ្លៃ
+          </div>
+        )}
         {isCompleted && (
           <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-emerald-500 text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow">
             <CheckCircleIcon className="w-3 h-3" />
             បានបញ្ចប់
           </div>
         )}
-        {isStarted && (
+        {isStarted && !isLocked && (
           <div className="absolute top-2.5 left-2.5 bg-amber-400 text-amber-900 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow">
             កំពុងរៀន
           </div>
@@ -375,7 +422,15 @@ function CourseCard({ cat, thumb, unoptimized, total, pct, watched, updated, onC
         {/* CTA */}
         <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
           <span className="text-xs font-semibold text-[var(--primary)]">
-            {isCompleted ? "មើលឡើងវិញ" : isStarted ? "បន្តសិក្សា" : "ចូលមើលវគ្គ"}
+            {isLocked
+              ? "ដំឡើងសមាជិកភាព"
+              : isCompleted
+                ? "មើលឡើងវិញ"
+                : isStarted
+                  ? "បន្តសិក្សា"
+                  : hasFree
+                    ? "មើលឥតគិតថ្លៃ"
+                    : "ចូលមើលវគ្គ"}
           </span>
           <svg className="w-4 h-4 text-[var(--primary)] opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

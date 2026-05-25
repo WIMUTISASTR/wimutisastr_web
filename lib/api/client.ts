@@ -155,7 +155,10 @@ export async function apiGet<T>(url: string): Promise<T> {
         typeof (json as { error?: unknown })?.error === "string"
           ? ((json as { error?: unknown }).error as string)
           : `HTTP ${res.status}`;
-      throw Object.assign(new Error(message), { status: res.status, payload: json });
+      throw Object.assign(
+        new Error(res.status === 404 ? "មិនរកឃើញទិន្នន័យ" : message),
+        { status: res.status, payload: json }
+      );
     }
     return json as T;
   } catch (error) {
@@ -185,7 +188,10 @@ export async function apiGetPublic<T>(url: string): Promise<T> {
         typeof (json as { error?: unknown })?.error === "string"
           ? ((json as { error?: unknown }).error as string)
           : `HTTP ${res.status}`;
-      throw Object.assign(new Error(message), { status: res.status, payload: json });
+      throw Object.assign(
+        new Error(res.status === 404 ? "មិនរកឃើញទិន្នន័យ" : message),
+        { status: res.status, payload: json }
+      );
     }
     return json as T;
   } catch (error) {
@@ -227,7 +233,10 @@ export async function apiPost<T>(url: string, body?: unknown): Promise<T> {
       typeof (json as { error?: unknown })?.error === "string"
         ? ((json as { error?: unknown }).error as string)
         : `HTTP ${res.status}`;
-    throw Object.assign(new Error(message), { status: res.status, payload: json });
+    throw Object.assign(
+      new Error(res.status === 404 ? "មិនរកឃើញទិន្នន័យ" : message),
+      { status: res.status, payload: json }
+    );
   }
   return json as T;
 }
@@ -240,6 +249,7 @@ export function fetchMembershipStatus() {
 
 export function fetchVideos(categoryId?: string) {
   const url = categoryId ? `/api/videos-public?categoryId=${encodeURIComponent(categoryId)}` : "/api/videos-public";
+  // Public browse: works without login; sends token when present for membership-aware UI.
   return apiGet<PublicVideosResponse>(url);
 }
 

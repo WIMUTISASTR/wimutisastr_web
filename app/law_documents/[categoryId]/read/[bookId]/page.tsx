@@ -167,7 +167,7 @@ export default function ReadDocumentPage() {
       }
     } catch (e) {
       console.error(e);
-      notify.error("មិនអាចបើករបៀបពេញអេកranបានទេ។");
+      notify.error("មិនអាចបើករបៀបពេញអេក្រង់បានទេ។");
     }
   }, []);
 

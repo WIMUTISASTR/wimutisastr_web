@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import PageContainer from "@/components/PageContainer";
-import ProtectedRoute from "@/components/ProtectedRoute";
 import Button from "@/components/Button";
 import {
   fetchVideoPlaybackUrl,
@@ -16,6 +15,7 @@ import {
 } from "@/lib/api/client";
 import { normalizeNextImageSrc } from "@/lib/utils/normalize-next-image-src";
 import { useMembership } from "@/lib/hooks/useMembership";
+import { canWatchVideo } from "@/lib/utils/videoAccess";
 import { notify } from "@/lib/utils/notify";
 
 const FALLBACK_THUMB = "/asset/document_background.png";
@@ -133,7 +133,8 @@ export default function WatchVideoPage() {
   const course = useMemo(() => categories.find((c) => c.id === courseId) ?? null, [categories, courseId]);
   const currentIndex = useMemo(() => videos.findIndex((v) => v.id === videoId), [videos, videoId]);
   const current = currentIndex >= 0 ? videos[currentIndex] : null;
-  const isFree = current?.access_level === "free";
+  const isApproved = membershipStatus === "approved";
+  const canPlayCurrent = canWatchVideo(current, isApproved);
   const prev = currentIndex > 0 ? videos[currentIndex - 1] : null;
   const next = currentIndex >= 0 && currentIndex < videos.length - 1 ? videos[currentIndex + 1] : null;
 
@@ -158,7 +159,7 @@ export default function WatchVideoPage() {
       setPlaybackError(null);
       if (!current?.id) return;
       if (membershipLoading) return;
-      if (!isFree && membershipStatus !== "approved") return;
+      if (!canWatchVideo(current, isApproved)) return;
       try {
         setPlaybackLoading(true);
         persistLastVideo(current.id);
@@ -176,7 +177,7 @@ export default function WatchVideoPage() {
     };
     loadPlayback();
     return () => { cancelled = true; };
-  }, [current?.id, isFree, membershipLoading, membershipStatus, persistLastVideo]);
+  }, [current, isApproved, membershipLoading, persistLastVideo]);
 
   const src = playback?.kind === "r2_proxy" ? playback.url : "";
   const thumb = normalizeNextImageSrc(current?.thumbnail_url, FALLBACK_THUMB, { bucket: "video" });
@@ -184,14 +185,18 @@ export default function WatchVideoPage() {
 
   const handleGo = useCallback(
     (vId: string) => {
+      const target = videos.find((v) => v.id === vId);
+      if (!canWatchVideo(target, isApproved)) {
+        router.push("/pricing_page");
+        return;
+      }
       persistLastVideo(vId);
       router.push(`/law_video/${courseId}/watch/${vId}`);
     },
-    [courseId, persistLastVideo, router]
+    [courseId, isApproved, persistLastVideo, router, videos]
   );
 
   return (
-    <ProtectedRoute>
       <PageContainer>
         <div className="text-gray-900">
           {/* ── Breadcrumb ── */}
@@ -229,7 +234,7 @@ export default function WatchVideoPage() {
                   <div className="absolute inset-0 flex items-center justify-center text-gray-300">
                     រកមិនឃើញវីដេអូ
                   </div>
-                ) : !isFree && membershipStatus !== "approved" ? (
+                ) : !canPlayCurrent ? (
                   /* ── Paywall ── */
                   <div className="absolute inset-0">
                     <Image
@@ -248,7 +253,7 @@ export default function WatchVideoPage() {
                         </div>
                         <h2 className="text-2xl font-bold mb-3">ត្រូវការសមាជិកភាព</h2>
                         <p className="text-gray-300 text-sm leading-relaxed mb-6">
-                          ដោះសោការចូលប្រើពេញលេញទៅកាន់វគ្គវីដេអូ ឯកសារច្បាប់ និងមាតិកាពិសេសទាំងអស់។
+                          មេរៀននេះសម្រាប់សមាជិកប៉ុណ្ណោះ។ សូមជ្រើសមេរៀនឥតគិតថ្លៃក្នុងបញ្ជី ឬដំឡើងសមាជិកភាពដើម្បីមើលពេញលេញ។
                         </p>
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
                           <Button onClick={() => router.push("/pricing_page")} variant="primary">
@@ -351,14 +356,14 @@ export default function WatchVideoPage() {
                 {/* Prev / Next + progress */}
                 <div className="flex flex-wrap items-center gap-3 mt-4">
                   <button
-                    disabled={!prev}
+                    disabled={!prev || !canWatchVideo(prev, isApproved)}
                     onClick={() => prev && handleGo(prev.id)}
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gray-100 text-sm font-medium text-gray-700 disabled:opacity-30 hover:bg-gray-200 transition-colors"
                   >
                     <ChevronLeftIcon /> មុន
                   </button>
                   <button
-                    disabled={!next}
+                    disabled={!next || !canWatchVideo(next, isApproved)}
                     onClick={() => next && handleGo(next.id)}
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gray-100 text-sm font-medium text-gray-700 disabled:opacity-30 hover:bg-gray-200 transition-colors"
                   >
@@ -433,6 +438,7 @@ export default function WatchVideoPage() {
                       const isActive = v.id === videoId;
                       const isWatched = (videoProgress[v.id] ?? 0) > 0.9;
                       const progress = videoProgress[v.id] ?? 0;
+                      const vLocked = !canWatchVideo(v, isApproved);
                       const vThumb = normalizeNextImageSrc(v.thumbnail_url, FALLBACK_THUMB, { bucket: "video" });
                       const vThumbUnoptimized = shouldDisableImageOptimization(vThumb);
 
@@ -443,7 +449,9 @@ export default function WatchVideoPage() {
                           className={`w-full flex items-start gap-3 px-3 py-2.5 text-left transition-colors border-l-2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-gray-300 ${
                             isActive
                               ? "bg-emerald-50 border-emerald-500"
-                              : "hover:bg-gray-100 border-transparent"
+                              : vLocked
+                                ? "opacity-70 hover:bg-gray-50 border-transparent"
+                                : "hover:bg-gray-100 border-transparent"
                           }`}
                         >
                           {/* Number / check */}
@@ -492,6 +500,12 @@ export default function WatchVideoPage() {
                             {v.presented_by && (
                               <p className="text-xs text-gray-400 mt-1 truncate">{v.presented_by}</p>
                             )}
+                            {vLocked && (
+                              <p className="text-[11px] text-amber-700 mt-1 font-medium">សមាជិកភាព</p>
+                            )}
+                            {v.access_level === "free" && !vLocked && (
+                              <p className="text-[11px] text-sky-600 mt-1 font-medium">ឥតគិតថ្លៃ</p>
+                            )}
                           </div>
                         </button>
                       );
@@ -503,6 +517,5 @@ export default function WatchVideoPage() {
           </div>
         </div>
       </PageContainer>
-    </ProtectedRoute>
   );
 }

@@ -6,18 +6,12 @@
  */
 
 import { unstable_cache } from 'next/cache';
-import { createClient } from '@supabase/supabase-js';
+import { createAdminClient, createServerClient } from '@/lib/supabase/server';
 
-// Create a server-side Supabase client (no auth needed for public data)
+// Public browsing: use service role when available (bypass RLS), else anon server client.
 function getServerSupabase() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  
-  if (!url || !anonKey) {
-    throw new Error('Missing Supabase environment variables');
-  }
-  
-  return createClient(url, anonKey);
+  const hasServiceRole = !!process.env.SUPABASE_SERVICE_ROLE_KEY;
+  return hasServiceRole ? createAdminClient() : createServerClient();
 }
 
 export type VideoCategory = {

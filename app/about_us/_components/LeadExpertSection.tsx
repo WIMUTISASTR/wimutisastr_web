@@ -25,13 +25,13 @@ export default function LeadExpertSection() {
 
         <div className="grid items-start gap-12 lg:grid-cols-12 lg:gap-14">
           <div className="scroll-animate delay-100 lg:col-span-5">
-            <div className="relative mx-auto aspect-4/5 max-w-sm overflow-hidden rounded-2xl border border-(--gray-200) shadow-lg ring-4 ring-(--primary)/10">
+            <div className="relative mx-auto aspect-4/5 max-w-xs overflow-hidden shadow-lg">
               <Image
                 src="/asset/teacherImage.png"
                 alt="Men Vuth"
                 fill
                 className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 400px"
+                sizes="(max-width: 1024px) 100vw, 320px"
                 priority
               />
             </div>

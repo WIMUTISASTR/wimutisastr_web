@@ -6,6 +6,7 @@ import logger from "@/lib/utils/logger";
 import { rateLimit, createRateLimitResponse, RateLimitPresets } from "@/lib/rate-limit/redis";
 import { COOKIE_NAMES, jsonResponseWithCookie } from "@/lib/security/secure-cookies";
 import { checkMembershipWithCache } from "@/lib/cache";
+import { createAdminClient, createServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -78,36 +79,47 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ videoId: st
   }
 
   const authHeader = req.headers.get("authorization") ?? "";
-  if (!authHeader.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const hasAuth = authHeader.startsWith("Bearer ");
 
   const { videoId } = await ctx.params;
   if (!videoId) return NextResponse.json({ error: "Missing videoId" }, { status: 400 });
 
   try {
-    const token = authHeader.replace("Bearer ", "");
-    const supabase = getSupabaseWithToken(token);
+    let userId = "guest";
+    let membershipSupabase: ReturnType<typeof getSupabaseWithToken> | null = null;
 
-    const { data: authData, error: authError } = await supabase.auth.getUser(token);
-    const user = authData.user;
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (hasAuth) {
+      const token = authHeader.replace("Bearer ", "");
+      membershipSupabase = getSupabaseWithToken(token);
+      const { data: authData, error: authError } = await membershipSupabase.auth.getUser(token);
+      const user = authData.user;
+      if (authError || !user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      userId = user.id;
     }
 
-    const { data: video, error: vidErr } = await supabase
+    const hasServiceRole = !!process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const lookupClient = hasServiceRole
+      ? createAdminClient()
+      : membershipSupabase ?? createServerClient();
+
+    const { data: video, error: vidErr } = await lookupClient
       .from("videos")
       .select("id,file_url,access_level")
       .eq("id", videoId)
       .maybeSingle();
     if (vidErr) {
-      log.error("GET /api/videos/[id]/play failed", vidErr, { videoId, userId: user.id });
+      log.error("GET /api/videos/[id]/play failed", vidErr, { videoId, userId });
       return NextResponse.json({ error: "Failed to fetch video" }, { status: 500 });
     }
     if (!video?.file_url) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     if (video.access_level !== "free") {
-      const gate = await requireApprovedMembership(supabase, user.id);
+      if (!hasAuth || !membershipSupabase) {
+        return NextResponse.json({ error: "Membership required" }, { status: 403 });
+      }
+      const gate = await requireApprovedMembership(membershipSupabase, userId);
       if (!gate.ok) {
         return NextResponse.json({ error: gate.error }, { status: gate.status });
       }
@@ -121,7 +133,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ videoId: st
 
     const playToken = signVideoToken(
       {
-        sub: user.id,
+        sub: userId,
         videoId,
         bucket: "video",
         key: extracted.key,
@@ -133,13 +145,13 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ videoId: st
     // Do not return direct/signed storage URLs to reduce link sharing/reuse.
     const url = `/api/videos/serve`;
     
-    log.info("Video play token generated", { videoId, userId: user.id });
+    log.info("Video play token generated", { videoId, userId });
     
     const secureCookie = process.env.NODE_ENV === "production" || process.env.HTTPS === "true";
     const cookiePath = secureCookie ? "/" : "/api/videos";
     log.info("Setting video token cookie", {
       videoId,
-      userId: user.id,
+      userId,
       cookie: COOKIE_NAMES.VIDEO_TOKEN,
       secure: secureCookie,
       path: cookiePath,
