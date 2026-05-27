@@ -3,13 +3,20 @@ import { getSiteUrl } from "@/lib/seo/site";
 
 export default function robots(): MetadataRoute.Robots {
   const baseUrl = getSiteUrl();
+  const disallowPrivateRoutes = [
+    "/api/",
+    "/auth/",
+    "/payment/",
+    "/profile_page",
+    "/profile_page/",
+  ];
 
   return {
     rules: [
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/auth/", "/profile_page", "/payment/"],
+        disallow: disallowPrivateRoutes,
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
