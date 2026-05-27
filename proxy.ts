@@ -37,7 +37,7 @@ function isAuthRoute(pathname: string): boolean {
   return AUTH_ROUTES.some((route) => pathname.startsWith(route));
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Fast-path for public pages: avoid Supabase session processing and cookie churn.
@@ -144,7 +144,7 @@ export async function middleware(request: NextRequest) {
 }
 
 /**
- * Matcher configuration for middleware
+ * Matcher configuration for proxy
  * Excludes: API routes, static files, images, and Next.js internals
  */
 export const config = {
