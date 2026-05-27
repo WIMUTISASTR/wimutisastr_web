@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "ទំនាក់ទំនង",
+  title: "ទំនាក់ទំនងការិយាល័យច្បាប់",
   description:
-    "ទាក់ទង WIMUTISASTR Law Office — សំណួរ ការចុះឈ្មោះ ឬជំនួយអំពីធនធានច្បាប់របស់យើង។",
+    "ទាក់ទងការិយាល័យមេធាវី WIMUTISASTR សម្រាប់សេវាច្បាប់ និងពិគ្រោះយោបល់ផ្នែកច្បាប់នៅកម្ពុជា។ សូមផ្ញើសំណួរ ឬស្នើជំនួយបានគ្រប់ពេល។",
   path: "/contact",
 });
 
