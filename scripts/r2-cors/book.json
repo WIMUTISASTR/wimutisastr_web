@@ -1,0 +1,42 @@
+{
+  "rules": [
+    {
+      "allowed": {
+        "origins": [
+          "https://wimutisastr.com",
+          "https://www.wimutisastr.com",
+          "https://admin.wimutisastr.com"
+        ],
+        "methods": ["GET", "HEAD"],
+        "headers": ["Range", "If-Match", "If-None-Match", "If-Modified-Since"]
+      },
+      "exposeHeaders": ["ETag", "Content-Length", "Content-Type", "Content-Range", "Accept-Ranges"],
+      "maxAgeSeconds": 86400
+    },
+    {
+      "allowed": {
+        "origins": [
+          "https://admin.wimutisastr.com"
+        ],
+        "methods": ["GET", "PUT", "POST", "DELETE"],
+        "headers": ["*"]
+      },
+      "exposeHeaders": ["ETag"],
+      "maxAgeSeconds": 3600
+    },
+    {
+      "allowed": {
+        "origins": [
+          "http://localhost:3000",
+          "http://localhost:3001",
+          "https://wimutisastr-web.vercel.app",
+          "https://wimutisastr-admin.vercel.app"
+        ],
+        "methods": ["GET", "PUT", "POST", "DELETE"],
+        "headers": ["*"]
+      },
+      "exposeHeaders": ["ETag", "Content-Length", "Content-Type", "Content-Range", "Accept-Ranges"],
+      "maxAgeSeconds": 3600
+    }
+  ]
+}

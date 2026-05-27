@@ -7,41 +7,42 @@ export type TeamMember = {
   facebook?: string;
 };
 
+// NOTE: Image URLs previously pointed to https://www.wimutisastrlawyer.com which
+// no longer resolves (ERR_NAME_NOT_RESOLVED) and produced console errors on the
+// about-us page. Until real portrait assets are uploaded to /public/team/ or R2,
+// fall back to the in-repo placeholder so the page renders cleanly.
+const TEAM_PLACEHOLDER_IMAGE = "/asset/teacherImage.png";
+
 export const TEAM_MEMBERS: TeamMember[] = [
   {
     name: "ភ័ណ្ឌ  ស្រីលីស",
     role: "អនុប្រធានការិយាល័យមេធាវី",
-    imageUrl:
-      "https://www.wimutisastrlawyer.com/assets/uploads/images/original/1760249843-1760249843-135497.jpg",
+    imageUrl: TEAM_PLACEHOLDER_IMAGE,
     phone: "069789722",
   },
   {
     name: "ឌឹម ចាន់ឡេង",
     role: "ទីប្រឹក្សាច្បាប់ និងជំនួយការមេធាវី",
-    imageUrl:
-      "https://www.wimutisastrlawyer.com/assets/uploads/images/original/1760250507-1760250507-820027.jpg",
+    imageUrl: TEAM_PLACEHOLDER_IMAGE,
     phone: "095410815",
   },
   {
     name: "ឡយ សីហា",
     role: "ទីប្រឹក្សាច្បាប់ និងជំនួយការមេធាវី",
-    imageUrl:
-      "https://www.wimutisastrlawyer.com/assets/uploads/images/original/1760250112-1760250112-417414.jpg",
+    imageUrl: TEAM_PLACEHOLDER_IMAGE,
     phone: "0969155963",
   },
   {
     name: "Kheang Su iy",
     role: "ទីប្រឹក្សាច្បាប់",
-    imageUrl:
-      "https://www.wimutisastrlawyer.com/assets/uploads/images/original/1709001614-1709001614-2660.jpg",
+    imageUrl: TEAM_PLACEHOLDER_IMAGE,
     phone: "087596866",
     email: "kheang1916baobei@gmail.com",
   },
   {
     name: "មេធាវី ម៉ែន វុធ",
     role: "ប្រធានការិយាល័យវិមុត្តិសាស្ត្រ",
-    imageUrl:
-      "https://www.wimutisastrlawyer.com/assets/uploads/images/original/1702799451-1702799451511161.jpg",
+    imageUrl: TEAM_PLACEHOLDER_IMAGE,
     phone: "0717251802",
     email: "avocatmenvuth@gmail.com",
     facebook: "https://web.facebook.com/profile.php?id=61552023062511",
@@ -49,8 +50,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
   {
     name: "អុល លីហួ",
     role: "ប្រឹក្សាច្បាប់",
-    imageUrl:
-      "https://www.wimutisastrlawyer.com/assets/uploads/images/original/1702799570-1702799570380404.jpg",
+    imageUrl: TEAM_PLACEHOLDER_IMAGE,
     phone: "095389323",
   },
 ];

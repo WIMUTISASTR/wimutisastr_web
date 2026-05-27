@@ -178,13 +178,15 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline'", // Next.js requires unsafe-inline for inline scripts, but removed unsafe-eval
+              // Next.js requires unsafe-inline for inline scripts; Cloudflare Turnstile is loaded from challenges.cloudflare.com
+              "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https: blob:",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.r2.dev https://*.r2.cloudflarestorage.com",
+              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.r2.dev https://*.r2.cloudflarestorage.com https://challenges.cloudflare.com",
               "media-src 'self' https://*.r2.dev https://*.r2.cloudflarestorage.com blob:",
-              "frame-src 'self' https://*.r2.dev https://*.r2.cloudflarestorage.com blob:",
+              // Turnstile renders its challenge widget inside an iframe served from challenges.cloudflare.com
+              "frame-src 'self' https://*.r2.dev https://*.r2.cloudflarestorage.com https://challenges.cloudflare.com blob:",
               "frame-ancestors 'self'",
               "base-uri 'self'",
               "form-action 'self'",

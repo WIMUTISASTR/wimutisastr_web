@@ -1,0 +1,28 @@
+{
+  "rules": [
+    {
+      "allowed": {
+        "origins": [
+          "https://admin.wimutisastr.com"
+        ],
+        "methods": ["GET", "PUT", "POST", "DELETE"],
+        "headers": ["*"]
+      },
+      "exposeHeaders": ["ETag", "Content-Length", "Content-Type"],
+      "maxAgeSeconds": 3600
+    },
+    {
+      "allowed": {
+        "origins": [
+          "http://localhost:3000",
+          "http://localhost:3001",
+          "https://wimutisastr-admin.vercel.app"
+        ],
+        "methods": ["GET", "PUT", "POST", "DELETE"],
+        "headers": ["*"]
+      },
+      "exposeHeaders": ["ETag"],
+      "maxAgeSeconds": 3600
+    }
+  ]
+}
