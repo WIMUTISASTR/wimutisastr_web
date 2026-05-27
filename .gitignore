@@ -24,6 +24,9 @@
 .DS_Store
 *.pem
 
+# internal documentation
+/documentation
+
 # debug
 npm-debug.log*
 yarn-debug.log*
