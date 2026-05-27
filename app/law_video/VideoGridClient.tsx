@@ -427,7 +427,7 @@ function CourseCard({
         <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
           <span className="text-xs font-semibold text-[var(--primary)]">
             {isLocked
-              ? "ដំឡើងសមាជិកភាព"
+              ? "ចួលជាសមាជិក"
               : isCompleted
                 ? "មើលឡើងវិញ"
                 : isStarted

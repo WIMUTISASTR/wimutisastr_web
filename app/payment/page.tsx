@@ -196,7 +196,7 @@ function PaymentPageContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">បានអនុម័ត</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">បានទទួល</h2>
             <p className="text-sm text-gray-600 mb-6">
               សមាជិកភាពរបស់អ្នកមានសុពលភាពរហូតដល់{" "}
               <span className="font-semibold text-gray-900">
@@ -360,7 +360,7 @@ function PaymentPageContent() {
                           <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                           </svg>
-                          <span className="text-blue-800 font-semibold text-lg">ABA · ACLEDA · Wing · Sathapana</span>
+                          <span className="text-blue-800 font-semibold text-lg">ABA</span>
                         </div>
                         <p className="text-sm text-blue-700">
                           ទូទាត់ភ្លាមៗ — ការជាវរបស់អ្នកនឹងដំណើរការស្វ័យប្រវត្តិ ដោយមិនចាំបាច់ផ្ទុកភស្តុតាង ឬរង់ចាំការពិនិត្យ។

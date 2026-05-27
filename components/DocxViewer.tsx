@@ -40,7 +40,6 @@ export default function DocxViewer({ url, className = "" }: DocxViewerProps) {
             }
           })();
 
-        // Fetch the document with credentials (cookies will be sent automatically)
         const response = await fetch(url, {
           method: "GET",
           credentials: isCrossOrigin ? "omit" : "include",
@@ -54,14 +53,12 @@ export default function DocxViewer({ url, className = "" }: DocxViewerProps) {
 
         if (cancelled) return;
 
-        // Dynamic import of docx-preview to avoid SSR issues
         const docxPreview = await import("docx-preview");
 
         if (cancelled) return;
 
-        // Clear container and render the document
         containerRef.current.innerHTML = "";
-        
+
         await docxPreview.renderAsync(blob, containerRef.current, undefined, {
           className: "docx-wrapper",
           inWrapper: true,
@@ -101,46 +98,55 @@ export default function DocxViewer({ url, className = "" }: DocxViewerProps) {
   }, [url]);
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative flex min-h-0 flex-col ${className}`}>
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-3"></div>
-            <div className="text-sm text-gray-600">Loading document...</div>
-          </div>
-        </div>
-      )}
-      
-      {error && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
-          <div className="text-center text-red-600">
-            <div className="font-semibold mb-2">Failed to load document</div>
-            <div className="text-sm">{error}</div>
+            <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900" />
+            <div className="text-sm text-gray-600">កំពុងផ្ទុកឯកសារ...</div>
           </div>
         </div>
       )}
 
-      {/* Document will be rendered here */}
+      {error && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white px-4">
+          <div className="text-center text-red-600">
+            <div className="mb-2 font-semibold">មិនអាចបើកឯកសារបានទេ</div>
+            <div className="text-sm wrap-break-word">{error}</div>
+          </div>
+        </div>
+      )}
+
       <div
         ref={containerRef}
-        className="docx-container bg-white min-h-[60vh]"
-        style={{
-          // Style the docx-preview output
-          padding: "1rem",
-        }}
+        className="docx-container min-h-0 flex-1 overflow-x-auto overflow-y-auto overscroll-contain bg-white px-3 py-4 [-webkit-overflow-scrolling:touch] sm:px-6 sm:py-6"
       />
 
-      {/* Custom styles for docx-preview */}
       <style jsx global>{`
+        .docx-container {
+          max-width: 100%;
+        }
         .docx-wrapper {
           background: white;
-          padding: 1rem;
+          padding: 0.5rem;
+          max-width: 100%;
         }
         .docx-wrapper > section.docx {
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
           margin-bottom: 1rem;
-          padding: 2rem;
+          padding: 1rem;
           background: white;
+          max-width: 100%;
+          overflow-wrap: anywhere;
+          word-break: break-word;
+        }
+        @media (min-width: 640px) {
+          .docx-wrapper {
+            padding: 1rem;
+          }
+          .docx-wrapper > section.docx {
+            padding: 2rem;
+          }
         }
         .docx-wrapper img {
           max-width: 100%;
@@ -149,11 +155,20 @@ export default function DocxViewer({ url, className = "" }: DocxViewerProps) {
         .docx-wrapper table {
           border-collapse: collapse;
           width: 100%;
+          display: block;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
         }
         .docx-wrapper table td,
         .docx-wrapper table th {
           border: 1px solid #ddd;
-          padding: 8px;
+          padding: 6px;
+        }
+        @media (min-width: 640px) {
+          .docx-wrapper table td,
+          .docx-wrapper table th {
+            padding: 8px;
+          }
         }
       `}</style>
     </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { Suspense, useEffect, useState } from "react";
 import PageContainer from "@/components/PageContainer";
 import Button from "@/components/Button";
@@ -13,6 +12,8 @@ type ActivationState = "idle" | "activating" | "done" | "pending" | "error";
 
 const BARAY_POLL_INTERVAL_MS = 2000;
 const BARAY_POLL_MAX_ATTEMPTS = 30; // ~60 seconds
+const PROFILE_REDIRECT_MS = 1500;
+const PAYMENT_SUCCESS_NOTICE_KEY = "payment_success_notice";
 
 function PaymentSuccessContent() {
   const router = useRouter();
@@ -102,40 +103,16 @@ function PaymentSuccessContent() {
     };
   }, [barayRef]);
 
-  // Animate elements into view
   useEffect(() => {
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: "0px 0px -50px 0px",
-    };
+    if (activation !== "done") return;
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("animate-in");
-          observer.unobserve(entry.target);
-        }
-      });
-    }, observerOptions);
+    const timer = window.setTimeout(() => {
+      sessionStorage.setItem(PAYMENT_SUCCESS_NOTICE_KEY, "1");
+      router.replace("/profile_page");
+    }, PROFILE_REDIRECT_MS);
 
-    const checkAndAnimate = () => {
-      const animatedElements = document.querySelectorAll(
-        '.opacity-0[class*="delay"], .opacity-0.translate-y-8'
-      );
-      animatedElements.forEach((el) => {
-        observer.observe(el);
-        const rect = el.getBoundingClientRect();
-        if (rect.top < window.innerHeight && rect.bottom > 0) {
-          setTimeout(() => el.classList.add("animate-in"), 50);
-        }
-      });
-    };
-
-    checkAndAnimate();
-    setTimeout(checkAndAnimate, 100);
-
-    return () => observer.disconnect();
-  }, []);
+    return () => window.clearTimeout(timer);
+  }, [activation, router]);
 
   if (activation === "activating") {
     return (
@@ -209,94 +186,32 @@ function PaymentSuccessContent() {
 
   return (
     <PageContainer>
-      {/* Hero Section */}
-      <section className="relative bg-slate-900 text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/asset/aboutUs.png"
-            alt="Success background"
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
-            fetchPriority="high"
-          />
-        </div>
-        <div className="absolute inset-0 bg-slate-900/65 z-10"></div>
-        <div className="absolute inset-0 bg-(--brown-soft) opacity-20 z-10"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
-          <div className="text-center">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 opacity-0 translate-y-8 delay-100">
-              ការទូទាត់ជោគជ័យ!
-            </h1>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto opacity-0 translate-y-8 delay-300">
-              សូមអរគុណសម្រាប់ការជាវរបស់អ្នក
-            </p>
+      <div className="min-h-[60vh] flex items-center justify-center px-4 sm:px-6">
+        <div className="max-w-md w-full text-center">
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg
+              className="w-12 h-12 text-green-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
           </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">ការទូទាត់ជោគជ័យ!</h2>
+          <p className="text-gray-600">
+            {isBarayPayment
+              ? "ការជាវរបស់អ្នកបានដំណើរការរួចហើយ។ កំពុងយកអ្នកទៅប្រវត្តិរូប..."
+              : "ការទូទាត់របស់អ្នកត្រូវបានបញ្ជាក់។ កំពុងយកអ្នកទៅប្រវត្តិរូប..."}
+          </p>
         </div>
-      </section>
-
-      {/* Success Content */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 text-center opacity-0 translate-y-8 delay-100">
-            {/* Success Icon */}
-            <div className="mb-6">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                <svg
-                  className="w-12 h-12 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              </div>
-            </div>
-
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              ការទូទាត់ត្រូវបានបញ្ជាក់
-            </h2>
-
-            <p className="text-gray-600 mb-6">
-              {isBarayPayment
-                ? "ការជាវរបស់អ្នកបានដំណើរការរួចហើយ។ អ្នកអាចចូលប្រើប្រាស់មាតិកាបានភ្លាមៗ។"
-                : "ការទូទាត់របស់អ្នកត្រូវបានដំណើរការដោយជោគជ័យ។ ឥឡូវនេះការជាវរបស់អ្នកបានដំណើរការ។"}
-            </p>
-
-            {(reference || barayRef) && (
-              <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                <p className="text-sm text-gray-600">លេខយោងការទូទាត់</p>
-                <p className="text-lg font-semibold text-gray-900 font-mono break-all">
-                  {reference ?? barayRef}
-                </p>
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <Button
-                onClick={() => router.push("/law_documents")}
-                variant="primary"
-                className="w-full sm:w-auto px-8 py-3"
-              >
-                ចូលប្រើឯកសារច្បាប់
-              </Button>
-              <Button
-                onClick={() => router.push("/law_video")}
-                variant="secondary"
-                className="w-full sm:w-auto px-8 py-3"
-              >
-                រកមើលវគ្គវីដេអូ
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      </div>
     </PageContainer>
   );
 }

@@ -4,8 +4,12 @@ import Image from "next/image";
 import PageContainer from "@/components/PageContainer";
 import Button from "@/components/Button";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { notify } from "@/lib/utils/notify";
+import { useAuth } from "@/lib/auth/context";
+import { useMembership } from "@/lib/hooks/useMembership";
+import { fetchProfileMe } from "@/lib/api/client";
+import { isActiveApprovedMembership } from "@/lib/utils/membership";
 
 interface PricingPlan {
   id: string;
@@ -20,11 +24,43 @@ interface PricingPlan {
 
 export default function PricingPage() {
   const router = useRouter();
+  const { user } = useAuth();
+  const { status: membershipStatus, membershipEndsAt } = useMembership();
   const [remotePlans, setRemotePlans] = useState<PricingPlan[] | null>(null);
   const [isPlansLoading, setIsPlansLoading] = useState(true);
   const [plansError, setPlansError] = useState<string | null>(null);
+  const [subscribedPlanId, setSubscribedPlanId] = useState<string | null>(null);
 
   const plans = useMemo(() => remotePlans ?? [], [remotePlans]);
+  const hasActiveMembership = isActiveApprovedMembership(membershipStatus, membershipEndsAt);
+
+  const isSubscribedPlan = useCallback(
+    (planId: string) => hasActiveMembership && subscribedPlanId === planId,
+    [hasActiveMembership, subscribedPlanId]
+  );
+
+  useEffect(() => {
+    if (!user || !hasActiveMembership) {
+      setSubscribedPlanId(null);
+      return;
+    }
+
+    let cancelled = false;
+    const loadSubscribedPlan = async () => {
+      try {
+        const data = await fetchProfileMe();
+        if (cancelled) return;
+        setSubscribedPlanId(data.plan?.id ?? data.latestProof?.planId ?? null);
+      } catch {
+        if (!cancelled) setSubscribedPlanId(null);
+      }
+    };
+
+    loadSubscribedPlan();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, hasActiveMembership]);
 
   useEffect(() => {
     let cancelled = false;
@@ -224,12 +260,23 @@ export default function PricingPage() {
                     </ul>
 
                     <Button
-                      onClick={() => router.push(`/payment?plan=${plan.id}`)}
-                      variant={plan.popular ? "primary" : "outline"}
+                      onClick={() => {
+                        if (!isSubscribedPlan(plan.id)) {
+                          router.push(`/payment?plan=${plan.id}`);
+                        }
+                      }}
+                      disabled={isSubscribedPlan(plan.id)}
+                      variant={
+                        isSubscribedPlan(plan.id)
+                          ? "secondary"
+                          : plan.popular
+                            ? "primary"
+                            : "outline"
+                      }
                       fullWidth
                       className="px-6 py-3"
                     >
-                      ចាប់ផ្តើម
+                      {isSubscribedPlan(plan.id) ? "បានចូល" : "ចាប់ផ្តើម"}
                     </Button>
                   </div>
                 </div>

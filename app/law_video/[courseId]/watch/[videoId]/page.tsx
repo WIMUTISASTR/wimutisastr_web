@@ -254,11 +254,11 @@ export default function WatchVideoPage() {
                         </div>
                         <h2 className="text-2xl font-bold mb-3">ត្រូវការសមាជិកភាព</h2>
                         <p className="text-gray-300 text-sm leading-relaxed mb-6">
-                          មេរៀននេះសម្រាប់សមាជិកប៉ុណ្ណោះ។ សូមជ្រើសមេរៀនឥតគិតថ្លៃក្នុងបញ្ជី ឬដំឡើងសមាជិកភាពដើម្បីមើលពេញលេញ។
+                          មេរៀននេះសម្រាប់សមាជិកប៉ុណ្ណោះ។ សូមជ្រើសមេរៀនឥតគិតថ្លៃក្នុងបញ្ជី ឬចួលជាសមាជិកដើម្បីមើលពេញលេញ។
                         </p>
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
                           <Button onClick={() => router.push("/pricing_page")} variant="primary">
-                            ដំឡើងសមាជិកភាព
+                            ចួលជាសមាជិក
                           </Button>
                           <Button
                             onClick={() => router.push("/law_video")}

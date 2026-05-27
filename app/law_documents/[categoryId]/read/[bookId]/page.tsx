@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useParams, useRouter } from "next/navigation";
 import PageContainer from "@/components/PageContainer";
 import Button from "@/components/Button";
@@ -16,9 +16,9 @@ import useScrollAnimation from "@/lib/hooks/useScrollAnimation";
 const DocxViewer = dynamic(() => import("@/components/DocxViewer"), {
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center h-[60vh]">
+    <div className="flex min-h-[50dvh] items-center justify-center sm:min-h-[60dvh]">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-3"></div>
+        <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900" />
         <div className="text-sm text-gray-600">កំពុងផ្ទុកកម្មវិធីមើលឯកសារ...</div>
       </div>
     </div>
@@ -28,13 +28,19 @@ const DocxViewer = dynamic(() => import("@/components/DocxViewer"), {
 const PdfViewer = dynamic(() => import("@/components/PdfViewer"), {
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center h-[60vh]">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-3"></div>
+    <div className="flex min-h-[50dvh] items-center justify-center sm:min-h-[60dvh]">
+      <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900" />
     </div>
   ),
 });
 
 const ALL_CATEGORY_ID = "__all__";
+
+const viewerHeight = {
+  docx: "min-h-[calc(100dvh-14rem)] sm:min-h-[calc(100dvh-16rem)] lg:min-h-[65dvh]",
+  pdf: "min-h-[calc(100dvh-14rem)] sm:min-h-[calc(100dvh-16rem)] lg:min-h-[70dvh]",
+  fullscreen: "min-h-0 h-full",
+} as const;
 
 function requestElementFullscreen(element: HTMLElement) {
   if (element.requestFullscreen) return element.requestFullscreen();
@@ -52,6 +58,30 @@ function exitElementFullscreen() {
 
 function getFullscreenElement() {
   return document.fullscreenElement ?? (document as Document & { webkitFullscreenElement?: Element }).webkitFullscreenElement ?? null;
+}
+
+function NavIconButton({
+  label,
+  onClick,
+  disabled,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={label}
+      className="inline-flex min-h-11 min-w-11 touch-manipulation items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:border-(--primary) hover:text-(--primary) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 sm:min-h-0 sm:min-w-0 sm:py-2"
+    >
+      {children}
+    </button>
+  );
 }
 
 export default function ReadDocumentPage() {
@@ -108,9 +138,8 @@ export default function ReadDocumentPage() {
   const prev = currentIndex > 0 ? books[currentIndex - 1] : null;
   const next = currentIndex >= 0 && currentIndex < books.length - 1 ? books[currentIndex + 1] : null;
 
-  // Track if we have a valid token cookie set (ready state from API)
   const [isReady, setIsReady] = useState(false);
-  
+
   useEffect(() => {
     let cancelled = false;
     const run = async () => {
@@ -123,12 +152,10 @@ export default function ReadDocumentPage() {
         if (!bookId) return;
         if (!current?.id) return;
         if (!isFree && membershipStatus !== "approved") return;
-        // API now sets HTTP-only cookie and returns ready state
         const res = await apiPost<{ ready?: boolean; token?: string; ext?: string; filename?: string; url?: string }>("/api/books/view-token", { bookId });
         if (!cancelled) {
-          // Support both new cookie-based flow and legacy token flow
           setIsReady(res.ready ?? !!res.token);
-          setViewToken(res.token ?? "cookie"); // Use marker for cookie-based auth
+          setViewToken(res.token ?? "cookie");
           setViewExt(res.ext ? String(res.ext).toLowerCase() : null);
           setViewFilename(res.filename ?? null);
           setViewUrl(res.url ?? null);
@@ -208,12 +235,15 @@ export default function ReadDocumentPage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isReady, membershipLoading, navigateToBook, next, prev, toggleFullscreen]);
 
-  // URL for serving content - cookie will be sent automatically
   const serveUrl = useMemo(() => {
     if (!isReady && !viewToken) return null;
     if (viewUrl) return viewUrl;
     return `/api/books/serve`;
   }, [isReady, viewToken, viewUrl]);
+
+  const isDocx = viewExt === "docx" || viewExt === "doc";
+  const showBookNav = !isLoading && !error && !!current && (isFree || membershipStatus === "approved") && books.length > 1;
+  const showMobileBookNav = showBookNav && isReady && !isFullscreen;
 
   useScrollAnimation(
     { threshold: 0.1, rootMargin: "0px" },
@@ -222,66 +252,69 @@ export default function ReadDocumentPage() {
 
   return (
     <ProtectedRoute>
-      <PageContainer>
-        <section className={`px-2 sm:px-4 lg:px-6 ${isFullscreen ? "py-0" : "py-8"}`}>
-          <div className={isFullscreen ? "max-w-7xl mx-auto" : "max-w-7xl mx-auto scroll-animate"}>
+      <PageContainer className={isFullscreen ? "pt-0!" : "pt-20! md:pt-24!"}>
+        <section
+          className={`law-documents-font px-0 sm:px-2 lg:px-6 ${
+            isFullscreen ? "py-0" : "py-3 sm:py-6 lg:py-8"
+          } ${showMobileBookNav ? "pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] sm:pb-0" : ""}`}
+        >
+          <div className={isFullscreen ? "mx-auto max-w-7xl" : "scroll-animate mx-auto max-w-7xl"}>
             {!isFullscreen && (
-              <div className="mb-6 scroll-animate flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <header className="scroll-animate mb-4 flex flex-col gap-3 px-3 sm:mb-6 sm:gap-4 sm:px-0">
                 <div className="min-w-0">
-                  <Link href={`/law_documents/${categoryId}`} className="text-sm text-gray-600 hover:text-gray-900">
+                  <Link
+                    href={`/law_documents/${categoryId}`}
+                    className="inline-flex min-h-10 touch-manipulation items-center text-sm text-gray-600 hover:text-gray-900"
+                  >
                     ← ត្រឡប់ទៅ {category?.name ?? "ឯកសារ"}
                   </Link>
-                  <h1 className="mt-2 text-2xl sm:text-3xl font-semibold text-gray-900 truncate">{current?.title ?? "អានឯកសារ"}</h1>
-                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600">
+                  <h1 className="mt-1 text-xl font-semibold leading-snug text-gray-900 sm:mt-2 sm:text-2xl lg:text-3xl">
+                    {current?.title ?? "អានឯកសារ"}
+                  </h1>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-600 sm:mt-2 sm:text-sm">
                     {current?.author ? <span>{current.author}</span> : null}
                     {typeof current?.year === "number" ? <span>{current.year}</span> : null}
-                    {currentIndex >= 0 ? <span>ឯកសារ {currentIndex + 1} នៃ {books.length}</span> : null}
+                    {currentIndex >= 0 ? (
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 font-medium text-slate-700">
+                        {currentIndex + 1} / {books.length}
+                      </span>
+                    ) : null}
                   </div>
                 </div>
 
-                {!isLoading && !error && current && (isFree || membershipStatus === "approved") && books.length > 1 ? (
-                  <div className="flex shrink-0 items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => prev && navigateToBook(prev.id)}
-                      disabled={!prev}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-(--primary) hover:text-(--primary) disabled:cursor-not-allowed disabled:opacity-40"
-                    >
+                {showBookNav ? (
+                  <div className="hidden items-center gap-2 sm:flex">
+                    <NavIconButton label="ឯកសារមុន" onClick={() => prev && navigateToBook(prev.id)} disabled={!prev}>
                       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                       </svg>
-                      <span className="hidden sm:inline">មុន</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => next && navigateToBook(next.id)}
-                      disabled={!next}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-(--primary) hover:text-(--primary) disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      <span className="hidden sm:inline">បន្ទាប់</span>
+                      <span>មុន</span>
+                    </NavIconButton>
+                    <NavIconButton label="ឯកសារបន្ទាប់" onClick={() => next && navigateToBook(next.id)} disabled={!next}>
+                      <span>បន្ទាប់</span>
                       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
-                    </button>
+                    </NavIconButton>
                   </div>
                 ) : null}
-              </div>
+              </header>
             )}
 
             {isLoading ? (
-              <div className="py-16">
+              <div className="px-3 py-12 sm:py-16">
                 <LoadingState label="កំពុងផ្ទុកឯកសារ..." />
               </div>
             ) : error ? (
-              <div className="text-center text-red-600 py-16">{error}</div>
+              <div className="px-3 py-12 text-center text-red-600 sm:py-16">{error}</div>
             ) : !current ? (
-              <div className="text-center text-gray-600 py-16">រកមិនឃើញឯកសារ។</div>
+              <div className="px-3 py-12 text-center text-gray-600 sm:py-16">រកមិនឃើញឯកសារ។</div>
             ) : membershipLoading ? (
-              <div className="py-16">
+              <div className="px-3 py-12 sm:py-16">
                 <LoadingState label="កំពុងពិនិត្យសមាជិកភាព..." />
               </div>
             ) : !isFree && membershipStatus !== "approved" ? (
-              <div className="rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center shadow-sm sm:px-10">
+              <div className="mx-3 rounded-2xl border border-slate-200 bg-white px-5 py-12 text-center shadow-sm sm:mx-0 sm:px-10 sm:py-16">
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-600">
                   <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                     <path
@@ -292,103 +325,132 @@ export default function ReadDocumentPage() {
                     />
                   </svg>
                 </div>
-                <h2 className="mt-5 text-xl font-semibold text-slate-900">ត្រូវការសមាជិកភាព</h2>
-                <p className="mt-2 mx-auto max-w-md text-sm leading-relaxed text-slate-600">
+                <h2 className="mt-5 text-lg font-semibold text-slate-900 sm:text-xl">ត្រូវការសមាជិកភាព</h2>
+                <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-600">
                   អ្នកអាចរកមើលប្រភេទ និងគម្របបាន ប៉ុន្តែការអានឯកសារគឺសម្រាប់សមាជិកប៉ុណ្ណោះ។
                 </p>
                 <div className="mt-6">
                   <Button onClick={() => router.push("/pricing_page")} variant="primary">
-                    ដំឡើងសមាជិកភាព
+                    ចួលជាសមាជិក
                   </Button>
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-6">
-                <div>
+              <div className="grid grid-cols-1 gap-4 sm:gap-6">
+                <div
+                  ref={viewerRef}
+                  className={`overflow-hidden bg-white ${
+                    isFullscreen
+                      ? "flex h-dvh w-full flex-col bg-slate-100"
+                      : "scroll-animate border-y border-slate-200 shadow-sm sm:rounded-xl sm:border"
+                  }`}
+                >
                   <div
-                    ref={viewerRef}
-                    className={`overflow-hidden bg-white shadow-sm ${
-                      isFullscreen ? "flex h-full w-full flex-col bg-slate-100" : "scroll-animate"
+                    className={`flex items-center justify-between gap-2 border-b border-slate-200 bg-white px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-3 ${
+                      isFullscreen ? "" : "scroll-animate"
                     }`}
                   >
-                    <div
-                      className={`flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3 ${
-                        isFullscreen ? "" : "scroll-animate"
-                      }`}
-                    >
-                      <div className="min-w-0">
-                        <div className="truncate text-sm font-semibold text-slate-900">
-                          {viewExt === "docx" || viewExt === "doc" ? "កម្មវិធីមើលឯកសារ" : "អានឯកសារ PDF"}
-                        </div>
-                        {viewFilename ? (
-                          <div className="truncate text-xs text-slate-500">{viewFilename}</div>
-                        ) : null}
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-xs font-semibold text-slate-900 sm:text-sm">
+                        {isDocx ? "កម្មវិធីមើលឯកសារ" : "អានឯកសារ PDF"}
                       </div>
-                      {isReady ? (
-                        <button
-                          type="button"
-                          onClick={toggleFullscreen}
-                          className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-(--primary) hover:text-(--primary)"
-                          aria-label={isFullscreen ? "ចាកចេញពីអេក្រង់ពេញ" : "មើលពេញអេក្រង់"}
-                        >
-                          {isFullscreen ? (
-                            <>
-                              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M9 9V4.5M9 9H4.5M9 9L3.5 3.5M15 9h4.5M15 9V4.5M15 9l5.5-5.5M9 15v4.5M9 15H4.5M9 15l-5.5 5.5M15 15h4.5M15 15v4.5m0-4.5l5.5 5.5"
-                                />
-                              </svg>
-                              <span className="hidden sm:inline">ចាកចេញ</span>
-                            </>
-                          ) : (
-                            <>
-                              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-                                />
-                              </svg>
-                              <span className="hidden sm:inline">ពេញអេក្រង់</span>
-                            </>
-                          )}
-                        </button>
+                      {viewFilename && !isFullscreen ? (
+                        <div className="hidden truncate text-xs text-slate-500 sm:block">{viewFilename}</div>
                       ) : null}
                     </div>
-
-                    <div className={`bg-slate-50 ${isFullscreen ? "min-h-0 flex-1" : ""}`}>
-                      {isReady ? (
-                        viewExt === "docx" || viewExt === "doc" ? (
-                          <DocxViewer
-                            url={serveUrl ?? `/api/books/serve`}
-                            className={isFullscreen ? "min-h-0 h-full" : "min-h-[65vh]"}
-                          />
+                    {isReady ? (
+                      <button
+                        type="button"
+                        onClick={toggleFullscreen}
+                        className="inline-flex min-h-11 min-w-11 shrink-0 touch-manipulation items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:border-(--primary) hover:text-(--primary) active:scale-[0.98] sm:min-h-0 sm:min-w-0 sm:py-2"
+                        aria-label={isFullscreen ? "ចាកចេញពីអេក្រង់ពេញ" : "មើលពេញអេក្រង់"}
+                      >
+                        {isFullscreen ? (
+                          <>
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 9V4.5M9 9H4.5M9 9L3.5 3.5M15 9h4.5M15 9V4.5M15 9l5.5-5.5M9 15v4.5M9 15H4.5M9 15l-5.5 5.5M15 15h4.5M15 15v4.5m0-4.5l5.5 5.5"
+                              />
+                            </svg>
+                            <span className="hidden sm:inline">ចាកចេញ</span>
+                          </>
                         ) : (
-                          <PdfViewer
-                            url={serveUrl ?? `/api/books/serve`}
-                            bookId={bookId}
-                            className={isFullscreen ? "min-h-0 h-full" : "min-h-[75vh]"}
-                          />
-                        )
+                          <>
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                              />
+                            </svg>
+                            <span className="hidden sm:inline">ពេញអេក្រង់</span>
+                          </>
+                        )}
+                      </button>
+                    ) : null}
+                  </div>
+
+                  <div className={`bg-slate-50 ${isFullscreen ? "min-h-0 flex-1 overflow-hidden" : ""}`}>
+                    {isReady ? (
+                      isDocx ? (
+                        <DocxViewer
+                          url={serveUrl ?? `/api/books/serve`}
+                          className={isFullscreen ? viewerHeight.fullscreen : viewerHeight.docx}
+                        />
                       ) : (
-                        <div className="p-6 text-center text-gray-700">
-                          <div className="font-semibold mb-2">កំពុងរៀបចំកម្មវិធីអានមានសុវត្ថិភាព…</div>
-                          <div className="text-sm text-gray-600">សូមរង់ចាំបន្តិច។</div>
-                        </div>
-                      )}
-                    </div>
+                        <PdfViewer
+                          url={serveUrl ?? `/api/books/serve`}
+                          bookId={bookId}
+                          className={isFullscreen ? viewerHeight.fullscreen : viewerHeight.pdf}
+                        />
+                      )
+                    ) : (
+                      <div className="px-4 py-10 text-center text-gray-700 sm:p-6 sm:py-12">
+                        <div className="mb-2 font-semibold">កំពុងរៀបចំកម្មវិធីអានមានសុវត្ថិភាព…</div>
+                        <div className="text-sm text-gray-600">សូមរង់ចាំបន្តិច។</div>
+                      </div>
+                    )}
                   </div>
                 </div>
+
+                {isReady && !isFullscreen ? (
+                  <p className="hidden px-3 text-center text-xs text-slate-500 sm:block sm:px-0">
+                    ប្រើគ្រាប់ចុច ← → សម្រាប់ទំព័រ PDF · Alt+← → សម្រាប់ឯកសារមុន/បន្ទាប់ · F សម្រាប់ពេញអេក្រង់
+                  </p>
+                ) : null}
               </div>
             )}
           </div>
         </section>
+
+        {showMobileBookNav ? (
+          <nav
+            className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-3 py-2 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] backdrop-blur-md sm:hidden"
+            style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
+            aria-label="រុករកឯកសារ"
+          >
+            <div className="mx-auto flex max-w-lg items-center justify-between gap-2">
+              <NavIconButton label="ឯកសារមុន" onClick={() => prev && navigateToBook(prev.id)} disabled={!prev}>
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </NavIconButton>
+              <span className="truncate px-2 text-center text-xs font-medium text-slate-600">
+                {currentIndex + 1} / {books.length}
+              </span>
+              <NavIconButton label="ឯកសារបន្ទាប់" onClick={() => next && navigateToBook(next.id)} disabled={!next}>
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </NavIconButton>
+            </div>
+          </nav>
+        ) : null}
       </PageContainer>
     </ProtectedRoute>
   );
 }
-

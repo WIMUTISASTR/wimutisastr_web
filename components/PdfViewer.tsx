@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, type ReactNode } from "react";
 import * as pdfjsLib from "pdfjs-dist";
 import type { PDFDocumentProxy, RenderTask } from "pdfjs-dist";
 import LoadingState from "@/components/LoadingState";
@@ -16,6 +16,30 @@ interface PdfViewerProps {
   url: string;
   bookId?: string;
   className?: string;
+}
+
+function ToolbarButton({
+  label,
+  onClick,
+  disabled,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={label}
+      className="inline-flex min-h-11 min-w-11 touch-manipulation items-center justify-center rounded-lg p-2 transition-colors hover:bg-white/10 active:bg-white/15 disabled:cursor-not-allowed disabled:opacity-30 sm:min-h-0 sm:min-w-0 sm:p-1.5"
+    >
+      {children}
+    </button>
+  );
 }
 
 export default function PdfViewer({ url, bookId, className = "" }: PdfViewerProps) {
@@ -40,7 +64,25 @@ export default function PdfViewer({ url, bookId, className = "" }: PdfViewerProp
     setPageInputValue(String(clamped));
   }, [numPages]);
 
-  // Load document
+  const computeFitScale = useCallback(async (doc: PDFDocumentProxy, pageNum = 1) => {
+    if (!containerRef.current) return null;
+    const page = await doc.getPage(pageNum);
+    const horizontalPadding = window.innerWidth < 640 ? 16 : 32;
+    const containerWidth = Math.max(120, containerRef.current.clientWidth - horizontalPadding);
+    const unscaledViewport = page.getViewport({ scale: 1 });
+    return Math.min(MAX_SCALE, Math.max(MIN_SCALE, containerWidth / unscaledViewport.width));
+  }, []);
+
+  const fitToWidth = useCallback(async () => {
+    if (!pdf) return;
+    try {
+      const fitScale = await computeFitScale(pdf, currentPage);
+      if (fitScale != null) setScale(parseFloat(fitScale.toFixed(2)));
+    } catch (err) {
+      console.error("PDF fit-to-width error:", err);
+    }
+  }, [pdf, currentPage, computeFitScale]);
+
   useEffect(() => {
     let cancelled = false;
     setIsDocLoading(true);
@@ -72,7 +114,6 @@ export default function PdfViewer({ url, bookId, className = "" }: PdfViewerProp
     };
   }, [url]);
 
-  // Fit to container width on first load
   useEffect(() => {
     if (!pdf || hasAutoFitRef.current || !containerRef.current) return;
 
@@ -80,16 +121,8 @@ export default function PdfViewer({ url, bookId, className = "" }: PdfViewerProp
 
     const autoFit = async () => {
       try {
-        const page = await pdf.getPage(1);
-        if (cancelled || !containerRef.current) return;
-
-        const containerWidth = containerRef.current.clientWidth - 32;
-        const unscaledViewport = page.getViewport({ scale: 1 });
-        const fitScale = Math.min(
-          MAX_SCALE,
-          Math.max(MIN_SCALE, containerWidth / unscaledViewport.width)
-        );
-
+        const fitScale = await computeFitScale(pdf, 1);
+        if (cancelled || fitScale == null) return;
         hasAutoFitRef.current = true;
         setScale(parseFloat(fitScale.toFixed(2)));
       } catch (err) {
@@ -102,9 +135,29 @@ export default function PdfViewer({ url, bookId, className = "" }: PdfViewerProp
     return () => {
       cancelled = true;
     };
-  }, [pdf]);
+  }, [pdf, computeFitScale]);
 
-  // Restore saved reading position
+  useEffect(() => {
+    if (!pdf || !containerRef.current) return;
+
+    const el = containerRef.current;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    const ro = new ResizeObserver(() => {
+      if (!hasAutoFitRef.current) return;
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        void fitToWidth();
+      }, 150);
+    });
+
+    ro.observe(el);
+    return () => {
+      clearTimeout(timeoutId);
+      ro.disconnect();
+    };
+  }, [pdf, fitToWidth]);
+
   useEffect(() => {
     if (!pdf || !bookId || hasRestoredPageRef.current) return;
 
@@ -117,13 +170,11 @@ export default function PdfViewer({ url, bookId, className = "" }: PdfViewerProp
     }
   }, [pdf, bookId]);
 
-  // Persist reading position
   useEffect(() => {
     if (!bookId || !pdf || currentPage < 1) return;
     saveReadingPage(bookId, currentPage);
   }, [bookId, pdf, currentPage]);
 
-  // Render page whenever pdf, currentPage, or scale changes
   useEffect(() => {
     if (!pdf || !canvasRef.current) return;
 
@@ -145,7 +196,7 @@ export default function PdfViewer({ url, bookId, className = "" }: PdfViewerProp
         const canvas = canvasRef.current!;
         const ctx = canvas.getContext("2d")!;
 
-        const dpr = window.devicePixelRatio || 1;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
         canvas.style.width = `${viewport.width}px`;
         canvas.style.height = `${viewport.height}px`;
         canvas.width = Math.floor(viewport.width * dpr);
@@ -177,7 +228,6 @@ export default function PdfViewer({ url, bookId, className = "" }: PdfViewerProp
     };
   }, [pdf, currentPage, scale]);
 
-  // Keyboard page navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
@@ -207,9 +257,11 @@ export default function PdfViewer({ url, bookId, className = "" }: PdfViewerProp
     }
   };
 
+  const toolbarSafeArea = { paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" } as const;
+
   if (isDocLoading) {
     return (
-      <div className={`flex items-center justify-center min-h-[60vh] ${className}`}>
+      <div className={`flex min-h-[50dvh] items-center justify-center ${className}`}>
         <LoadingState label="កំពុងផ្ទុក PDF..." />
       </div>
     );
@@ -217,83 +269,85 @@ export default function PdfViewer({ url, bookId, className = "" }: PdfViewerProp
 
   if (loadError) {
     return (
-      <div className={`flex items-center justify-center min-h-[60vh] text-center px-6 ${className}`}>
+      <div className={`flex min-h-[50dvh] items-center justify-center px-4 text-center sm:px-6 ${className}`}>
         <div>
-          <svg className="w-12 h-12 text-red-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="mx-auto mb-3 h-12 w-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
               d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
           </svg>
-          <p className="text-red-600 font-medium">{loadError}</p>
+          <p className="font-medium text-red-600">{loadError}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`flex flex-col bg-slate-100 ${className}`}>
-      <div className="sticky top-0 z-20 flex items-center justify-between gap-3 bg-slate-800 text-white px-4 py-2 shadow-md">
-        <div className="flex items-center gap-1.5 text-xs text-white/60 min-w-0">
-          {isPageRendering && (
+    <div className={`flex min-h-0 flex-col bg-slate-100 ${className}`}>
+      <div
+        className="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-2 bg-slate-800 px-2 py-2 text-white shadow-md sm:gap-3 sm:px-4"
+        style={toolbarSafeArea}
+      >
+        <div className="flex min-w-0 items-center gap-2 text-xs text-white/60">
+          {isPageRendering ? (
             <>
-              <svg className="animate-spin w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24">
+              <svg className="h-3 w-3 shrink-0 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
-              កំពុងបង្ហាញ...
+              <span className="sr-only sm:not-sr-only sm:inline">កំពុងបង្ហាញ...</span>
             </>
-          )}
+          ) : null}
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={zoomOut}
-            disabled={scale <= MIN_SCALE}
-            className="p-1.5 rounded hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            aria-label="Zoom out"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="flex items-center gap-0.5 sm:gap-2">
+          <ToolbarButton label="បង្រួម" onClick={zoomOut} disabled={scale <= MIN_SCALE}>
+            <svg className="h-4 w-4 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
             </svg>
-          </button>
+          </ToolbarButton>
 
-          <span className="text-xs text-white/70 w-10 text-center tabular-nums">
+          <span className="w-10 text-center text-xs tabular-nums text-white/70 sm:w-12">
             {Math.round(scale * 100)}%
           </span>
 
-          <button
-            onClick={zoomIn}
-            disabled={scale >= MAX_SCALE}
-            className="p-1.5 rounded hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            aria-label="Zoom in"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <ToolbarButton label="ពង្រីក" onClick={zoomIn} disabled={scale >= MAX_SCALE}>
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
             </svg>
-          </button>
+          </ToolbarButton>
+
+          <ToolbarButton label="ប្ដូរទំហំឲ្យជាប់ទទឹង" onClick={() => void fitToWidth()}>
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+            </svg>
+          </ToolbarButton>
         </div>
       </div>
 
-      <div ref={containerRef} className="flex-1 overflow-auto flex justify-center py-6 px-4">
-        <div className="shadow-2xl bg-white">
-          <canvas ref={canvasRef} className="block" />
+      <div
+        ref={containerRef}
+        className="min-h-0 flex-1 overflow-x-auto overflow-y-auto overscroll-contain px-2 py-4 [-webkit-overflow-scrolling:touch] sm:px-4 sm:py-6"
+      >
+        <div className="mx-auto w-max max-w-full shadow-2xl bg-white">
+          <canvas ref={canvasRef} className="block max-w-full" />
         </div>
       </div>
 
-      <div className="sticky bottom-0 z-20 flex items-center justify-center gap-3 bg-slate-800 text-white px-4 py-2 shadow-md">
-        <button
-          onClick={() => goTo(currentPage - 1)}
-          disabled={currentPage <= 1}
-          className="p-1.5 rounded hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-          aria-label="Previous page"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div
+        className="sticky bottom-0 z-20 flex items-center justify-center gap-2 bg-slate-800 px-2 py-2 text-white shadow-[0_-2px_12px_rgba(0,0,0,0.2)] sm:gap-3 sm:px-4"
+        style={toolbarSafeArea}
+      >
+        <ToolbarButton label="ទំព័រមុន" onClick={() => goTo(currentPage - 1)} disabled={currentPage <= 1}>
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-        </button>
+        </ToolbarButton>
 
         <div className="flex items-center gap-1 text-sm">
           <input
             type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             value={pageInputValue}
             onChange={(e) => setPageInputValue(e.target.value)}
             onKeyDown={handlePageInputKeyDown}
@@ -301,21 +355,17 @@ export default function PdfViewer({ url, bookId, className = "" }: PdfViewerProp
               const n = parseInt(pageInputValue, 10);
               if (!isNaN(n)) goTo(n); else setPageInputValue(String(currentPage));
             }}
-            className="w-10 text-center bg-white/10 border border-white/20 rounded px-1 py-0.5 text-white text-sm focus:outline-none focus:bg-white/20"
+            aria-label="លេខទំព័រ"
+            className="w-11 rounded border border-white/20 bg-white/10 px-1 py-1.5 text-center text-base text-white focus:bg-white/20 focus:outline-none sm:w-10 sm:py-0.5 sm:text-sm"
           />
-          <span className="text-white/60 text-sm">/ {numPages}</span>
+          <span className="text-sm text-white/60">/ {numPages}</span>
         </div>
 
-        <button
-          onClick={() => goTo(currentPage + 1)}
-          disabled={currentPage >= numPages}
-          className="p-1.5 rounded hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-          aria-label="Next page"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <ToolbarButton label="ទំព័របន្ទាប់" onClick={() => goTo(currentPage + 1)} disabled={currentPage >= numPages}>
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
-        </button>
+        </ToolbarButton>
       </div>
     </div>
   );
