@@ -1,48 +1,39 @@
 export type TeamMember = {
   name: string;
   role: string;
-  imageUrl: string;
   phone?: string;
   email?: string;
   facebook?: string;
 };
 
-// NOTE: Image URLs previously pointed to https://www.wimutisastrlawyer.com which
-// no longer resolves (ERR_NAME_NOT_RESOLVED) and produced console errors on the
-// about-us page. Until real portrait assets are uploaded to /public/team/ or R2,
-// fall back to the in-repo placeholder so the page renders cleanly.
-const TEAM_PLACEHOLDER_IMAGE = "/asset/teacherImage.png";
-
 export const TEAM_MEMBERS: TeamMember[] = [
   {
     name: "ភ័ណ្ឌ  ស្រីលីស",
     role: "អនុប្រធានការិយាល័យមេធាវី",
-    imageUrl: TEAM_PLACEHOLDER_IMAGE,
     phone: "069789722",
+    email: "sreylin@gmail.com",
   },
   {
     name: "ឌឹម ចាន់ឡេង",
     role: "ទីប្រឹក្សាច្បាប់ និងជំនួយការមេធាវី",
-    imageUrl: TEAM_PLACEHOLDER_IMAGE,
     phone: "095410815",
+    email: "chanlengdem@gmail.com",
   },
   {
     name: "ឡយ សីហា",
     role: "ទីប្រឹក្សាច្បាប់ និងជំនួយការមេធាវី",
-    imageUrl: TEAM_PLACEHOLDER_IMAGE,
     phone: "0969155963",
+    email: "seyhaloy@gmail.com",
   },
   {
     name: "Kheang Su iy",
     role: "ទីប្រឹក្សាច្បាប់",
-    imageUrl: TEAM_PLACEHOLDER_IMAGE,
     phone: "087596866",
     email: "kheang1916baobei@gmail.com",
   },
   {
     name: "មេធាវី ម៉ែន វុធ",
     role: "ប្រធានការិយាល័យវិមុត្តិសាស្ត្រ",
-    imageUrl: TEAM_PLACEHOLDER_IMAGE,
     phone: "0717251802",
     email: "avocatmenvuth@gmail.com",
     facebook: "https://web.facebook.com/profile.php?id=61552023062511",
@@ -50,8 +41,8 @@ export const TEAM_MEMBERS: TeamMember[] = [
   {
     name: "អុល លីហួ",
     role: "ប្រឹក្សាច្បាប់",
-    imageUrl: TEAM_PLACEHOLDER_IMAGE,
     phone: "095389323",
+    email: "lyhour@gmail.com",
   },
 ];
 
