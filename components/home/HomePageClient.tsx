@@ -82,7 +82,7 @@ export default function HomePageClient() {
 
       <FeaturedCoursesSection home={home} isLoading={homeLoading} />
 
-      <FeaturedDocumentsSection home={home} hasPaid={isMember} isLoading={homeLoading} />
+      {/* <FeaturedDocumentsSection home={home} hasPaid={isMember} isLoading={homeLoading} /> */}
 
       <Footer />
     </PageContainer>

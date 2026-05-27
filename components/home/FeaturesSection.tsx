@@ -36,6 +36,21 @@ const features = [
     cta: "រកមើលឯកសារ",
     iconWrapClass: "bg-(--accent) text-white",
   },
+  {
+    href: "/vocche_banche_banchal",
+    icon: (
+      <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14v7M5.176 10.576L12 14l6.824-3.424" />
+      </svg>
+    ),
+    title: "វគ្គបណ្តុះបណ្តាល",
+    description:
+      "បង្កើនសមត្ថភាពអនុវត្តច្បាប់ និងទទួលការណែនាំពីអ្នកជំនាញការិយាល័យច្បាប់ តាមរយៈវគ្គបណ្តុះបណ្តាលជាក់លាក់។",
+    cta: "មើលវគ្គបណ្តុះបណ្តាល",
+    iconWrapClass: "bg-(--primary-dark) text-white",
+  },
 ];
 
 const highlights = [
@@ -107,11 +122,11 @@ export default function FeaturesSection() {
             <span className="text-(--accent-light)">ដែលធ្វើអោយអ្នកយល់ដឹងអំពីច្បាប់</span>
           </h2>
           <p className="mt-4 text-base leading-relaxed text-white/90 sm:text-lg">
-            ផ្តល់ជូននៅវគ្គសិក្សាច្បាប់ និង ឯកសារច្បាប់
+            ផ្តល់ជូននៅវគ្គសិក្សាច្បាប់ ឯកសារច្បាប់ និងវគ្គបណ្តុះបណ្តាល
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 md:gap-8">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 md:gap-8">
           {features.map((feature, index) => (
             <Link
               key={feature.href}
@@ -120,7 +135,7 @@ export default function FeaturesSection() {
                 "group relative scroll-animate opacity-0 translate-y-8 block rounded-2xl border border-(--gray-200) bg-white p-7 sm:p-8",
                 "cursor-pointer transition-colors duration-200",
                 "hover:border-(--primary)/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2",
-                index === 0 ? "delay-100" : "delay-200",
+                index === 0 ? "delay-100" : index === 1 ? "delay-200" : "delay-300",
               ].join(" ")}
             >
               <div className={`mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl ${feature.iconWrapClass} shadow-sm`}>
