@@ -26,6 +26,16 @@ interface EnvConfig {
   BARAY_SK?: string;
   BARAY_IV?: string;
 
+  // Public site URL (Baray redirects, SEO)
+  NEXT_PUBLIC_APP_URL?: string;
+
+  // CORS allowed origins (comma-separated)
+  ALLOWED_ORIGINS?: string;
+
+  // Cloudflare Turnstile (optional but recommended in production)
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY?: string;
+  TURNSTILE_SECRET_KEY?: string;
+
   // Telegram (optional)
   TELEGRAM_BOT_TOKEN?: string;
   TELEGRAM_CHAT_ID?: string;
@@ -144,6 +154,25 @@ export const env = {
   redis: {
     url: () => getOptionalEnv('UPSTASH_REDIS_REST_URL'),
     token: () => getOptionalEnv('UPSTASH_REDIS_REST_TOKEN'),
+  },
+
+  // Baray payment gateway
+  baray: {
+    apiKey: () => getOptionalEnv('BARAY_API_KEY'),
+    secretKey: () => getOptionalEnv('BARAY_SK'),
+    iv: () => getOptionalEnv('BARAY_IV'),
+    isConfigured: () => {
+      const apiKey = getOptionalEnv('BARAY_API_KEY');
+      const sk = getOptionalEnv('BARAY_SK');
+      const iv = getOptionalEnv('BARAY_IV');
+      return Boolean(apiKey && sk && iv);
+    },
+  },
+
+  // App URL & CORS
+  app: {
+    url: () => getOptionalEnv('NEXT_PUBLIC_APP_URL'),
+    allowedOrigins: () => getOptionalEnv('ALLOWED_ORIGINS'),
   },
 
   // System

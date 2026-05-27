@@ -70,12 +70,21 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-white">គណនី</h3>
             <ul className="mt-4 space-y-2.5 text-sm">
-              {!loading && user ? (
-                <li>
-                  <Link href="/profile_page" className="text-gray-300 transition-colors duration-200 hover:text-white">
-                    ប្រវត្តិរូប
-                  </Link>
-                </li>
+              {user ? (
+                <>
+                  <li>
+                    <Link href="/profile_page" className="text-gray-300 transition-colors duration-200 hover:text-white">
+                      ប្រវត្តិរូប
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/law_video" className="text-gray-300 transition-colors duration-200 hover:text-white">
+                      វគ្គសិក្សា
+                    </Link>
+                  </li>
+                </>
+              ) : loading ? (
+                <li className="text-gray-500">...</li>
               ) : (
                 <>
                   <li>

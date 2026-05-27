@@ -8,6 +8,7 @@ import PageContainer from "@/components/PageContainer";
 import { fetchBooks, type BookCategory, type BookRow } from "@/lib/api/client";
 import LoadingState from "@/components/LoadingState";
 import { useMembership } from "@/lib/hooks/useMembership";
+import { isActiveApprovedMembership } from "@/lib/utils/membership";
 import { notify } from "@/lib/utils/notify";
 import DocumentsTable from "../_components/DocumentsTable";
 
@@ -26,8 +27,8 @@ export default function DocumentCategoryPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get("q") ?? "");
   const [selectedYear, setSelectedYear] = useState(() => searchParams.get("year") ?? "all");
-  const { status: membershipStatus } = useMembership();
-  const isApproved = membershipStatus === "approved";
+  const { status: membershipStatus, membershipEndsAt } = useMembership();
+  const isApproved = isActiveApprovedMembership(membershipStatus, membershipEndsAt);
 
   useEffect(() => {
     let cancelled = false;

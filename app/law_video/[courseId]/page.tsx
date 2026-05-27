@@ -4,14 +4,15 @@ import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { fetchVideos } from "@/lib/api/client";
 import { useMembership } from "@/lib/hooks/useMembership";
+import { isActiveApprovedMembership } from "@/lib/utils/membership";
 import { getWatchTargetVideo } from "@/lib/utils/videoAccess";
 
 export default function VideoCategoryRedirectPage() {
   const params = useParams();
   const router = useRouter();
   const categoryId = params.courseId as string;
-  const { status: membershipStatus } = useMembership();
-  const isApproved = membershipStatus === "approved";
+  const { status: membershipStatus, membershipEndsAt } = useMembership();
+  const isApproved = isActiveApprovedMembership(membershipStatus, membershipEndsAt);
 
   useEffect(() => {
     let cancelled = false;

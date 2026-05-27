@@ -14,12 +14,13 @@ import {
   FeaturedDocumentsSection,
   Footer,
 } from "@/components/home";
-import { useAuth } from "@/lib/auth/context";
+import { useMembership } from "@/lib/hooks/useMembership";
+import { isActiveApprovedMembership } from "@/lib/utils/membership";
 
 export default function HomePageClient() {
-  const { user } = useAuth();
+  const { status: membershipStatus, membershipEndsAt } = useMembership();
+  const isMember = isActiveApprovedMembership(membershipStatus, membershipEndsAt);
   const [isVisible, setIsVisible] = useState(false);
-  const [hasPaid, setHasPaid] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [home, setHome] = useState<HomeResponse | null>(null);
   const [homeLoading, setHomeLoading] = useState(true);
@@ -35,59 +36,6 @@ export default function HomePageClient() {
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const checkPaymentStatus = async () => {
-      try {
-        const cachedPayment = localStorage.getItem("payment_status");
-        if (cachedPayment) {
-          const parsed = JSON.parse(cachedPayment);
-          if (parsed.paid === true && !cancelled) {
-            setHasPaid(true);
-          }
-        }
-
-        if (!user) {
-          if (!cancelled) setHasPaid(false);
-          return;
-        }
-
-        const response = await fetch("/api/payment/verify", {
-          method: "GET",
-          credentials: "include",
-        });
-
-        if (!cancelled && response.ok) {
-          const data = await response.json();
-          setHasPaid(data.hasPaid === true);
-
-          localStorage.setItem(
-            "payment_status",
-            JSON.stringify({
-              paid: data.hasPaid === true,
-              verifiedAt: new Date().toISOString(),
-            })
-          );
-        }
-      } catch (error) {
-        logger.error("Error checking payment status:", error);
-      }
-    };
-
-    checkPaymentStatus();
-
-    const handleStorageChange = () => {
-      checkPaymentStatus();
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => {
-      cancelled = true;
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, [user]);
 
   useEffect(() => {
     let cancelled = false;
@@ -132,9 +80,9 @@ export default function HomePageClient() {
 
       <FeaturesSection />
 
-      <FeaturedCoursesSection home={home} />
+      <FeaturedCoursesSection home={home} isLoading={homeLoading} />
 
-      <FeaturedDocumentsSection home={home} hasPaid={hasPaid} />
+      <FeaturedDocumentsSection home={home} hasPaid={isMember} isLoading={homeLoading} />
 
       <Footer />
     </PageContainer>

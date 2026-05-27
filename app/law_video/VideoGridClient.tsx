@@ -12,6 +12,7 @@ import {
   getVideosInCategory,
   getWatchTargetVideo,
 } from "@/lib/utils/videoAccess";
+import { formatKhmerMonthYear } from "@/lib/utils/formatKhmerDate";
 
 const FALLBACK_THUMB = "/asset/document_background.png";
 
@@ -21,13 +22,6 @@ const STORAGE = {
 
 function shouldDisableImageOptimization(src: string) {
   return src.includes(".r2.dev/") || /^https?:\/\//i.test(src);
-}
-
-function formatDate(d: string | null | undefined) {
-  if (!d) return null;
-  const date = new Date(d);
-  if (Number.isNaN(date.getTime())) return null;
-  return date.toLocaleDateString("km-KH", { year: "numeric", month: "short" });
 }
 
 function clamp(n: number, min: number, max: number) {
@@ -355,6 +349,12 @@ function CourseCard({
             សមាជិក
           </div>
         )}
+        {isApproved && !isLocked && !isCompleted && !isStarted && (
+          <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-emerald-500 text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow">
+            <CheckCircleIcon className="w-3 h-3" />
+            ចូលប្រើបាន
+          </div>
+        )}
         {!isLocked && hasFree && !isApproved && (
           <div className="absolute top-2.5 left-2.5 bg-sky-500 text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow">
             មើលឥតគិតថ្លៃ
@@ -419,7 +419,7 @@ function CourseCard({
             )}
           </div>
           {updated && (
-            <span>{formatDate(updated)}</span>
+            <span>{formatKhmerMonthYear(updated)}</span>
           )}
         </div>
 

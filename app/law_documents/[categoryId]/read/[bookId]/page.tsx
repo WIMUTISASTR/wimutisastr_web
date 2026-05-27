@@ -11,6 +11,7 @@ import LoadingState from "@/components/LoadingState";
 import { apiPost, fetchBooks, type BookCategory, type BookRow } from "@/lib/api/client";
 import { useMembership } from "@/lib/hooks/useMembership";
 import { notify } from "@/lib/utils/notify";
+import useScrollAnimation from "@/lib/hooks/useScrollAnimation";
 
 const DocxViewer = dynamic(() => import("@/components/DocxViewer"), {
   ssr: false,
@@ -214,13 +215,18 @@ export default function ReadDocumentPage() {
     return `/api/books/serve`;
   }, [isReady, viewToken, viewUrl]);
 
+  useScrollAnimation(
+    { threshold: 0.1, rootMargin: "0px" },
+    [isLoading, error, membershipLoading, isReady, isFullscreen, viewExt, current?.id]
+  );
+
   return (
     <ProtectedRoute>
       <PageContainer>
         <section className={`px-2 sm:px-4 lg:px-6 ${isFullscreen ? "py-0" : "py-8"}`}>
-          <div className="max-w-7xl mx-auto">
+          <div className={isFullscreen ? "max-w-7xl mx-auto" : "max-w-7xl mx-auto scroll-animate"}>
             {!isFullscreen && (
-              <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="mb-6 scroll-animate flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
                   <Link href={`/law_documents/${categoryId}`} className="text-sm text-gray-600 hover:text-gray-900">
                     ← ត្រឡប់ទៅ {category?.name ?? "ឯកសារ"}
@@ -302,10 +308,14 @@ export default function ReadDocumentPage() {
                   <div
                     ref={viewerRef}
                     className={`overflow-hidden bg-white shadow-sm ${
-                      isFullscreen ? "flex h-full w-full flex-col bg-slate-100" : ""
+                      isFullscreen ? "flex h-full w-full flex-col bg-slate-100" : "scroll-animate"
                     }`}
                   >
-                    <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3">
+                    <div
+                      className={`flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3 ${
+                        isFullscreen ? "" : "scroll-animate"
+                      }`}
+                    >
                       <div className="min-w-0">
                         <div className="truncate text-sm font-semibold text-slate-900">
                           {viewExt === "docx" || viewExt === "doc" ? "កម្មវិធីមើលឯកសារ" : "អានឯកសារ PDF"}

@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import Button from "@/components/Button";
 import type { BookCategory, BookRow } from "@/lib/data/books";
 import { useMembership } from "@/lib/hooks/useMembership";
+import { isActiveApprovedMembership } from "@/lib/utils/membership";
 
 const ALL_CATEGORY_ID = "__all__";
 const UNCATEGORIZED_ID = "__uncategorized__";
@@ -16,8 +17,8 @@ interface BookGridClientProps {
 export default function BookGridClient({ categories, books }: BookGridClientProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const { status: membershipStatus } = useMembership();
-  const isApproved = membershipStatus === "approved";
+  const { status: membershipStatus, membershipEndsAt } = useMembership();
+  const isApproved = isActiveApprovedMembership(membershipStatus, membershipEndsAt);
 
   // Group books by category
   const byCategory = useMemo(() => {

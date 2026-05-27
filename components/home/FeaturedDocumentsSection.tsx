@@ -1,13 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import Button from "@/components/Button";
 import type { HomeResponse } from "@/lib/api/client";
 
 interface FeaturedDocumentsSectionProps {
   home: HomeResponse | null;
   hasPaid: boolean;
+  isLoading?: boolean;
+}
+
+function DocumentCardSkeleton() {
+  return (
+    <li className="overflow-hidden rounded-xl border border-(--gray-200) bg-white shadow-sm animate-pulse">
+      <div className="h-16 border-b border-(--gray-100) bg-(--gray-100)" />
+      <div className="space-y-3 p-5">
+        <div className="h-5 w-4/5 rounded bg-(--gray-200)" />
+        <div className="h-4 w-1/2 rounded bg-(--gray-100)" />
+        <div className="h-4 w-full rounded bg-(--gray-100)" />
+      </div>
+    </li>
+  );
 }
 
 function DocumentIcon({ className = "h-8 w-8" }: { className?: string }) {
@@ -23,10 +35,10 @@ function DocumentIcon({ className = "h-8 w-8" }: { className?: string }) {
   );
 }
 
-export default function FeaturedDocumentsSection({ home, hasPaid }: FeaturedDocumentsSectionProps) {
-  const router = useRouter();
+export default function FeaturedDocumentsSection({ home, hasPaid, isLoading = false }: FeaturedDocumentsSectionProps) {
   const books = home?.featuredBooks ?? [];
   const libraryHref = hasPaid ? "/law_documents" : "/pricing_page";
+  const showSkeleton = isLoading && books.length === 0;
 
   return (
     <section className="relative overflow-hidden bg-(--gray-100) py-16 sm:py-20 lg:py-24">
@@ -56,7 +68,13 @@ export default function FeaturedDocumentsSection({ home, hasPaid }: FeaturedDocu
           ) : null}
         </div>
 
-        {books.length === 0 ? (
+        {showSkeleton ? (
+          <ul className="scroll-animate mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <DocumentCardSkeleton key={i} />
+            ))}
+          </ul>
+        ) : books.length === 0 ? (
           <div className="scroll-animate mt-10 rounded-2xl border border-(--gray-200) bg-white px-6 py-14 text-center shadow-sm">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-(--primary)/10 text-(--primary)">
               <DocumentIcon />

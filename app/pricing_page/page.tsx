@@ -3,7 +3,6 @@
 import Image from "next/image";
 import PageContainer from "@/components/PageContainer";
 import Button from "@/components/Button";
-import LoadingState from "@/components/LoadingState";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { notify } from "@/lib/utils/notify";
@@ -133,8 +132,23 @@ export default function PricingPage() {
       <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           {isPlansLoading ? (
-            <div className="py-16">
-              <LoadingState label="កំពុងផ្ទុកគម្រោង..." />
+            <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-2xl border border-(--border) bg-(--surface-strong) p-8 animate-pulse"
+                >
+                  <div className="h-7 w-2/3 rounded bg-slate-200 mb-3" />
+                  <div className="h-4 w-1/3 rounded bg-slate-100 mb-6" />
+                  <div className="h-12 w-1/2 rounded bg-slate-200 mb-8" />
+                  <div className="space-y-3">
+                    <div className="h-4 w-full rounded bg-slate-100" />
+                    <div className="h-4 w-5/6 rounded bg-slate-100" />
+                    <div className="h-4 w-4/5 rounded bg-slate-100" />
+                  </div>
+                  <div className="mt-8 h-11 w-full rounded-xl bg-slate-200" />
+                </div>
+              ))}
             </div>
           ) : plansError ? (
             <div className="text-center text-red-600 py-16">{plansError}</div>

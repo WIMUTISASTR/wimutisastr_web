@@ -22,10 +22,25 @@ function PlayIcon({ className = "h-5 w-5" }: { className?: string }) {
 
 interface FeaturedCoursesSectionProps {
   home: HomeResponse | null;
+  isLoading?: boolean;
 }
 
-export default function FeaturedCoursesSection({ home }: FeaturedCoursesSectionProps) {
+function CourseCardSkeleton() {
+  return (
+    <li className="overflow-hidden rounded-xl border border-(--gray-200) bg-white shadow-sm animate-pulse">
+      <div className="aspect-[16/10] bg-(--gray-200)" />
+      <div className="space-y-3 p-5">
+        <div className="h-5 w-3/4 rounded bg-(--gray-200)" />
+        <div className="h-4 w-full rounded bg-(--gray-100)" />
+        <div className="h-4 w-2/3 rounded bg-(--gray-100)" />
+      </div>
+    </li>
+  );
+}
+
+export default function FeaturedCoursesSection({ home, isLoading = false }: FeaturedCoursesSectionProps) {
   const categories = (home?.categories ?? []).slice(0, MAX_DISPLAY);
+  const showSkeleton = isLoading && categories.length === 0;
 
   return (
     <section className="relative overflow-hidden bg-white py-16 sm:py-20 lg:py-24">
@@ -55,7 +70,13 @@ export default function FeaturedCoursesSection({ home }: FeaturedCoursesSectionP
           ) : null}
         </div>
 
-        {categories.length === 0 ? (
+        {showSkeleton ? (
+          <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <CourseCardSkeleton key={i} />
+            ))}
+          </ul>
+        ) : categories.length === 0 ? (
           <div className="scroll-animate mt-10 rounded-2xl border border-(--gray-200) bg-(--gray-50) px-6 py-14 text-center">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-(--primary)/10 text-(--primary)">
               <PlayIcon className="h-7 w-7" />

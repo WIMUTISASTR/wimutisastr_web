@@ -18,6 +18,8 @@ import { useMembership } from "@/lib/hooks/useMembership";
 import { isActiveApprovedMembership } from "@/lib/utils/membership";
 import { canWatchVideo } from "@/lib/utils/videoAccess";
 import { notify } from "@/lib/utils/notify";
+import { formatKhmerShortDate } from "@/lib/utils/formatKhmerDate";
+import useScrollAnimation from "@/lib/hooks/useScrollAnimation";
 
 const FALLBACK_THUMB = "/asset/document_background.png";
 
@@ -29,13 +31,6 @@ const STORAGE = {
   lastByCourse: "wimutisastr:lastVideoByCourse:v1",
   lastCourseId: "wimutisastr:lastCourseId:v1",
 } as const;
-
-function formatShortDate(v: string | null | undefined) {
-  if (!v) return null;
-  const d = new Date(v);
-  if (Number.isNaN(d.getTime())) return null;
-  return d.toLocaleDateString("km-KH", { year: "numeric", month: "short", day: "2-digit" });
-}
 
 const PlayIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 20 20">
@@ -139,6 +134,11 @@ export default function WatchVideoPage() {
   const prev = currentIndex > 0 ? videos[currentIndex - 1] : null;
   const next = currentIndex >= 0 && currentIndex < videos.length - 1 ? videos[currentIndex + 1] : null;
 
+  useScrollAnimation(
+    { threshold: 0.1, rootMargin: "0px" },
+    [isLoading, membershipLoading, playbackLoading, error, current?.id]
+  );
+
   const persistLastVideo = useCallback(
     (vId: string) => {
       try {
@@ -201,7 +201,7 @@ export default function WatchVideoPage() {
       <PageContainer>
         <div className="text-gray-900">
           {/* ── Breadcrumb ── */}
-          <div className="flex items-center gap-1.5 px-4 sm:px-6 py-3 text-sm text-gray-500 border-b border-gray-200">
+          <div className="scroll-animate flex items-center gap-1.5 px-4 sm:px-6 py-3 text-sm text-gray-500 border-b border-gray-200">
             <Link href="/law_video" className="hover:text-gray-900 transition-colors">
               វគ្គសិក្សា
             </Link>
@@ -216,7 +216,7 @@ export default function WatchVideoPage() {
             <div className="flex-1 min-w-0 lg:pl-6 xl:pl-10">
 
               {/* Player area */}
-              <div className="relative w-full aspect-video bg-black">
+              <div className="scroll-animate relative w-full aspect-video bg-black">
                 {isLoading || membershipLoading ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
                     <div className="w-12 h-12 rounded-full border-4 border-white/20 border-t-white animate-spin" />
@@ -312,7 +312,7 @@ export default function WatchVideoPage() {
               </div>
 
               {/* Video info */}
-              <div className="px-4 sm:px-6 py-5 border-b border-gray-200 lg:border-b-0">
+              <div className="scroll-animate px-4 sm:px-6 py-5 border-b border-gray-200 lg:border-b-0">
                 {/* Title */}
                 <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-snug">
                   {current?.title ?? "—"}
@@ -343,12 +343,12 @@ export default function WatchVideoPage() {
                       </span>
                     </>
                   )}
-                  {formatShortDate(current?.uploaded_at) && (
+                  {formatKhmerShortDate(current?.uploaded_at) && (
                     <>
                       <span className="text-gray-300">•</span>
                       <span className="flex items-center gap-1">
                         <CalendarIcon />
-                        {formatShortDate(current?.uploaded_at)}
+                        {formatKhmerShortDate(current?.uploaded_at)}
                       </span>
                     </>
                   )}
@@ -407,7 +407,7 @@ export default function WatchVideoPage() {
             <aside className="w-full lg:w-[380px] xl:w-[420px] shrink-0 border-t border-gray-200 lg:border-t-0 lg:border-l lg:border-gray-200 lg:sticky lg:top-24 lg:max-h-[calc(100vh-6rem)] flex flex-col bg-gray-50">
 
               {/* Playlist header */}
-              <div className="shrink-0 px-4 py-4 border-b border-gray-200">
+              <div className="scroll-animate shrink-0 px-4 py-4 border-b border-gray-200">
                 <div className="font-bold text-gray-900 text-base leading-snug">
                   {course?.name ?? "វគ្គសិក្សា"}
                 </div>
@@ -501,11 +501,12 @@ export default function WatchVideoPage() {
                             {v.presented_by && (
                               <p className="text-xs text-gray-400 mt-1 truncate">{v.presented_by}</p>
                             )}
-                            {vLocked && !isApproved && (
-                              <p className="text-[11px] text-amber-700 mt-1 font-medium">សមាជិកភាព</p>
-                            )}
-                            {v.access_level === "free" && !vLocked && (
+                            {v.access_level === "free" ? (
                               <p className="text-[11px] text-sky-600 mt-1 font-medium">ឥតគិតថ្លៃ</p>
+                            ) : isApproved ? (
+                              <p className="text-[11px] text-emerald-700 mt-1 font-medium">ចូលប្រើបាន</p>
+                            ) : (
+                              <p className="text-[11px] text-amber-700 mt-1 font-medium">សមាជិកភាព</p>
                             )}
                           </div>
                         </button>
