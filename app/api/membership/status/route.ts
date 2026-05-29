@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { enforceRateLimit } from "@/lib/rate-limit/guard";
+import { RateLimitPresets } from "@/lib/rate-limit/redis";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +18,9 @@ function getSupabaseWithToken(token: string) {
 }
 
 export async function GET(req: NextRequest) {
+  const limited = await enforceRateLimit(req, "api-membership-status", RateLimitPresets.standard);
+  if (limited) return limited;
+
   const authHeader = req.headers.get("authorization") ?? "";
   if (!authHeader.startsWith("Bearer ")) {
     return NextResponse.json({ status: "none" satisfies MembershipStatus, membershipEndsAt: null }, { status: 200 });

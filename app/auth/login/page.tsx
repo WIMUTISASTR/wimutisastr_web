@@ -52,6 +52,16 @@ function LoginPageContent() {
     setLoading(true);
 
     try {
+      const lockResponse = await fetch("/api/auth/login-guard");
+      const lockData = await lockResponse.json().catch(() => ({ locked: false }));
+
+      if (lockData.locked) {
+        const minutes = Math.max(1, Math.ceil((lockData.retryAfter ?? 900) / 60));
+        notify.error(`គណនីត្រូវបានចាក់សោជាបណ្តោះអាសន្ន។ សូមព្យាយាមម្តងទៀតក្នុងរយៈពេល ${minutes} នាទី។`);
+        setLoading(false);
+        return;
+      }
+
       // Verify Turnstile token on server (only if we have a token)
       if (turnstileToken) {
         const turnstileResponse = await fetch('/api/turnstile', {
@@ -75,12 +85,29 @@ function LoginPageContent() {
       });
 
       if (signInError) {
-        notify.error(signInError.message || "ចូលគណនីមិនជោគជ័យ។ សូមពិនិត្យព័ត៌មានសម្ងាត់របស់អ្នក។");
+        const failResponse = await fetch("/api/auth/login-guard", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "failed" }),
+        });
+        const failData = await failResponse.json().catch(() => ({ locked: false }));
+
+        if (failData.locked) {
+          const minutes = Math.max(1, Math.ceil((failData.retryAfter ?? 900) / 60));
+          notify.error(`ព្យាយាមចូលច្រើនដងពេក។ សូមព្យាយាមម្តងទៀតក្នុងរយៈពេល ${minutes} នាទី។`);
+        } else {
+          notify.error(signInError.message || "ចូលគណនីមិនជោគជ័យ។ សូមពិនិត្យព័ត៌មានសម្ងាត់របស់អ្នក។");
+        }
         setLoading(false);
         return;
       }
 
       if (data.user) {
+        await fetch("/api/auth/login-guard", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "success" }),
+        });
         notify.success("សូមស្វាគមន៍ត្រឡប់មកវិញ! ចូលគណនីបានជោគជ័យ។");
         // Redirect to home page or profile page
         setTimeout(() => {

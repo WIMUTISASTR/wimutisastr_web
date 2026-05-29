@@ -34,7 +34,7 @@ export default function AboutHero() {
             អំពី<span className="text-(--accent-light)">យើង</span>
           </h1>
           <p className="mt-5 text-base leading-relaxed text-white/90 sm:text-lg">
-            យើងបង្កើតវេទិកានេះដើម្បីធ្វើឱ្យការអប់រំច្បាប់កាន់តែងាយចូលប្រើ និងទុកចិត្តបានសម្រាប់សាធារណជនគ្រប់រូបនៅកម្ពុជា។
+            យើងបង្កើតវេទិកានេះដើម្បីធ្វើឱ្យការអប់រំច្បាប់កាន់តែងាយចូលប្រើ និងទុកចិត្តបានសម្រាប់សាធារណជនគ្រប់រូប។
           </p>
         </div>
       </div>

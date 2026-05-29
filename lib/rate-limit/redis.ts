@@ -12,7 +12,7 @@ const log = logger.child({ module: 'rate-limit' });
 /**
  * Rate limiting configuration
  */
-interface RateLimitConfig {
+export interface RateLimitConfig {
   /**
    * Time window in seconds
    * @default 60 (1 minute)
@@ -29,6 +29,11 @@ interface RateLimitConfig {
    * Custom identifier (defaults to IP)
    */
   identifier?: string;
+
+  /**
+   * Route/feature scope so limits are tracked per endpoint
+   */
+  scope?: string;
 }
 
 /**
@@ -163,7 +168,7 @@ const redisClient = getRedisClient();
 /**
  * Extract client identifier from request
  */
-function getClientIdentifier(request: NextRequest, customIdentifier?: string): string {
+export function getClientIdentifier(request: NextRequest, customIdentifier?: string): string {
   if (customIdentifier) return customIdentifier;
 
   const forwardedFor = request.headers.get('x-forwarded-for');
@@ -188,10 +193,12 @@ export async function rateLimit(
     windowSeconds = 60,
     maxRequests = 10,
     identifier: customIdentifier,
+    scope = "default",
   } = config;
 
   const identifier = getClientIdentifier(request, customIdentifier);
-  const key = `ratelimit:${identifier}:${Math.floor(Date.now() / (windowSeconds * 1000))}`;
+  const windowBucket = Math.floor(Date.now() / (windowSeconds * 1000));
+  const key = `ratelimit:${scope}:${identifier}:${windowBucket}`;
 
   try {
     const count = await redisClient.incr(key);
@@ -270,5 +277,7 @@ export const RateLimitPresets = {
   strict: { windowSeconds: 60, maxRequests: 5 },
   standard: { windowSeconds: 60, maxRequests: 30 },
   relaxed: { windowSeconds: 60, maxRequests: 100 },
+  publicRead: { windowSeconds: 60, maxRequests: 120 },
+  auth: { windowSeconds: 900, maxRequests: 20 },
   upload: { windowSeconds: 300, maxRequests: 3 },
 } as const;

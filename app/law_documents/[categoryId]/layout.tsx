@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
   if (categoryId === ALL_CATEGORY_ID) {
     return buildPageMetadata({
       title: "ឯកសារច្បាប់ទាំងអស់",
-      description: "រុករកឯកសារច្បាប់កម្ពុជាទាំងអស់ — តម្រៀបតាមប្រភេទ និងឆ្នាំ។",
+      description: "រុករកឯកសារច្បាប់ទាំងអស់ — តម្រៀបតាមប្រភេទ និងឆ្នាំ។",
       path: `/law_documents/${ALL_CATEGORY_ID}`,
     });
   }

@@ -342,36 +342,6 @@ function CourseCard({
           </div>
         </div>
 
-        {/* Status badge */}
-        {isLocked && (
-          <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-slate-900/75 text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow">
-            <LockIcon className="w-3 h-3" />
-            សមាជិក
-          </div>
-        )}
-        {isApproved && !isLocked && !isCompleted && !isStarted && (
-          <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-emerald-500 text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow">
-            <CheckCircleIcon className="w-3 h-3" />
-            ចូលប្រើបាន
-          </div>
-        )}
-        {!isLocked && hasFree && !isApproved && (
-          <div className="absolute top-2.5 left-2.5 bg-sky-500 text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow">
-            មើលឥតគិតថ្លៃ
-          </div>
-        )}
-        {isCompleted && (
-          <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-emerald-500 text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow">
-            <CheckCircleIcon className="w-3 h-3" />
-            បានបញ្ចប់
-          </div>
-        )}
-        {isStarted && !isLocked && (
-          <div className="absolute top-2.5 left-2.5 bg-amber-400 text-amber-900 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow">
-            កំពុងរៀន
-          </div>
-        )}
-
         {/* Video count */}
         {total > 0 && (
           <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1 bg-black/60 backdrop-blur-sm text-white text-[11px] font-medium px-2 py-0.5 rounded-full">

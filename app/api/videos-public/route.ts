@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient, createServerClient } from "@/lib/supabase/server";
+import { enforceRateLimit } from "@/lib/rate-limit/guard";
+import { RateLimitPresets } from "@/lib/rate-limit/redis";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
+  const limited = await enforceRateLimit(req, "api-videos-public", RateLimitPresets.publicRead);
+  if (limited) return limited;
+
   try {
     const hasServiceRole = !!process.env.SUPABASE_SERVICE_ROLE_KEY;
     const supabase = hasServiceRole ? createAdminClient() : createServerClient();

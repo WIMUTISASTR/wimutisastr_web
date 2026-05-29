@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
+import { enforceRateLimit } from "@/lib/rate-limit/guard";
+import { RateLimitPresets } from "@/lib/rate-limit/redis";
 
 export const dynamic = "force-dynamic";
 
@@ -107,6 +109,9 @@ function normalizePlan(row: any): PricingPlan | null {
 }
 
 export async function GET(req: NextRequest) {
+  const limited = await enforceRateLimit(req, "api-pricing-plans", RateLimitPresets.publicRead);
+  if (limited) return limited;
+
   const supabase = createServerClient();
   const { searchParams } = new URL(req.url);
   const idFilter = searchParams.get("id");

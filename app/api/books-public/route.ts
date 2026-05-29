@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createAdminClient, createServerClient } from "@/lib/supabase/server";
 import logger from "@/lib/utils/logger";
+import { enforceRateLimit } from "@/lib/rate-limit/guard";
+import { RateLimitPresets } from "@/lib/rate-limit/redis";
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +51,9 @@ type BooksPublicResponse = {
 };
 
 export async function GET(req: NextRequest) {
+  const limited = await enforceRateLimit(req, "api-books-public", RateLimitPresets.publicRead);
+  if (limited) return limited;
+
   try {
     logger.debug('books-public', 'Starting request');
     // Public endpoint:

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createServerClient } from "@/lib/supabase/server";
+import { enforceRateLimit } from "@/lib/rate-limit/guard";
+import { RateLimitPresets } from "@/lib/rate-limit/redis";
 
 export const dynamic = "force-dynamic";
 
@@ -76,6 +78,9 @@ async function lookupPlan(planId: string) {
 }
 
 export async function GET(req: NextRequest) {
+  const limited = await enforceRateLimit(req, "api-profile-me", RateLimitPresets.standard);
+  if (limited) return limited;
+
   const authHeader = req.headers.get("authorization") ?? "";
   if (!authHeader.startsWith("Bearer ")) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

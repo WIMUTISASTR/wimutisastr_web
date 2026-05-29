@@ -62,7 +62,7 @@ export default function HeroSection({ isVisible, mousePosition, home, homeLoadin
                 <span className="mt-1 block text-(--primary)">និងការអប់រំច្បាប់</span>
               </h1>
               <p className="max-w-xl text-base leading-relaxed text-(--gray-700) sm:text-lg">
-                WIMUTISASTR ជាការិយាល័យមេធាវី និងមជ្ឈមណ្ឌលសិក្សាច្បាប់នៅកម្ពុជា ដែលផ្តល់សេវាច្បាប់
+                WIMUTISASTR ជាការិយាល័យមេធាវី និងមជ្ឈមណ្ឌលសិក្សាច្បាប់ ដែលផ្តល់សេវាច្បាប់
                 ពិគ្រោះយោបល់ផ្នែកច្បាប់ វគ្គវីដេអូ និងឯកសារច្បាប់ ដើម្បីជួយសិស្ស និស្សិត អ្នកជំនាញ និងសាធារណជន។
               </p>
             </div>

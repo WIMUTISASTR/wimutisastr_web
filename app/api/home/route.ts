@@ -1,6 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import logger from "@/lib/utils/logger";
+import { enforceRateLimit } from "@/lib/rate-limit/guard";
+import { RateLimitPresets } from "@/lib/rate-limit/redis";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -47,7 +49,10 @@ type BookRow = {
   access_level: "free" | "members" | null;
 };
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const limited = await enforceRateLimit(request, "api-home", RateLimitPresets.publicRead);
+  if (limited) return limited;
+
   try {
     // Home is public; use service role to avoid RLS hiding content.
     // Only select safe public fields (never return file URLs).

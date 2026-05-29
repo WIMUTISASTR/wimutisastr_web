@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { enforceRateLimit } from '@/lib/rate-limit/guard';
+import { RateLimitPresets } from '@/lib/rate-limit/redis';
 
 interface TurnstileResponse {
   success: boolean;
@@ -49,6 +51,9 @@ export async function verifyTurnstile(token: string, ip?: string): Promise<boole
 
 // API route for client-side verification (optional)
 export async function POST(request: NextRequest) {
+  const limited = await enforceRateLimit(request, 'api-turnstile', RateLimitPresets.strict);
+  if (limited) return limited;
+
   try {
     const { token } = await request.json();
     

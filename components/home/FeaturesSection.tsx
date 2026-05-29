@@ -3,12 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
-/**
- * Full-bleed features band backdrop (legal theme; navy scrim keeps copy readable).
- * Source (Pexels, free license): https://www.pexels.com/photo/gavel-on-wooden-desk-5668772/
- * Stored locally at public/asset/features-section-backdrop.jpg
- */
-const FEATURES_BACKDROP_SRC = "/asset/features-section-backdrop.jpg";
+/** Full-bleed features band backdrop — Angkor Wat at sunrise (local asset). */
+const FEATURES_BACKDROP_SRC = "/asset/featureBackground.png";
 
 const features = [
   {
@@ -22,7 +18,7 @@ const features = [
     title: "វគ្គវីដេអូ",
     description: "សិក្សាពីអ្នកជំនាញច្បាប់តាមវីដេអូបង្រៀនគ្រប់ជ្រុងជ្រោយ ដែលផលិតដោយវិជ្ជាជីវៈ និងគ្របដណ្តប់គ្រប់ទិដ្ឋភាពនៃច្បាប់។",
     cta: "ស្វែងរកវគ្គសិក្សា",
-    iconWrapClass: "bg-(--primary) text-white",
+    iconWrapClass: "bg-amber-800 text-amber-50 shadow-amber-900/20",
   },
   {
     href: "/law_documents",
@@ -34,7 +30,7 @@ const features = [
     title: "ឯកសារច្បាប់",
     description: "ចូលប្រើឯកសារច្បាប់ ព្រះរាជក្រម ករណីសិក្សា និងឯកសារយោង ដើម្បីពង្រឹងការយល់ដឹងអំពីប្រព័ន្ធច្បាប់។",
     cta: "រកមើលឯកសារ",
-    iconWrapClass: "bg-(--accent) text-white",
+    iconWrapClass: "bg-orange-700 text-orange-50 shadow-orange-900/20",
   },
   {
     href: "/vocche_banche_banchal",
@@ -49,7 +45,7 @@ const features = [
     description:
       "បង្កើនសមត្ថភាពអនុវត្តច្បាប់ និងទទួលការណែនាំពីអ្នកជំនាញការិយាល័យច្បាប់ តាមរយៈវគ្គបណ្តុះបណ្តាលជាក់លាក់។",
     cta: "មើលវគ្គបណ្តុះបណ្តាល",
-    iconWrapClass: "bg-(--primary-dark) text-white",
+    iconWrapClass: "bg-amber-950 text-amber-100 shadow-amber-950/25",
   },
 ];
 
@@ -101,27 +97,30 @@ export default function FeaturesSection() {
           alt=""
           fill
           priority
-          className="object-cover object-[center_35%]"
+          className="object-cover object-center"
           sizes="100vw"
         />
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(135deg, color-mix(in srgb, var(--primary-dark) 72%, transparent) 0%, color-mix(in srgb, var(--primary) 58%, transparent) 50%, color-mix(in srgb, var(--primary-dark) 68%, transparent) 100%)",
+              "linear-gradient(180deg, rgba(28, 16, 8, 0.78) 0%, rgba(120, 53, 18, 0.52) 42%, rgba(20, 12, 6, 0.82) 100%)",
           }}
         />
-        <div className="absolute -left-24 top-1/4 h-72 w-72 rounded-full bg-(--accent) opacity-[0.12] blur-3xl" />
-        <div className="absolute -right-16 bottom-0 h-80 w-80 rounded-full bg-(--accent-light) opacity-[0.1] blur-3xl" />
+        <div className="absolute -left-24 top-1/4 h-72 w-72 rounded-full bg-amber-400 opacity-[0.14] blur-3xl" />
+        <div className="absolute -right-16 bottom-0 h-80 w-80 rounded-full bg-orange-300 opacity-[0.12] blur-3xl" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto mb-12 max-w-3xl text-center sm:mb-16 scroll-animate opacity-0 translate-y-8">
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-200/90">
+            WIMUTISASTR Law Education
+          </p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-amber-50 drop-shadow-sm sm:text-4xl">
             មុខងារសំខាន់ៗ{" "}
-            <span className="text-(--accent-light)">ដែលធ្វើអោយអ្នកយល់ដឹងអំពីច្បាប់</span>
+            <span className="text-amber-200">ដែលធ្វើអោយអ្នកយល់ដឹងអំពីច្បាប់</span>
           </h2>
-          <p className="mt-4 text-base leading-relaxed text-white/90 sm:text-lg">
+          <p className="mt-4 text-base leading-relaxed text-amber-50/85 sm:text-lg">
             ផ្តល់ជូននៅវគ្គសិក្សាច្បាប់ ឯកសារច្បាប់ និងវគ្គបណ្តុះបណ្តាល
           </p>
         </div>
@@ -132,20 +131,21 @@ export default function FeaturesSection() {
               key={feature.href}
               href={feature.href}
               className={[
-                "group relative scroll-animate opacity-0 translate-y-8 block rounded-2xl border border-(--gray-200) bg-white p-7 sm:p-8",
-                "cursor-pointer transition-colors duration-200",
-                "hover:border-(--primary)/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2",
+                "group relative scroll-animate opacity-0 translate-y-8 block rounded-2xl border border-amber-200/50 bg-[#fffaf5]/95 p-7 shadow-lg shadow-amber-950/10 backdrop-blur-sm sm:p-8",
+                "cursor-pointer transition-all duration-200",
+                "hover:border-amber-400/60 hover:bg-white hover:shadow-xl hover:shadow-amber-950/15",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-amber-950/20",
                 index === 0 ? "delay-100" : index === 1 ? "delay-200" : "delay-300",
               ].join(" ")}
             >
-              <div className={`mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl ${feature.iconWrapClass} shadow-sm`}>
+              <div className={`mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl shadow-sm ${feature.iconWrapClass}`}>
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-semibold text-(--ink) transition-colors duration-200 group-hover:text-(--primary) sm:text-2xl">
+              <h3 className="text-xl font-semibold text-stone-900 transition-colors duration-200 group-hover:text-amber-900 sm:text-2xl">
                 {feature.title}
               </h3>
-              <p className="mt-3 text-sm leading-relaxed text-(--gray-700) sm:text-base">{feature.description}</p>
-              <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-(--primary) transition-colors duration-200">
+              <p className="mt-3 text-sm leading-relaxed text-stone-600 sm:text-base">{feature.description}</p>
+              <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-amber-800 transition-colors duration-200 group-hover:text-orange-700">
                 {feature.cta}
                 <svg className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -159,13 +159,13 @@ export default function FeaturesSection() {
           {highlights.map((item) => (
             <div
               key={item.title}
-              className="rounded-xl border border-white/15 bg-white/95 p-5 shadow-sm backdrop-blur-sm transition-colors duration-200 hover:border-white/30 hover:bg-white"
+              className="rounded-xl border border-amber-200/35 bg-[#fffaf5]/90 p-5 shadow-md shadow-amber-950/10 backdrop-blur-md transition-all duration-200 hover:border-amber-300/55 hover:bg-white/95"
             >
-              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-(--primary)/10 text-(--primary)">
+              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 text-amber-800">
                 {item.icon}
               </div>
-              <h4 className="font-semibold text-(--ink)">{item.title}</h4>
-              <p className="mt-1 text-sm text-(--gray-700)">{item.desc}</p>
+              <h4 className="font-semibold text-stone-900">{item.title}</h4>
+              <p className="mt-1 text-sm text-stone-600">{item.desc}</p>
             </div>
           ))}
         </div>
