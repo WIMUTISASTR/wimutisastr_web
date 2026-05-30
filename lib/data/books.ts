@@ -30,7 +30,9 @@ export type BookRow = {
   author: string;
   year: number;
   description: string | null;
-  file_url: string | null;
+  // file_url is intentionally NOT exposed here. This data is rendered in a client
+  // component (BookGridClient), so including file_url would leak the storage location
+  // into the client bundle. Document downloads go through /api/books/view-token by id.
   cover_url: string | null;
   category_id: string | null;
   uploaded_at: string | null;
@@ -71,7 +73,7 @@ async function fetchBooksInternal(categoryId?: string): Promise<BookRow[]> {
   
   let query = supabase
     .from('books')
-    .select('id, title, author, year, description, file_url, cover_url, category_id, uploaded_at, created_at, updated_at, access_level')
+    .select('id, title, author, year, description, cover_url, category_id, uploaded_at, created_at, updated_at, access_level')
     .order('created_at', { ascending: false });
   
   if (categoryId) {

@@ -6,7 +6,6 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { useParams, useRouter } from "next/navigation";
 import PageContainer from "@/components/PageContainer";
 import Button from "@/components/Button";
-import ProtectedRoute from "@/components/ProtectedRoute";
 import LoadingState from "@/components/LoadingState";
 import { apiPost, fetchBooks, type BookCategory, type BookRow } from "@/lib/api/client";
 import { useMembership } from "@/lib/hooks/useMembership";
@@ -251,7 +250,7 @@ export default function ReadDocumentPage() {
   );
 
   return (
-    <ProtectedRoute>
+    <>
       <PageContainer className={isFullscreen ? "pt-0!" : "pt-20! md:pt-24!"}>
         <section
           className={`law-documents-font px-0 sm:px-2 lg:px-6 ${
@@ -451,6 +450,6 @@ export default function ReadDocumentPage() {
           </nav>
         ) : null}
       </PageContainer>
-    </ProtectedRoute>
+    </>
   );
 }

@@ -62,7 +62,7 @@ export default function MissionSection() {
             <article className="rounded-2xl border border-(--gray-200) border-l-4 border-l-(--primary) bg-white p-7 shadow-sm transition-shadow duration-200 hover:shadow-md">
               <h3 className="text-xl font-semibold text-(--ink)">បេសកកម្មរបស់យើង</h3>
               <p className="mt-3 text-base leading-relaxed text-(--gray-700)">
-                វេទិការបស់យើងត្រូវបានបង្កើតឡើងដើម្បីផ្សព្វផ្សាយការអប់រំច្បាប់នៅកម្ពុជា ឱ្យកាន់តែងាយយល់ និងអាចចូលដល់សាធារណជនគ្រប់រូប
+                វេទិការបស់យើងត្រូវបានបង្កើតឡើងដើម្បីផ្សព្វផ្សាយការអប់រំច្បាប់ ឱ្យកាន់តែងាយយល់ និងអាចចូលដល់សាធារណជនគ្រប់រូប
                 ដោយមិនគិតពីប្រវត្តិរូប ឬទីតាំងរស់នៅ។
               </p>
             </article>

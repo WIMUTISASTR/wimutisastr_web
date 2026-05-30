@@ -230,6 +230,15 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Invalid bucket" }, { status: 400 });
   }
 
+  // The unauthenticated bucket+key mode is only for non-sensitive images (book covers,
+  // video thumbnails). Actual document files and video files are paywalled content and
+  // must go through the gated flows (/api/books/view-token -> /api/books/serve and
+  // /api/videos/[id]/play -> /api/videos/serve). Deny non-image keys here so they cannot
+  // be leeched by key, even though the bucket is private.
+  if ((bucketParam === "book" || bucketParam === "video") && !isImageKey(key)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     // Try a few key variants to reduce false 404s due to encoding differences.
     const candidates = keyCandidates(req.url, key).filter(isSafeKey);

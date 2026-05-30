@@ -6,6 +6,7 @@ import { logger } from "@/lib/utils/logger";
 import { rateLimit, createRateLimitResponse, RateLimitPresets } from "@/lib/rate-limit/redis";
 import { COOKIE_NAMES, jsonResponseWithCookie } from "@/lib/security/secure-cookies";
 import { checkMembershipWithCache } from "@/lib/cache";
+import { createAdminClient, createServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -46,22 +47,28 @@ async function requireApprovedMembership(supabase: ReturnType<typeof getSupabase
 
 function extractBookKey(fileUrl: string): { bucket: "book"; key: string } | null {
   // Supports:
-  // - /api/storage/serve?bucket=book&key=...
-  // - https://<public>.r2.dev/<key>
+  // - /api/storage/serve?bucket=book&key=...           (relative serve URL)
+  // - https://admin.../api/storage/serve?key=...       (absolute serve URL, current uploads)
+  // - https://<public>.r2.dev/<key>                    (legacy public URL: pathname = key)
   // - https://.../<key>
   const value = fileUrl.trim();
   if (!value) return null;
 
   if (value.startsWith("/api/storage/serve")) {
     const u = new URL(value, "http://localhost");
-    const bucket = u.searchParams.get("bucket");
     const key = u.searchParams.get("key");
-    if (bucket === "book" && key) return { bucket: "book", key };
+    if (key) return { bucket: "book", key };
     return null;
   }
 
   try {
     const u = new URL(value);
+    // Absolute serve endpoint: extract the key query param.
+    if (u.pathname.endsWith("/api/storage/serve")) {
+      const key = u.searchParams.get("key");
+      if (key) return { bucket: "book", key };
+    }
+    // Otherwise treat the URL path as the key (legacy public/custom-domain URLs).
     const key = u.pathname.replace(/^\/+/, "");
     if (!key) return null;
     return { bucket: "book", key };
@@ -85,38 +92,52 @@ export async function POST(req: NextRequest) {
   }
 
   const authHeader = req.headers.get("authorization") ?? "";
-  if (!authHeader.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const hasAuth = authHeader.startsWith("Bearer ");
 
   try {
-    const token = authHeader.replace("Bearer ", "");
-    const supabase = getSupabaseWithToken(token);
+    // Free documents are viewable by anyone (including anonymous visitors). Members-only
+    // documents still require an authenticated user with an active membership.
+    let userId = "guest";
+    let membershipSupabase: ReturnType<typeof getSupabaseWithToken> | null = null;
 
-    const { data: authData, error: authError } = await supabase.auth.getUser(token);
-    const user = authData.user;
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (hasAuth) {
+      const token = authHeader.replace("Bearer ", "");
+      membershipSupabase = getSupabaseWithToken(token);
+      const { data: authData, error: authError } = await membershipSupabase.auth.getUser(token);
+      const user = authData.user;
+      if (authError || !user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      userId = user.id;
     }
 
     const body = (await req.json().catch(() => ({}))) as { bookId?: string };
     const bookId = body.bookId ?? "";
     if (!bookId) return NextResponse.json({ error: "Missing bookId" }, { status: 400 });
 
-    const { data: book, error: bookErr } = await supabase
+    // Look up the book with privileges that also work for anonymous visitors (free docs).
+    const hasServiceRole = !!process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const lookupClient = hasServiceRole
+      ? createAdminClient()
+      : membershipSupabase ?? createServerClient();
+
+    const { data: book, error: bookErr } = await lookupClient
       .from("books")
       .select("id,file_url,access_level")
       .eq("id", bookId)
       .maybeSingle();
 
     if (bookErr) {
-      log.error("Book lookup failed", bookErr, { bookId, userId: user.id });
+      log.error("Book lookup failed", bookErr, { bookId, userId });
       return NextResponse.json({ error: "Failed to fetch document" }, { status: 500 });
     }
     if (!book?.file_url) return NextResponse.json({ error: "Document not found" }, { status: 404 });
 
     if (book.access_level !== "free") {
-      const gate = await requireApprovedMembership(supabase, user.id);
+      if (!hasAuth || !membershipSupabase) {
+        return NextResponse.json({ error: "Membership required" }, { status: 403 });
+      }
+      const gate = await requireApprovedMembership(membershipSupabase, userId);
       if (!gate.ok) return NextResponse.json({ error: gate.error }, { status: gate.status });
     }
 
@@ -126,7 +147,7 @@ export async function POST(req: NextRequest) {
     const meta = extractFileMetaFromKey(loc.key);
     const viewToken = signContentToken(
       {
-        sub: user.id,
+        sub: userId,
         bookId,
         bucket: "book",
         key: loc.key,
@@ -134,13 +155,13 @@ export async function POST(req: NextRequest) {
       TOKEN_EXPIRY.SHORT_LIVED
     );
 
-    log.info("View token generated", { bookId, userId: user.id });
+    log.info("View token generated", { bookId, userId });
     
     const secureCookie = process.env.NODE_ENV === "production" || process.env.HTTPS === "true";
     const cookiePath = secureCookie ? "/" : "/api/books";
     log.info("Setting book token cookie", {
       bookId,
-      userId: user.id,
+      userId,
       cookie: COOKIE_NAMES.BOOK_TOKEN,
       secure: secureCookie,
       path: cookiePath,
