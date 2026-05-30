@@ -34,6 +34,13 @@ export const DEFAULT_OG_IMAGE = "/logo/logo.png";
 
 export const CONTACT_EMAIL = "info@wimutisastr.com";
 
+/** Local format for tel: links (no spaces). */
+export const CONTACT_PHONE = "012227202";
+/** Human-readable display (e.g. nav, contact page). */
+export const CONTACT_PHONE_DISPLAY = "012 227 202";
+/** International display with country code. */
+export const CONTACT_PHONE_INTL_DISPLAY = "+855 12 227 202";
+
 /** Production fallback when env is unset (e.g. local dev sitemap preview). */
 const PRODUCTION_SITE_URL = "https://wimutisastr.com";
 

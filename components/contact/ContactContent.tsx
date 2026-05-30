@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { notify } from "@/lib/utils/notify";
 import Button from "@/components/Button";
+import { CONTACT_PHONE, CONTACT_PHONE_INTL_DISPLAY } from "@/lib/seo/site";
 
 type ContactFormState = {
   fullName: string;
@@ -84,7 +85,12 @@ export default function ContactContent() {
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">ទូរស័ព្ទ</div>
-                  <div className="font-semibold text-gray-900">+855 12 345 678</div>
+                  <a
+                    href={`tel:${CONTACT_PHONE}`}
+                    className="font-semibold text-gray-900 hover:text-(--primary) hover:underline"
+                  >
+                    {CONTACT_PHONE_INTL_DISPLAY}
+                  </a>
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">អ៊ីមែល</div>

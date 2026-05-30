@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
 import { EXPERT_EXPERIENCE, EXPERT_SPECIALIZATIONS } from "../_data/team";
+import { CONTACT_PHONE, CONTACT_PHONE_DISPLAY } from "@/lib/seo/site";
 import SectionHeading from "./SectionHeading";
 
 function InfoCard({ title, children }: { title: string; children: ReactNode }) {
@@ -122,8 +123,8 @@ export default function LeadExpertSection() {
           <InfoCard title="ព័ត៌មានទំនាក់ទំនង">
             <p>
               <span className="font-semibold text-(--ink)">ទូរស័ព្ទ:</span>{" "}
-              <a href="tel:012227202" className="text-(--primary) hover:underline cursor-pointer">
-                012 227 202
+              <a href={`tel:${CONTACT_PHONE}`} className="text-(--primary) hover:underline cursor-pointer">
+                {CONTACT_PHONE_DISPLAY}
               </a>
             </p>
             <p>

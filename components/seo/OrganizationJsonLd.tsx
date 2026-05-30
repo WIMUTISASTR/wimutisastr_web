@@ -1,5 +1,5 @@
 import JsonLd from "./JsonLd";
-import { CONTACT_EMAIL, SITE_DESCRIPTION, SITE_NAME, absoluteUrl } from "@/lib/seo/site";
+import { CONTACT_EMAIL, CONTACT_PHONE, SITE_DESCRIPTION, SITE_NAME, absoluteUrl } from "@/lib/seo/site";
 
 export default function OrganizationJsonLd() {
   return (
@@ -20,6 +20,7 @@ export default function OrganizationJsonLd() {
         contactPoint: {
           "@type": "ContactPoint",
           contactType: "customer service",
+          telephone: `+855${CONTACT_PHONE.replace(/^0/, "")}`,
           email: CONTACT_EMAIL,
           availableLanguage: ["km", "en"],
         },

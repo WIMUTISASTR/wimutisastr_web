@@ -6,6 +6,7 @@ import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/context";
 import Button from "@/components/Button";
+import { CONTACT_PHONE_INTL_DISPLAY } from "@/lib/seo/site";
 
 export default function Nav() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,7 +19,7 @@ export default function Nav() {
       <div className="hidden md:block bg-(--primary-dark) text-white text-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-8 flex items-center justify-between">
           <span>វេទិកាអប់រំច្បាប់ | WIMUTISASTR Law Office</span>
-          <span>ទំនាក់ទំនង: +855 12 345 678</span>
+          <span>ទំនាក់ទំនង: {CONTACT_PHONE_INTL_DISPLAY}</span>
         </div>
       </div>
 
