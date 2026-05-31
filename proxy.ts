@@ -54,6 +54,7 @@ export async function proxy(request: NextRequest) {
       '/api/videos-public',
       '/api/books-public',
       '/api/pricing-plans',
+      '/api/training-programs-public',
     ];
 
     const isPublicRoute = publicApiRoutes.some(route => pathname.startsWith(route));

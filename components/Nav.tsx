@@ -80,9 +80,9 @@ export default function Nav() {
               ឯកសារ
             </Link>
             <Link
-              href="/vocche_banche_banchal"
+              href="/training_program"
               className={`px-4 py-2 rounded-md transition-all duration-300 font-semibold text-sm ${
-                pathname === "/vocche_banche_banchal"
+                pathname === "/training_program"
                   ? "bg-(--primary) text-white"
                   : "text-(--gray-700) hover:text-(--primary) hover:bg-(--gray-100)"
               }`}
@@ -222,10 +222,10 @@ export default function Nav() {
               ឯកសារ
             </Link>
             <Link
-              href="/vocche_banche_banchal"
+              href="/training_program"
               onClick={() => setIsMenuOpen(false)}
               className={`px-4 py-3 rounded-xl transition-all duration-300 font-semibold text-sm ${
-                pathname === "/vocche_banche_banchal"
+                pathname === "/training_program"
                   ? "bg-(--primary) text-white shadow-md"
                   : "text-(--gray-700) hover:bg-(--gray-100) hover:text-(--primary)"
               }`}

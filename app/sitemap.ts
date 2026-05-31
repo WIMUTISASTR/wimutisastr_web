@@ -23,7 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/law_video`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${baseUrl}/pricing_page`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     {
-      url: `${baseUrl}/vocche_banche_banchal`,
+      url: `${baseUrl}/training_program`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.6,

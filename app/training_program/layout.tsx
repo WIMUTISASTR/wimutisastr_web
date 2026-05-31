@@ -5,10 +5,10 @@ export const metadata: Metadata = buildPageMetadata({
   title: "វគ្គបណ្តុះបណ្តាល",
   description:
     "វគ្គបណ្តុះបណ្តាល សម្រាប់អនុវត្តចំណេះដឹងច្បាប់ និងទទួលបានការណែនាំពីអ្នកជំនាញនៅ WIMUTISASTR។",
-  path: "/vocche_banche_banchal",
+  path: "/training_program",
 });
 
-export default function VoccheBancheBanchalLayout({
+export default function TrainingProgramLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

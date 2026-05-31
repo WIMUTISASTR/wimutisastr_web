@@ -71,6 +71,16 @@ const nextConfig: NextConfig = {
     optimizeCss: true,
   },
 
+  async redirects() {
+    return [
+      {
+        source: "/vocche_banche_banchal",
+        destination: "/training_program",
+        permanent: true,
+      },
+    ];
+  },
+
   // ========================================================================
   // Security Headers
   // ========================================================================
