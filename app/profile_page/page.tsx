@@ -202,7 +202,7 @@ export default function ProfilePage() {
         <div className="min-h-screen flex items-center justify-center p-6">
           <div className="max-w-md w-full rounded-2xl border border-(--border) bg-(--surface-strong) shadow-(--shadow-elev-1) p-6 text-center">
             <h1 className="text-2xl font-semibold text-gray-900">សូមចូលគណនីដើម្បីមើលប្រវត្តិរូប</h1>
-            <p className="mt-2 text-sm text-gray-600">ស្ថានភាពសមាជិកភាព និងប្រវត្តិបង់ប្រាក់របស់អ្នកត្រូវបានភ្ជាប់ជាមួយគណនីនេះ។</p>
+            <p className="mt-2 text-sm text-gray-600">ស្ថានភាពសមាជិក និងប្រវត្តិបង់ប្រាក់របស់អ្នកត្រូវបានភ្ជាប់ជាមួយគណនីនេះ។</p>
             <div className="mt-5">
               <Button variant="primary" onClick={() => router.push(`/auth/login?redirect=${encodeURIComponent("/profile_page")}`)}>
                 ចូលគណនី
@@ -236,7 +236,7 @@ export default function ProfilePage() {
           <div className="text-center">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-3">ប្រវត្តិរូបរបស់ខ្ញុំ</h1>
             <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto">
-              ព័ត៌មានគណនី ស្ថានភាពសមាជិកភាព និងប្រវត្តិបង់ប្រាក់។
+              ព័ត៌មានគណនី ស្ថានភាពសមាជិក និងប្រវត្តិបង់ប្រាក់។
             </p>
           </div>
         </div>
@@ -285,9 +285,9 @@ export default function ProfilePage() {
             </div>
 
             <ProfileSection
-              eyebrow="សមាជិកភាព"
+              eyebrow="សមាជិក"
               title="សមាជិក"
-              description="ស្ថានភាព និងរយៈពេលសមាជិកភាពរបស់អ្នក។"
+              description="ស្ថានភាព និងរយៈពេលសមាជិករបស់អ្នក។"
             >
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="rounded-xl border border-(--border) bg-slate-50/50 p-5 lg:col-span-1">

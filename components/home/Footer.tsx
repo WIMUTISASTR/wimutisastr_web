@@ -42,7 +42,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/contact" className="text-gray-300 transition-colors duration-200 hover:text-white">
-                  ទំនាក់ទំនង
+                  ទាក់ទងមកយើង
                 </Link>
               </li>
             </ul>
@@ -62,7 +62,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/pricing_page" className="text-gray-300 transition-colors duration-200 hover:text-white">
-                  គម្រោងសមាជិកភាព
+                  គម្រោងសមាជិក
                 </Link>
               </li>
             </ul>

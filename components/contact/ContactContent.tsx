@@ -4,7 +4,13 @@ import Image from "next/image";
 import { useState } from "react";
 import { notify } from "@/lib/utils/notify";
 import Button from "@/components/Button";
-import { CONTACT_PHONE, CONTACT_PHONE_INTL_DISPLAY } from "@/lib/seo/site";
+import SocialLinks from "@/components/contact/SocialLinks";
+import {
+  CONTACT_EMAIL,
+  CONTACT_PHONE,
+  CONTACT_PHONE_INTL_DISPLAY,
+  SOCIAL_LINKS,
+} from "@/lib/seo/site";
 
 type ContactFormState = {
   fullName: string;
@@ -22,6 +28,26 @@ const INITIAL_FORM: ContactFormState = {
   message: "",
 };
 
+const INPUT_CLASS =
+  "w-full border border-(--gray-200) bg-white px-4 py-3.5 text-base text-(--ink) placeholder:text-(--gray-700)/50 transition-colors duration-200 focus:border-(--primary) focus:outline-none";
+
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <label className="mb-2.5 block text-sm font-semibold uppercase tracking-wide text-(--gray-700)">
+      {children}
+    </label>
+  );
+}
+
+function ContactRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="grid gap-1.5 border-b border-(--gray-100) py-4 sm:grid-cols-[8rem_1fr] sm:gap-6">
+      <dt className="text-sm font-semibold uppercase tracking-wide text-(--gray-700)">{label}</dt>
+      <dd className="text-base leading-relaxed text-(--ink)">{children}</dd>
+    </div>
+  );
+}
+
 export default function ContactContent() {
   const [form, setForm] = useState<ContactFormState>(INITIAL_FORM);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,7 +64,6 @@ export default function ContactContent() {
     }
     try {
       setIsSubmitting(true);
-      // Placeholder: no backend yet. This confirms the submission UI.
       await new Promise((resolve) => setTimeout(resolve, 400));
       notify.success("សូមអរគុណសម្រាប់ការទាក់ទងមកយើង។ យើងនឹងឆ្លើយតបឆាប់ៗនេះ។");
       setForm(INITIAL_FORM);
@@ -51,135 +76,148 @@ export default function ContactContent() {
 
   return (
     <>
-      <section className="relative bg-slate-900 text-white py-16 sm:py-20 overflow-hidden">
-        <div className="absolute inset-0 z-0">
+      <section className="relative isolate overflow-hidden border-b border-(--gray-200)">
+        <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
           <Image
-            src="/asset/aboutUs.png"
-            alt="Contact background"
+            src="/asset/features-section-backdrop.jpg"
+            alt=""
             fill
-            className="object-cover"
             priority
+            className="object-cover object-[center_35%]"
             sizes="100vw"
-            fetchPriority="high"
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(135deg, color-mix(in srgb, var(--primary-dark) 82%, transparent) 0%, color-mix(in srgb, var(--primary) 68%, transparent) 55%, color-mix(in srgb, var(--primary-dark) 80%, transparent) 100%)",
+            }}
           />
         </div>
-        <div className="absolute inset-0 bg-slate-900/65 z-10" />
-        <div className="absolute inset-0 bg-(--brown-soft) opacity-20 z-10" />
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 z-20 text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-3">ទាក់ទងមកយើង</h1>
-          <p className="text-lg text-gray-200 max-w-2xl mx-auto">
-            សូមទាក់ទងមកយើង ប្រសិនបើអ្នកមានសំណួរអំពីសមាជិកភាព វគ្គសិក្សា ឬឯកសារច្បាប់។
-          </p>
+
+        <div className="relative z-10 mx-auto max-w-7xl px-4 pb-14 pt-28 sm:px-6 sm:pb-16 sm:pt-32 lg:px-8">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-(--accent-light) sm:text-base">
+              WIMUTISASTR Law Office
+            </p>
+            <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
+              ទាក់<span className="text-(--accent-light)">ទង</span>មកយើង
+            </h1>
+            <p className="mt-5 text-lg leading-relaxed text-white/90 sm:text-xl">
+              សូមទាក់ទងមកយើង ប្រសិនបើអ្នកមានសំណួរអំពីសមាជិក វគ្គសិក្សា ឬឯកសារច្បាប់។
+            </p>
+            <div className="mt-8 flex justify-center border-t border-white/15 pt-6">
+              <SocialLinks links={SOCIAL_LINKS} variant="light" className="justify-center" />
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto grid lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-5 space-y-6">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">ព័ត៌មានទំនាក់ទំនង</h2>
-              <div className="space-y-4 text-gray-700">
-                <div>
-                  <div className="text-sm text-gray-500">អាសយដ្ឋាន</div>
-                  <div className="font-semibold text-gray-900">Phnom Penh, Cambodia</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500">ទូរស័ព្ទ</div>
-                  <a
-                    href={`tel:${CONTACT_PHONE}`}
-                    className="font-semibold text-gray-900 hover:text-(--primary) hover:underline"
-                  >
-                    {CONTACT_PHONE_INTL_DISPLAY}
-                  </a>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500">អ៊ីមែល</div>
-                  <div className="font-semibold text-gray-900">info@wimutisastr.com</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500">ម៉ោងធ្វើការ</div>
-                  <div className="font-semibold text-gray-900">ចន្ទ - សៅរ៍, 8:00 ព្រឹក - 5:00 ល្ងាច</div>
-                </div>
+      <section className="bg-(--gray-50) py-16 sm:py-20 lg:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <article className="border border-(--gray-200) bg-white">
+            <div className="grid lg:grid-cols-12">
+              <aside className="border-b border-(--gray-200) px-6 py-10 sm:px-8 lg:col-span-5 lg:border-b-0 lg:border-r">
+                <h2 className="text-xl font-semibold text-(--ink) sm:text-2xl">ព័ត៌មានទំនាក់ទំនង</h2>
+                <p className="mt-3 text-base leading-relaxed text-(--gray-700)">
+                  ទាក់ទងការិយាល័យដោយផ្ទាល់តាមរយៈព័ត៌មានខាងក្រោម ឬផ្ញើសារតាមប្រព័ន្ធទម្រង់។
+                </p>
+
+                <dl className="mt-8">
+                  <ContactRow label="អាសយដ្ឋាន">Phnom Penh, Cambodia</ContactRow>
+                  <ContactRow label="ទូរស័ព្ទ">
+                    <a href={`tel:${CONTACT_PHONE}`} className="text-(--primary) hover:underline cursor-pointer">
+                      {CONTACT_PHONE_INTL_DISPLAY}
+                    </a>
+                  </ContactRow>
+                  <ContactRow label="អ៊ីមែល">
+                    <a href={`mailto:${CONTACT_EMAIL}`} className="break-all text-(--primary) hover:underline cursor-pointer">
+                      {CONTACT_EMAIL}
+                    </a>
+                  </ContactRow>
+                  <ContactRow label="ម៉ោងធ្វើការ">ចន្ទ – សៅរ៍ · 8:00 ព្រឹក – 5:00 ល្ងាច</ContactRow>
+                  <div className="py-4">
+                    <dt className="text-sm font-semibold uppercase tracking-wide text-(--gray-700)">បណ្តាញសង្គម</dt>
+                    <dd className="mt-3">
+                      <SocialLinks links={SOCIAL_LINKS} />
+                    </dd>
+                  </div>
+                </dl>
+              </aside>
+
+              <div className="px-6 py-10 sm:px-8 lg:col-span-7">
+                <h2 className="text-xl font-semibold text-(--ink) sm:text-2xl">ផ្ញើសារមកយើង</h2>
+                <p className="mt-3 text-base leading-relaxed text-(--gray-700)">
+                  សូមបញ្ចូលព័ត៌មានរបស់អ្នក និងពិពណ៌នាសំណើឱ្យច្បាស់លាស់។ យើងនឹងឆ្លើយតបក្នុងរយៈពេលធ្វើការ។
+                </p>
+
+                <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <div>
+                      <FieldLabel>ឈ្មោះពេញ</FieldLabel>
+                      <input
+                        type="text"
+                        value={form.fullName}
+                        onChange={handleChange("fullName")}
+                        className={INPUT_CLASS}
+                        placeholder="ឈ្មោះរបស់អ្នក"
+                      />
+                    </div>
+                    <div>
+                      <FieldLabel>អ៊ីមែល</FieldLabel>
+                      <input
+                        type="email"
+                        value={form.email}
+                        onChange={handleChange("email")}
+                        className={INPUT_CLASS}
+                        placeholder="you@example.com"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <div>
+                      <FieldLabel>ទូរស័ព្ទ</FieldLabel>
+                      <input
+                        type="tel"
+                        value={form.phone}
+                        onChange={handleChange("phone")}
+                        className={INPUT_CLASS}
+                        placeholder="ជាជម្រើស"
+                      />
+                    </div>
+                    <div>
+                      <FieldLabel>ប្រធានបទ</FieldLabel>
+                      <input
+                        type="text"
+                        value={form.subject}
+                        onChange={handleChange("subject")}
+                        className={INPUT_CLASS}
+                        placeholder="តើយើងអាចជួយអ្វីបាន?"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <FieldLabel>សារ</FieldLabel>
+                    <textarea
+                      value={form.message}
+                      onChange={handleChange("message")}
+                      rows={7}
+                      className={`${INPUT_CLASS} resize-y min-h-40`}
+                      placeholder="សរសេរសាររបស់អ្នកនៅទីនេះ..."
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-end border-t border-(--gray-100) pt-5">
+                    <Button type="submit" variant="primary" size="lg" disabled={isSubmitting} className="rounded-lg">
+                      {isSubmitting ? "កំពុងផ្ញើ..." : "ផ្ញើសារ"}
+                    </Button>
+                  </div>
+                </form>
               </div>
             </div>
-
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-2">ជំនួយរហ័ស</h3>
-              <p className="text-gray-700">
-                ដើម្បីទទួលបានជំនួយលឿន សូមបញ្ចូលអ៊ីមែលសមាជិកភាព និងពិពណ៌នាបញ្ហារបស់អ្នកឱ្យខ្លី។
-              </p>
-            </div>
-          </div>
-
-          <div className="lg:col-span-7">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 sm:p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">ផ្ញើសារមកយើង</h2>
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">ឈ្មោះពេញ</label>
-                    <input
-                      type="text"
-                      value={form.fullName}
-                      onChange={handleChange("fullName")}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-(--brown)"
-                      placeholder="ឈ្មោះរបស់អ្នក"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">អ៊ីមែល</label>
-                    <input
-                      type="email"
-                      value={form.email}
-                      onChange={handleChange("email")}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-(--brown)"
-                      placeholder="you@example.com"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">ទូរស័ព្ទ</label>
-                    <input
-                      type="tel"
-                      value={form.phone}
-                      onChange={handleChange("phone")}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-(--brown)"
-                      placeholder="ជាជម្រើស"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">ប្រធានបទ</label>
-                    <input
-                      type="text"
-                      value={form.subject}
-                      onChange={handleChange("subject")}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-(--brown)"
-                      placeholder="តើយើងអាចជួយអ្វីបាន?"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">សារ</label>
-                  <textarea
-                    value={form.message}
-                    onChange={handleChange("message")}
-                    rows={6}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-(--brown)"
-                    placeholder="សរសេរសាររបស់អ្នកនៅទីនេះ..."
-                  />
-                </div>
-
-                <div className="flex items-center justify-end">
-                  <Button type="submit" variant="primary" disabled={isSubmitting}>
-                    {isSubmitting ? "កំពុងផ្ញើ..." : "ផ្ញើសារ"}
-                  </Button>
-                </div>
-              </form>
-            </div>
-          </div>
+          </article>
         </div>
       </section>
     </>

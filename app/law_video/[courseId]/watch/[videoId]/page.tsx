@@ -221,7 +221,7 @@ export default function WatchVideoPage() {
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
                     <div className="w-12 h-12 rounded-full border-4 border-white/20 border-t-white animate-spin" />
                     <p className="text-sm text-gray-300">
-                      {membershipLoading ? "កំពុងពិនិត្យសមាជិកភាព..." : "កំពុងផ្ទុក..."}
+                      {membershipLoading ? "កំពុងពិនិត្យសមាជិក..." : "កំពុងផ្ទុក..."}
                     </p>
                   </div>
                 ) : error ? (
@@ -252,7 +252,7 @@ export default function WatchVideoPage() {
                         <div className="flex justify-center mb-4 text-gray-400">
                           <LockIcon />
                         </div>
-                        <h2 className="text-2xl font-bold mb-3">ត្រូវការសមាជិកភាព</h2>
+                        <h2 className="text-2xl font-bold mb-3">ត្រូវការសមាជិក</h2>
                         <p className="text-gray-300 text-sm leading-relaxed mb-6">
                           មេរៀននេះសម្រាប់សមាជិកប៉ុណ្ណោះ។ សូមជ្រើសមេរៀនឥតគិតថ្លៃក្នុងបញ្ជី ឬចួលជាសមាជិកដើម្បីមើលពេញលេញ។
                         </p>
@@ -506,7 +506,7 @@ export default function WatchVideoPage() {
                             ) : isApproved ? (
                               <p className="text-[11px] text-emerald-700 mt-1 font-medium">ចូលប្រើបាន</p>
                             ) : (
-                              <p className="text-[11px] text-amber-700 mt-1 font-medium">សមាជិកភាព</p>
+                              <p className="text-[11px] text-amber-700 mt-1 font-medium">សមាជិក</p>
                             )}
                           </div>
                         </button>

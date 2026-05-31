@@ -139,7 +139,7 @@ function PaymentSuccessContent() {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">កំពុងដំណើរការការទូទាត់</h2>
             <p className="text-gray-600 mb-6">
-              ការទូទាត់របស់អ្នកកំពុងត្រូវបានបញ្ជាក់។ សមាជិកភាពរបស់អ្នកនឹងបើកដំណើរការក្នុងរយៈពេលពីរបីនាទី។
+              ការទូទាត់របស់អ្នកកំពុងត្រូវបានបញ្ជាក់។ សមាជិករបស់អ្នកនឹងបើកដំណើរការក្នុងរយៈពេលពីរបីនាទី។
             </p>
             {barayRef && (
               <div className="bg-gray-50 rounded-lg p-4 mb-6">

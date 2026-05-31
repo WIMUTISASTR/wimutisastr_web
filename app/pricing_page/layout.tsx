@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "តម្លៃ និងសមាជិកភាព",
+  title: "តម្លៃ និងសមាជិក",
   description:
-    "មើលគម្រោងសមាជិកភាព WIMUTISASTR — ចូលប្រើវីដេអូ និងឯកសារច្បាប់ពេញលេញពីអ្នកជំនាញ។",
+    "មើលគម្រោងសមាជិក WIMUTISASTR — ចូលប្រើវីដេអូ និងឯកសារច្បាប់ពេញលេញពីអ្នកជំនាញ។",
   path: "/pricing_page",
 });
 

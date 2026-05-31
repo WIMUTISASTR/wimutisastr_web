@@ -41,6 +41,45 @@ export const CONTACT_PHONE_DISPLAY = "012 227 202";
 /** International display with country code. */
 export const CONTACT_PHONE_INTL_DISPLAY = "+855 12 227 202";
 
+export type SocialPlatform = "facebook" | "telegram" | "youtube";
+
+export type SocialLink = {
+  platform: SocialPlatform;
+  label: string;
+  href: string;
+};
+
+function readPublicUrl(key: string, fallback = ""): string {
+  return process.env[key]?.trim() || fallback;
+}
+
+/** Public social profiles — override via NEXT_PUBLIC_SOCIAL_* in .env */
+export const SOCIAL_LINKS: SocialLink[] = [
+  {
+    platform: "facebook",
+    label: "Facebook",
+    href: readPublicUrl(
+      "NEXT_PUBLIC_SOCIAL_FACEBOOK_URL",
+      "https://www.facebook.com/profile.php?id=61567180603365",
+    ),
+  },
+  {
+    platform: "telegram",
+    label: "Telegram",
+    href: readPublicUrl("NEXT_PUBLIC_SOCIAL_TELEGRAM_URL", "https://t.me/lawyermenvuth"),
+  },
+  {
+    platform: "youtube",
+    label: "YouTube",
+    href: readPublicUrl(
+      "NEXT_PUBLIC_SOCIAL_YOUTUBE_URL",
+      "https://www.youtube.com/channel/UCkGdVadZz0Hqsvu8lonQdhQ",
+    ),
+  },
+];
+
+export const SOCIAL_LINKS_ACTIVE = SOCIAL_LINKS.filter((link) => link.href.length > 0);
+
 /** Production fallback when env is unset (e.g. local dev sitemap preview). */
 const PRODUCTION_SITE_URL = "https://wimutisastr.com";
 

@@ -182,9 +182,9 @@ function PaymentPageContent() {
           </div>
           <div className="absolute inset-0 bg-slate-900/65 z-10" />
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20 text-center">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4">សមាជិកភាពរបស់អ្នកសកម្មរួចហើយ</h1>
+            <h1 className="text-4xl sm:text-5xl font-bold mb-4">សមាជិករបស់អ្នកសកម្មរួចហើយ</h1>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              អ្នកមានសមាជិកភាពពេញលេញ — មិនចាំបាច់ទូទាត់ម្តងទៀតទេ
+              អ្នកមានសមាជិកពេញលេញ — មិនចាំបាច់ទូទាត់ម្តងទៀតទេ
             </p>
           </div>
         </section>
@@ -198,7 +198,7 @@ function PaymentPageContent() {
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">បានទទួល</h2>
             <p className="text-sm text-gray-600 mb-6">
-              សមាជិកភាពរបស់អ្នកមានសុពលភាពរហូតដល់{" "}
+              សមាជិករបស់អ្នកមានសុពលភាពរហូតដល់{" "}
               <span className="font-semibold text-gray-900">
                 {formatMembershipDateTime(membershipEndsAt)}
               </span>

@@ -1,146 +1,169 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
-import { EXPERT_EXPERIENCE, EXPERT_SPECIALIZATIONS } from "../_data/team";
-import { CONTACT_PHONE, CONTACT_PHONE_DISPLAY } from "@/lib/seo/site";
+import type { LeadExpert } from "../_data/team";
+import { LEAD_EXPERT } from "../_data/team";
 import SectionHeading from "./SectionHeading";
 
-function InfoCard({ title, children }: { title: string; children: ReactNode }) {
+function ProfileSection({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <article className="rounded-2xl border border-(--gray-200) bg-white p-7 shadow-sm scroll-animate">
-      <h3 className="text-xl font-semibold text-(--ink)">{title}</h3>
-      <div className="mt-5 space-y-4 text-(--gray-700)">{children}</div>
-    </article>
+    <section>
+      <h4 className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-(--primary)">
+        <span className="h-px flex-1 bg-(--gray-200)" aria-hidden />
+        {title}
+        <span className="h-px flex-1 bg-(--gray-200)" aria-hidden />
+      </h4>
+      <div className="mt-6">{children}</div>
+    </section>
+  );
+}
+
+function MetaLink({
+  href,
+  label,
+  external,
+}: {
+  href: string;
+  label: string;
+  external?: boolean;
+}) {
+  return (
+    <a
+      href={href}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noreferrer" : undefined}
+      className="inline-flex items-center gap-2 text-sm text-white/90 transition-colors duration-200 hover:text-white cursor-pointer"
+    >
+      <span className="h-1 w-1 shrink-0 rounded-full bg-(--accent-light)" aria-hidden />
+      <span>{label}</span>
+    </a>
   );
 }
 
 export default function LeadExpertSection() {
+  const expert: LeadExpert = LEAD_EXPERT;
+
   return (
-    <section className="bg-white py-16 sm:py-20 lg:py-24">
+    <section className="border-t border-(--gray-200) bg-(--gray-50) py-16 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow="អ្នកជំនាញដឹកនាំ"
           title="ស្គាល់អ្នកជំនាញរបស់យើង"
           description="ឯកសារ និងវីដេអូទាំងអស់ត្រូវបានរៀបចំយ៉ាងម៉ត់ចត់ដោយអ្នកជំនាញច្បាប់ដែលមានបទពិសោធន៍របស់យើង។"
-          className="mb-14"
+          className="mb-12"
         />
 
-        <div className="grid items-start gap-12 lg:grid-cols-12 lg:gap-14">
-          <div className="scroll-animate delay-100 lg:col-span-5">
-            <div className="relative mx-auto aspect-4/5 max-w-xs overflow-hidden shadow-lg">
-              <Image
-                src="/asset/teacherImage.png"
-                alt="Men Vuth"
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 320px"
-                priority
-              />
-            </div>
-          </div>
+        <article className="scroll-animate overflow-hidden border border-(--gray-200) bg-white">
+          {/* Profile header */}
+          <header
+            className="relative px-6 py-10 sm:px-10 sm:py-12"
+            style={{
+              background:
+                "linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 55%, color-mix(in srgb, var(--primary-light) 85%, var(--primary)) 100%)",
+            }}
+          >
+            <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-(--accent-light) opacity-[0.08] blur-3xl" aria-hidden />
+            <div className="pointer-events-none absolute -bottom-20 -left-10 h-56 w-56 rounded-full bg-(--accent) opacity-[0.06] blur-3xl" aria-hidden />
 
-          <div className="space-y-8 lg:col-span-7 scroll-animate delay-200">
-            <div>
-              <h3 className="text-3xl font-semibold text-(--ink) sm:text-4xl">Men Vuth</h3>
-              <p className="mt-2 text-lg font-medium text-(--primary)">អ្នកជំនាញច្បាប់</p>
-              <p className="mt-4 leading-relaxed text-(--gray-700)">
-                ឯកសារ និងវីដេអូទាំងអស់លើវេទិកានេះត្រូវបានរៀបចំដោយអ្នកជំនាញច្បាប់របស់យើង ដើម្បីផ្តល់ចំណេះដឹងដែលអាចអនុវត្តបានជាក់ស្តែង។
-              </p>
-            </div>
+            <div className="relative flex flex-col items-center gap-8 lg:flex-row lg:items-start lg:gap-12">
+              <div className="relative h-44 w-36 shrink-0 overflow-hidden ring-2 ring-white/20 sm:h-52 sm:w-40 lg:h-56 lg:w-44">
+                <Image
+                  src={expert.image}
+                  alt={expert.imageAlt}
+                  fill
+                  className="object-cover"
+                  sizes="160px"
+                  priority
+                />
+              </div>
 
-            <div className="rounded-2xl border border-(--gray-200) bg-(--gray-50) p-6">
-              <h4 className="font-semibold text-(--ink)">ជំនាញឯកទេស</h4>
-              <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-                {EXPERT_SPECIALIZATIONS.map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm text-(--gray-700)">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-(--primary)" aria-hidden />
+              <div className="min-w-0 flex-1 text-center lg:text-left">
+                <p className="text-sm font-medium tracking-wide text-(--accent-light)">{expert.nameLatin}</p>
+                <h3 className="mt-1 text-2xl font-semibold text-white sm:text-3xl lg:text-4xl">{expert.nameKh}</h3>
+                <p className="mt-2 text-base font-medium text-white/90 sm:text-lg">{expert.title}</p>
+                <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-white/75 lg:mx-0 lg:max-w-none lg:text-base">
+                  {expert.bio}
+                </p>
+
+                <div className="mt-6 flex flex-col gap-3 border-t border-white/15 pt-6 sm:flex-row sm:flex-wrap sm:gap-x-8 sm:gap-y-2">
+                  <MetaLink href={`tel:${expert.contact.phone}`} label={expert.contact.phone} />
+                  <MetaLink href={`mailto:${expert.contact.email}`} label={expert.contact.email} />
+                  {expert.contact.facebook ? (
+                    <MetaLink href={expert.contact.facebook} label="Facebook" external />
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {/* Unified body */}
+          <div className="space-y-12 px-6 py-10 sm:px-10 sm:py-12">
+            <ProfileSection title="ជំនាញឯកទេស">
+              <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {expert.specializations.map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-start gap-3 bg-(--gray-50) px-4 py-3 text-sm leading-relaxed text-(--gray-700)"
+                  >
+                    <span className="mt-2 h-1 w-4 shrink-0 rounded-full bg-(--primary)" aria-hidden />
                     {item}
                   </li>
                 ))}
               </ul>
+            </ProfileSection>
+
+            <ProfileSection title="បទពិសោធន៍វិជ្ជាជីវៈ">
+              <ol className="divide-y divide-(--gray-100)">
+                {expert.experience.map((item, index) => (
+                  <li
+                    key={`${item.period}-${index}`}
+                    className="grid gap-2 py-5 first:pt-0 last:pb-0 sm:grid-cols-[12rem_1fr] sm:gap-8 lg:grid-cols-[16rem_1fr]"
+                  >
+                    <div className="flex flex-wrap items-center gap-2 sm:flex-col sm:items-start">
+                      <p className="text-sm font-semibold text-(--ink)">{item.period}</p>
+                      {item.ongoing ? (
+                        <span className="bg-(--primary)/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-(--primary)">
+                          បច្ចុប្បន្ន
+                        </span>
+                      ) : null}
+                    </div>
+                    <p className="text-sm leading-relaxed text-(--gray-700)">{item.title}</p>
+                  </li>
+                ))}
+              </ol>
+            </ProfileSection>
+
+            <div className="grid gap-12 lg:grid-cols-2">
+              <ProfileSection title="ការអប់រំ">
+                <ul className="space-y-5">
+                  {expert.education.map((item) => (
+                    <li key={item.period} className="border-l-2 border-(--primary)/30 pl-4">
+                      <p className="text-sm font-semibold text-(--ink)">{item.period}</p>
+                      <p className="mt-1.5 text-sm leading-relaxed text-(--gray-700)">{item.detail}</p>
+                    </li>
+                  ))}
+                </ul>
+              </ProfileSection>
+
+              <ProfileSection title="ព័ត៌មានបន្ថែម">
+                <dl className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
+                  {[
+                    { label: "ភេទ", value: expert.personal.gender },
+                    { label: "សញ្ជាតិ", value: expert.personal.nationality },
+                    { label: "ថ្ងៃកំណើត", value: expert.personal.dateOfBirth },
+                    { label: "ភាសា", value: expert.languages.join(" · ") },
+                    { label: "ទីកន្លែងកំណើត", value: expert.personal.birthplace, wide: true },
+                    { label: "អាសយដ្ឋាន", value: expert.contact.address, wide: true },
+                  ].map((row) => (
+                    <div key={row.label} className={row.wide ? "sm:col-span-2" : undefined}>
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-(--gray-700)">{row.label}</dt>
+                      <dd className="mt-1 text-sm leading-relaxed text-(--ink)">{row.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </ProfileSection>
             </div>
           </div>
-        </div>
-
-        <div className="mt-12 grid gap-6 md:grid-cols-2">
-          <InfoCard title="ព័ត៌មានផ្ទាល់ខ្លួន">
-            <p>
-              <span className="font-semibold text-(--ink)">ឈ្មោះពេញ:</span> Men Vuth
-            </p>
-            <p>
-              <span className="font-semibold text-(--ink)">ភេទ:</span> ប្រុស
-            </p>
-            <p>
-              <span className="font-semibold text-(--ink)">សញ្ជាតិ:</span> ខ្មែរ
-            </p>
-            <p>
-              <span className="font-semibold text-(--ink)">ថ្ងៃខែឆ្នាំកំណើត:</span> 5 ឧសភា 1984
-            </p>
-            <p>
-              <span className="font-semibold text-(--ink)">ទីកន្លែងកំណើត:</span> ភូមិតាកវ៉ាន់ ឃុំឧត្តមសុរិយា ស្រុកត្រាំកក់ ខេត្តតាកែវ
-            </p>
-          </InfoCard>
-
-          <InfoCard title="ការអប់រំ">
-            <div>
-              <p className="font-semibold text-(--ink)">2006–2010</p>
-              <p className="text-sm">
-                បរិញ្ញាបត្រនីតិសាស្ត្រ (ឯកទេសភាសាបារាំង), សាកលវិទ្យាល័យភូមិន្ទនីតិសាស្ត្រ និងវិទ្យាសាស្ត្រសេដ្ឋកិច្ច
-              </p>
-            </div>
-            <div>
-              <p className="font-semibold text-(--ink)">2010–2013</p>
-              <p className="text-sm">
-                បរិញ្ញាបត្រជាន់ខ្ពស់ផ្នែកច្បាប់អន្តរជាតិ និងប្រៀបធៀប, សាកលវិទ្យាល័យ Lyon II និង សាកលវិទ្យាល័យភូមិន្ទនីតិសាស្ត្រ
-              </p>
-            </div>
-          </InfoCard>
-        </div>
-
-        <article className="mt-6 rounded-2xl border border-(--gray-200) bg-white p-7 shadow-sm scroll-animate delay-100">
-          <h3 className="text-xl font-semibold text-(--ink)">បទពិសោធន៍វិជ្ជាជីវៈ</h3>
-          <ul className="mt-6 space-y-5">
-            {EXPERT_EXPERIENCE.map((item) => (
-              <li key={item.period} className="border-l-4 border-(--primary) pl-5">
-                <p className="font-semibold text-(--ink)">{item.period}</p>
-                <p className="mt-1 text-sm text-(--gray-700)">{item.detail}</p>
-              </li>
-            ))}
-          </ul>
         </article>
-
-        <div className="mt-6 grid gap-6 md:grid-cols-2">
-          <InfoCard title="ភាសា">
-            <ul className="space-y-2">
-              {["ខ្មែរ — ភាសាកំណើត", "អង់គ្លេស", "បារាំង"].map((lang) => (
-                <li key={lang} className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-(--primary)" aria-hidden />
-                  {lang}
-                </li>
-              ))}
-            </ul>
-          </InfoCard>
-
-          <InfoCard title="ព័ត៌មានទំនាក់ទំនង">
-            <p>
-              <span className="font-semibold text-(--ink)">ទូរស័ព្ទ:</span>{" "}
-              <a href={`tel:${CONTACT_PHONE}`} className="text-(--primary) hover:underline cursor-pointer">
-                {CONTACT_PHONE_DISPLAY}
-              </a>
-            </p>
-            <p>
-              <span className="font-semibold text-(--ink)">អ៊ីមែល:</span>{" "}
-              <a href="mailto:vuthmen5@gmail.com" className="text-(--primary) hover:underline cursor-pointer">
-                vuthmen5@gmail.com
-              </a>
-            </p>
-            <p>
-              <span className="font-semibold text-(--ink)">អាសយដ្ឋាន:</span>{" "}
-              <span className="text-sm">
-                ផ្ទះលេខ 24Q ផ្លូវលេខ 36 ភូមិភ្នំពេញថ្មី ឃុំព្រែកអញ្ចាញ ស្រុកមុខកំពូល ខេត្តកណ្ដាល
-              </span>
-            </p>
-          </InfoCard>
-        </div>
       </div>
     </section>
   );

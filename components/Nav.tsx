@@ -99,6 +99,16 @@ export default function Nav() {
             >
               អំពីយើង
             </Link>
+            <Link
+              href="/contact"
+              className={`px-4 py-2 rounded-md transition-all duration-300 font-semibold text-sm ${
+                pathname === "/contact"
+                  ? "bg-(--primary) text-white"
+                  : "text-(--gray-700) hover:text-(--primary) hover:bg-(--gray-100)"
+              }`}
+            >
+              ទាក់ទងមកយើង
+            </Link>
           </div>
 
           {/* Desktop Auth Buttons */}
@@ -232,6 +242,17 @@ export default function Nav() {
               }`}
             >
               អំពីយើង
+            </Link>
+            <Link
+              href="/contact"
+              onClick={() => setIsMenuOpen(false)}
+              className={`px-4 py-3 rounded-xl transition-all duration-300 font-semibold text-sm ${
+                pathname === "/contact"
+                  ? "bg-(--primary) text-white shadow-md"
+                  : "text-(--gray-700) hover:bg-(--gray-100) hover:text-(--primary)"
+              }`}
+            >
+              ទាក់ទងមកយើង
             </Link>
             <div className="pt-3 border-t border-gray-200 mt-2 space-y-2">
               {!loading && (

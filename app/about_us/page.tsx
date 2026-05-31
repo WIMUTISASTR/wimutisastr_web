@@ -1,7 +1,6 @@
 "use client";
 
 import PageContainer from "@/components/PageContainer";
-import ContactContent from "@/components/contact/ContactContent";
 import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
 import AboutHero from "./_components/AboutHero";
 import LeadExpertSection from "./_components/LeadExpertSection";
@@ -18,7 +17,6 @@ export default function AboutUsPage() {
       <MissionSection />
       <TeamSection members={TEAM_MEMBERS} />
       <LeadExpertSection />
-      <ContactContent />
     </PageContainer>
   );
 }

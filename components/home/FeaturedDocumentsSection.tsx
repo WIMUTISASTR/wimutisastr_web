@@ -60,7 +60,7 @@ export default function FeaturedDocumentsSection({ home, hasPaid, isLoading = fa
               href={libraryHref}
               className="inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-(--primary) underline-offset-4 transition-colors hover:text-(--primary-dark) hover:underline"
             >
-              {hasPaid ? "មើលឯកសារទាំងអស់" : "មើលគម្រោងសមាជិកភាព"}
+              {hasPaid ? "មើលឯកសារទាំងអស់" : "មើលគម្រោងសមាជិក"}
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
@@ -84,7 +84,7 @@ export default function FeaturedDocumentsSection({ home, hasPaid, isLoading = fa
               href={libraryHref}
               className="mt-4 inline-flex text-sm font-semibold text-(--primary) underline-offset-4 transition-colors hover:underline"
             >
-              {hasPaid ? "រកមើលឯកសារច្បាប់" : "មើលគម្រោងសមាជិកភាព"}
+              {hasPaid ? "រកមើលឯកសារច្បាប់" : "មើលគម្រោងសមាជិក"}
             </Link>
           </div>
         ) : (

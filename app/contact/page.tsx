@@ -1,11 +1,12 @@
 "use client";
- import PageContainer from "@/components/PageContainer";
+
+import PageContainer from "@/components/PageContainer";
 import ContactContent from "@/components/contact/ContactContent";
- 
- export default function ContactPage() {
-   return (
-     <PageContainer>
+
+export default function ContactPage() {
+  return (
+    <PageContainer className="pt-0">
       <ContactContent />
-     </PageContainer>
-   );
- }
+    </PageContainer>
+  );
+}

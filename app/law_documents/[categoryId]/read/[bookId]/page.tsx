@@ -310,7 +310,7 @@ export default function ReadDocumentPage() {
               <div className="px-3 py-12 text-center text-gray-600 sm:py-16">រកមិនឃើញឯកសារ។</div>
             ) : membershipLoading ? (
               <div className="px-3 py-12 sm:py-16">
-                <LoadingState label="កំពុងពិនិត្យសមាជិកភាព..." />
+                <LoadingState label="កំពុងពិនិត្យសមាជិក..." />
               </div>
             ) : !isFree && membershipStatus !== "approved" ? (
               <div className="mx-3 rounded-2xl border border-slate-200 bg-white px-5 py-12 text-center shadow-sm sm:mx-0 sm:px-10 sm:py-16">
@@ -324,7 +324,7 @@ export default function ReadDocumentPage() {
                     />
                   </svg>
                 </div>
-                <h2 className="mt-5 text-lg font-semibold text-slate-900 sm:text-xl">ត្រូវការសមាជិកភាព</h2>
+                <h2 className="mt-5 text-lg font-semibold text-slate-900 sm:text-xl">ត្រូវការសមាជិក</h2>
                 <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-600">
                   អ្នកអាចរកមើលប្រភេទ និងគម្របបាន ប៉ុន្តែការអានឯកសារគឺសម្រាប់សមាជិកប៉ុណ្ណោះ។
                 </p>

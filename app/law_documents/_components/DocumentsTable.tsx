@@ -244,8 +244,8 @@ export default function DocumentsTable({
                     <button
                       type="button"
                       onClick={() => handleOpen(doc)}
-                      title={isLocked ? "ត្រូវការសមាជិកភាព" : "អានឯកសារ"}
-                      aria-label={isLocked ? "ត្រូវការសមាជិកភាព" : "អានឯកសារ"}
+                      title={isLocked ? "ត្រូវការសមាជិក" : "អានឯកសារ"}
+                      aria-label={isLocked ? "ត្រូវការសមាជិក" : "អានឯកសារ"}
                       className={`inline-flex h-10 w-10 items-center justify-center rounded-lg border transition-all ${
                         isLocked
                           ? "border-slate-200 bg-slate-50 text-slate-400 hover:border-slate-300 hover:bg-slate-100"
